@@ -1,0 +1,1762 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Inner Shadow Circle</title>
+<meta name="description" content="Inner Shadow Circle: schaduwwerk in een groep. Elke maandag een gratis cirkel.">
+<meta name="theme-color" content="#060709">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 fill=%27%23060709%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%279%27 fill=%27%23000%27 stroke=%27%23eceef1%27 stroke-width=%271.5%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- fonts load without blocking the first paint; the opening waits for them (see "opening sequence") -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400..500&family=Sofia+Sans:wght@400..700&family=Sofia+Sans+Extra+Condensed:wght@600..900&family=Sofia+Sans+Semi+Condensed:wght@400..700&display=swap">
+<link id="gf" rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400..500&family=Sofia+Sans:wght@400..700&family=Sofia+Sans+Extra+Condensed:wght@600..900&family=Sofia+Sans+Semi+Condensed:wght@400..700&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400..600;1,7..72,400..500&family=Sofia+Sans:wght@400..700&family=Sofia+Sans+Extra+Condensed:wght@600..900&family=Sofia+Sans+Semi+Condensed:wght@400..700&display=swap"></noscript>
+<script>
+  (function () {
+    var d = document.documentElement, l = 'nl';
+    try { var s = localStorage.getItem('isc-lang'); if (s === 'en' || s === 'nl') l = s; } catch (e) {}
+    if (l === 'en') d.classList.add('en');
+    d.lang = l;
+    d.classList.add('js');
+    var rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    d.classList.add(rm ? 'rm' : 'mo');
+  })();
+</script>
+<style>
+  /* FILM. One light source, black frames, title cards and subtitles.
+     Title cards are Extra Condensed, everything spoken or narrated is Semi Condensed.
+     Literata italic is kept for one thing only: the six sentences nobody says out loud.
+     Colour lives only inside the light. */
+  :root {
+    --night: #060709;
+    --pearl: #eceef1;
+    --sub: #f7f3ea;
+    --silver: #c4c8ce;
+    --dim: #959ba4;
+    --text: #dfe2e6;
+    --f-title: "Sofia Sans Extra Condensed", "Arial Narrow", sans-serif;
+    --f-sub: "Sofia Sans Semi Condensed", "Sofia Sans", Arial, sans-serif;
+    --f-text: "Sofia Sans", "Helvetica Neue", Arial, sans-serif;
+    --f-voice: "Literata", Georgia, "Times New Roman", serif;
+    --g: clamp(16px, 5.2vw, 84px);
+    --out: cubic-bezier(.16, 1, .3, 1);
+    --io: cubic-bezier(.65, 0, .35, 1);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--night); scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--night); color: var(--pearl);
+    font-family: var(--f-text); font-size: 1.0625rem; line-height: 1.6; font-weight: 400;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  main, footer { position: relative; z-index: 1; }
+  section { position: relative; overflow-x: clip; }
+  p { margin: 0; }
+  h1, h2, h3 { margin: 0; font-weight: inherit; }
+  a { color: inherit; }
+  ::selection { background: var(--pearl); color: var(--night); }
+  :focus-visible { outline: 2px solid var(--pearl); outline-offset: 4px; border-radius: 2px; }
+  [tabindex="-1"]:focus { outline: none; }
+  [hidden] { display: none !important; }
+  html:not(.en) [data-l="en"], html.en [data-l="nl"] { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* the light (one fixed WebGL canvas) and a still film grain that only textures the black */
+  #light { position: fixed; left: 0; top: 0; width: 100%; height: 100vh; z-index: 0; pointer-events: none; display: block; opacity: 0; }
+  .grain {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .045;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* type roles */
+  .card { font-family: var(--f-title); font-weight: 760; line-height: .9; letter-spacing: -.004em; text-wrap: balance; color: var(--pearl); }
+  .subtitle {
+    font-family: var(--f-sub); font-weight: 500; color: var(--sub); line-height: 1.24; letter-spacing: .002em; text-wrap: balance;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .95), 0 0 18px rgba(0, 0, 0, .8);
+  }
+  .cue { display: block; transition: opacity .9s var(--out); }
+  .js .sub-wait .cue { opacity: 0; }
+  .js .sub-wait.play .cue { opacity: 1; }
+  .js .fade { opacity: 0; transform: translateY(10px); transition: opacity .9s var(--out), transform 1.1s var(--out); }
+  .js .fade.in { opacity: 1; transform: none; }
+  .js .fade.d2 { transition-delay: .18s; }
+  .body-copy { color: var(--silver); max-width: 34rem; font-size: clamp(1.06rem, 1.25vw, 1.2rem); line-height: 1.55; text-wrap: pretty; }
+  .body-copy + .body-copy { margin-top: 1em; }
+
+  /* buttons: on hover the fill dims and a thin rim of light appears around it; the arrow leaves and comes back */
+  .btn {
+    position: relative; display: inline-flex; align-items: center; justify-content: center; gap: .7em;
+    min-height: 56px; padding: .9em 1.5em; border: 0; border-radius: 2px; cursor: pointer; text-decoration: none;
+    font-family: var(--f-sub); font-weight: 650; font-size: 1.06rem; letter-spacing: .005em; line-height: 1.1;
+    background: var(--pearl); color: var(--night);
+    box-shadow: 0 0 0 0 var(--night), 0 0 0 0 rgba(236, 238, 241, 0);
+    transition: transform .18s ease, background-color .35s ease, box-shadow .5s var(--out), color .35s ease;
+  }
+  .btn:hover { background-color: #dadde2; box-shadow: 0 0 0 4px var(--night), 0 0 0 5px rgba(236, 238, 241, .62); }
+  .btn:active { transform: translateY(1px); background-color: #c9cdd3; transition-duration: .06s; }
+  .btn .arr { display: inline-block; }
+  .btn:hover .arr { animation: arr .7s var(--out); }
+  @keyframes arr { 0% { transform: none; opacity: 1; } 38% { transform: translateX(14px); opacity: 0; } 39% { transform: translateX(-10px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+  .btn.line { background: transparent; color: var(--pearl); box-shadow: inset 0 0 0 1px rgba(236, 238, 241, .46); }
+  .btn.line:hover { background: rgba(236, 238, 241, .06); box-shadow: inset 0 0 0 1px rgba(236, 238, 241, .95); }
+  .btn.line:active { background-color: rgba(236, 238, 241, .12); }
+  .wa-ico { width: 1.2em; height: 1.2em; flex: none; }
+
+  .ulink { text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; padding-bottom: 2px; transition: background-size .5s var(--out); }
+  .ulink:hover { background-size: 0 1px; background-position: 100% 100%; }
+
+  /* NAV */
+  .nav {
+    position: fixed; z-index: 50; left: 0; right: 0; top: 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 1.2rem;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) var(--g) 14px;
+    transition: transform .7s var(--out), opacity 1.2s ease;
+  }
+  .nav::before { content: ""; position: absolute; inset: 0 0 -30px; z-index: -1; pointer-events: none; background: linear-gradient(rgba(6, 7, 9, .88), rgba(6, 7, 9, 0)); opacity: 0; transition: opacity .6s; }
+  .nav.scrolled::before { opacity: 1; }
+  .nav.away, .nav.hush { transform: translateY(-110%); }
+  .js .nav.pre { opacity: 0; pointer-events: none; }
+  .wm { font-family: var(--f-title); font-weight: 700; font-size: 1.42rem; letter-spacing: .015em; text-decoration: none; white-space: nowrap; line-height: 1; }
+  .links { display: flex; gap: clamp(1rem, 2vw, 2rem); }
+  .links a { font-family: var(--f-sub); font-size: .98rem; color: var(--silver); text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; padding-bottom: 2px; transition: color .3s, background-size .45s var(--out); }
+  .links a:hover { color: var(--pearl); background-size: 100% 1px; }
+  .nav-r { display: flex; align-items: center; gap: .9rem; }
+  .lang { display: inline-flex; gap: .1rem; }
+  .lang button {
+    position: relative; background: none; border: 0; cursor: pointer; padding: .5rem .45rem; min-width: 34px; min-height: 40px;
+    font-family: var(--f-sub); font-size: .95rem; font-weight: 600; color: var(--dim); transition: color .3s;
+  }
+  .lang button::after { content: ""; position: absolute; left: .45rem; right: .45rem; bottom: .42rem; height: 1px; background: var(--pearl); transform: scaleX(0); transition: transform .45s var(--out); }
+  .lang button:hover { color: var(--pearl); }
+  .lang button[aria-pressed="true"] { color: var(--pearl); }
+  .lang button[aria-pressed="true"]::after { transform: scaleX(1); }
+  .nav-cta { min-height: 40px; padding: .5rem .95rem; font-size: .96rem; }
+  .nav-cta:hover { box-shadow: 0 0 0 3px var(--night), 0 0 0 4px rgba(236, 238, 241, .55); }
+  @media (max-width: 920px) { .links { display: none; } }
+  @media (max-width: 400px) { .wm { font-size: 1.22rem; } .nav-r { gap: .35rem; } .nav-cta { padding: .5rem .7rem; } .lang button { min-width: 30px; padding: .5rem .35rem; } }
+
+  /* HERO: one frame on a single centre axis, like a projected shot. The light is the Feel first button:
+     the invitation is written on the black moon itself, and the whole moon is pressable. */
+  .hero {
+    min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    padding: calc(64px + env(safe-area-inset-top, 0px)) var(--g) clamp(22px, 4.5vh, 52px);
+  }
+  .feel {
+    position: relative; display: block; flex: none; border: 0; padding: 0; margin: 0; color: var(--pearl); font: inherit; cursor: pointer; background: none;
+    border-radius: 50%; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none;
+  }
+  .feel:focus-visible { outline: none; }
+  .feel:focus-visible .disc { box-shadow: 0 0 0 3px var(--night), 0 0 0 4px rgba(236, 238, 241, .7); }
+  .disc { display: block; width: clamp(220px, min(44vmin, 46vh), 500px); aspect-ratio: 1; border-radius: 50%; position: relative; }
+  /* the words on the moon: white subtitle type on the black disc */
+  .invite-t { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .55em; padding: 0 14%; pointer-events: none; }
+  .invite-t .l { font-family: var(--f-sub); font-weight: 600; font-size: clamp(1.2rem, 2.15vw, 2.15rem); line-height: 1.16; color: #fff; text-wrap: balance; }
+  .invite-t .l > span { background: linear-gradient(currentColor, currentColor) 50% 100% / 0 1px no-repeat; padding-bottom: 3px; transition: background-size .6s var(--out); }
+  .invite-t .m { display: inline-flex; align-items: center; gap: .5em; font-family: var(--f-sub); font-weight: 500; font-size: clamp(.92rem, 1.1vw, 1.1rem); color: #b9bec6; transition: color .4s ease; }
+  /* a tiny ring that breathes at the tempo of the guide (4.5s in, 2.5s still, 6s out) */
+  .invite-t .m i { width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.25px currentColor; flex: none; }
+  .mo .invite-t .m i { animation: bi 13s var(--io) infinite; }
+  @keyframes bi { 0% { transform: scale(.6); } 34.6% { transform: scale(1.25); } 53.8% { transform: scale(1.25); } 100% { transform: scale(.6); } }
+  .feel:hover .invite-t .l > span, .feel:focus-visible .invite-t .l > span { background-size: 100% 1px; }
+  .feel:hover .invite-t .m, .feel:focus-visible .invite-t .m { color: #fff; }
+  .js .invite-t { opacity: 0; transition: opacity 1.6s var(--out); }
+  .js .hero.invite .invite-t { opacity: 1; }
+  .feel:active .disc { transform: scale(.985); transition: transform .12s ease; }
+  .disc { transition: transform .5s var(--out); }
+
+  .hero h1 { margin-top: clamp(1.6rem, 5vh, 3.4rem); font-size: clamp(2.5rem, 4.9vw, 5.4rem); line-height: .92; text-shadow: 0 2px 24px rgba(0, 0, 0, .75); }
+  .hero h1 .br { display: inline; }
+  @media (min-width: 701px) { .hero h1 .cue { white-space: nowrap; } }
+  .hero-sub { margin-top: clamp(.9rem, 2.2vh, 1.4rem); max-width: 40rem; font-family: var(--f-sub); font-weight: 500; color: var(--text); font-size: clamp(1.08rem, 1.3vw, 1.25rem); line-height: 1.4; text-wrap: balance; }
+  .hero-act { margin-top: clamp(1.1rem, 2.8vh, 1.8rem); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .8rem 1.4rem; }
+  .hero-meta { font-family: var(--f-sub); font-weight: 500; color: var(--text); font-size: 1.02rem; }
+  .js .hero .late { opacity: 0; transition: opacity 1.4s var(--out); }
+  .js .hero.ready .late { opacity: 1; }
+  .js .hero.ready .late.l3 { transition-delay: .3s; }
+  @media (max-width: 700px) {
+    .hero { padding-top: calc(66px + env(safe-area-inset-top, 0px)); }
+    .disc { width: min(64vw, 33svh, 270px); }
+    .invite-t { padding: 0 15%; }
+    .invite-t .l { font-size: 1.06rem; }
+    .invite-t .m { font-size: .9rem; }
+    .hero h1 { font-size: clamp(2.05rem, 10.2vw, 3.3rem); margin-top: clamp(1.2rem, 3.4vh, 2rem); }
+    .hero h1 .cue:first-child { white-space: nowrap; }
+    .hero h1 .br { display: block; }
+    .hero-sub { font-size: 1.04rem; }
+    .hero-act { flex-direction: column; align-items: stretch; gap: .55rem; width: 100%; }
+    .hero-act .btn { width: 100%; }
+    .hero-meta { font-size: .96rem; }
+  }
+
+  /* UNSAID: a title card under the setting light, then six people. Each one has their own voice (typeface, cut, size, place
+     in the frame) and their own physical quality: a rack focus, a cut across the frame, words at subtitle pace, a slow push-in,
+     a whisper that takes its time, a hard cut. Between them, only a sliver of the light at the edge of the frame, lit from
+     somewhere else each time. Scroll is the projector: every line owns a stretch of scroll. */
+  .said-track { position: relative; }
+  .said { list-style: none; margin: 0; padding: 0; }
+  .said .title { font-size: clamp(2.6rem, 5.8vw, 6.2rem); max-width: 15ch; text-align: center; }
+  .said .line { margin: 0; color: var(--sub); text-wrap: balance; text-shadow: 0 1px 2px rgba(0, 0, 0, .95), 0 0 22px rgba(0, 0, 0, .85); }
+  .said .p2, .said .w { display: inline; }
+  /* envy: roman, heavy optical size, low on the left, the way you'd say it looking down */
+  .said .envy .line { font-family: var(--f-voice); font-style: normal; font-weight: 520; font-variation-settings: "opsz" 72; font-size: clamp(1.9rem, 3.6vw, 3.9rem); line-height: 1.1; letter-spacing: -.016em; max-width: 18ch; }
+  /* competition: the one italic; the second sentence cuts in on the other side of the frame */
+  .said .comp .line { font-family: var(--f-voice); font-style: italic; font-weight: 440; font-size: clamp(1.8rem, 3.3vw, 3.6rem); line-height: 1.14; width: 100%; max-width: 74rem; }
+  .said .comp .p1 { display: block; max-width: 15ch; }
+  .said .comp .p2 { display: block; margin: .9em 0 0 auto; max-width: 14ch; text-align: right; }
+  /* grief: tracked capitals, quiet and alone in a lot of black; the words arrive at the pace someone would say them */
+  .said .grief .line { font-family: var(--f-sub); font-weight: 500; text-transform: uppercase; letter-spacing: .15em; word-spacing: .08em; font-size: clamp(1.25rem, 1.75vw, 1.75rem); line-height: 1.6; max-width: 26ch; text-align: center; }
+  .said .grief .p2 { display: block; margin-top: .7em; color: #d3cfc6; }
+  /* fear: huge and close, roman Literata at display size */
+  .said .fear .line { font-family: var(--f-voice); font-weight: 560; font-variation-settings: "opsz" 72; font-size: clamp(2.4rem, 7vw, 8.2rem); line-height: 1; max-width: 15ch; letter-spacing: -.03em; transform-origin: 20% 50%; }
+  /* shame: lower case, small but legible, low on the right, further away */
+  .said .shame .line { font-family: var(--f-sub); font-weight: 400; text-transform: lowercase; font-size: clamp(1.45rem, 2vw, 2.05rem); letter-spacing: .02em; line-height: 1.32; color: #e7e3da; max-width: 22ch; text-align: right; }
+  html.en .said .shame .line { text-transform: none; }
+  /* anger stands up and fills the frame, in the title face */
+  .said .anger .line {
+    font-family: var(--f-title); font-weight: 820; font-size: clamp(3.2rem, 13.2vw, 15.5rem); line-height: .84;
+    letter-spacing: -.012em; color: var(--pearl); max-width: none; text-wrap: balance;
+  }
+  .said .cutline { font-size: clamp(2.8rem, 7vw, 7.4rem); max-width: 14ch; text-align: center; }
+  .mo .said-track { height: calc(100vh + 230vh); height: calc(100svh + 230svh); }
+  .mo .said-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  .mo .said li { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 14vh var(--g); opacity: 0; }
+  .mo .said li:first-child { opacity: 1; }
+  .mo .said .line { will-change: opacity, filter, transform; }
+  .mo .said .t-open { align-items: center; justify-content: center; padding-top: 34vh; padding-bottom: 8vh; }
+  .mo .said .envy { justify-content: flex-end; align-items: flex-start; padding-bottom: 15vh; }
+  .mo .said .comp { justify-content: center; align-items: stretch; }
+  .mo .said .grief { justify-content: center; align-items: center; padding-bottom: 16vh; }
+  .mo .said .fear { justify-content: center; align-items: flex-start; padding-left: calc(var(--g) * .7); }
+  .mo .said .shame { justify-content: flex-end; align-items: flex-end; padding-bottom: 12vh; }
+  .mo .said .anger { justify-content: center; align-items: flex-start; padding: 0 clamp(10px, 2.2vw, 36px); }
+  .mo .said .cut { justify-content: center; align-items: center; padding: 0 var(--g); }
+  .mo .said .grief .w { opacity: 0; }
+  html:not(.mo) .said { display: flex; flex-direction: column; gap: clamp(6rem, 16vh, 9rem); padding: 18vh var(--g); }
+  html:not(.mo) .said li { display: flex; flex-direction: column; align-items: flex-start; }
+  html:not(.mo) .said .t-open, html:not(.mo) .said .grief, html:not(.mo) .said .cut { align-items: center; }
+  html:not(.mo) .said .shame { align-items: flex-end; }
+  @media (max-width: 700px) {
+    /* the portrait frame is used top to bottom, so the cutting survives on a phone */
+    .mo .said li { padding-top: 11vh; padding-bottom: 11vh; }
+    .mo .said .t-open { padding-top: 30vh; }
+    .mo .said .envy { padding-bottom: 9vh; }
+    .mo .said .fear { padding-left: 12px; padding-right: 10px; }
+    .mo .said .shame { padding-bottom: 6vh; padding-right: 18px; }
+    .mo .said .anger { padding: 0 10px; }
+    .said .envy .line { font-size: clamp(1.9rem, 8.6vw, 2.5rem); }
+    .said .comp .line { font-size: clamp(1.75rem, 7.8vw, 2.3rem); }
+    .said .fear .line { font-size: clamp(2.6rem, 13vw, 3.8rem); letter-spacing: -.035em; line-height: .98; }
+    .said .grief .line { font-size: 1.12rem; letter-spacing: .12em; }
+    .said .shame .line { font-size: 1.24rem; max-width: 17ch; }
+    .said .anger .line { font-size: clamp(3.2rem, 19vw, 5.6rem); line-height: .86; }
+  }
+
+  /* CIRCLE: the body and the circle, one sticky scene. A title card over an empty room, then people walk in and sit down,
+     and as the ring closes the light comes back: the circle sits on the limb of a dim eclipse.
+     Everything that is said runs underneath, as subtitles. */
+  #circle-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .cues { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; pointer-events: none; }
+  .cues li { position: absolute; opacity: 0; }
+  .cues li:first-child { opacity: 1; }
+  .cues .cue-card { left: var(--g); right: var(--g); top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding-bottom: 8vh; }
+  .cues .subtitle {
+    left: 50%; bottom: max(7vh, 52px); transform: translateX(-50%); width: min(48rem, calc(100% - 2 * var(--g)));
+    text-align: center; font-size: clamp(1.3rem, 1.95vw, 1.85rem);
+  }
+  .cue-card h2 { font-size: clamp(2.8rem, 7vw, 7.6rem); max-width: 12ch; }
+  .circle-track { position: relative; height: calc(100vh + 8 * 38vh); height: calc(100svh + 8 * 38svh); }
+  .circle-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  @media (max-width: 760px) {
+    .cues .subtitle { font-size: clamp(1.16rem, 5.2vw, 1.42rem); bottom: max(6vh, 36px); }
+    .cue-card h2 { font-size: clamp(2.6rem, 12.4vw, 3.6rem); }
+  }
+
+  /* WHO: a wide shot. One sentence fills the frame; what it means runs underneath as a subtitle. */
+  .who { min-height: 100vh; min-height: 100svh; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 8vh; padding: 16vh var(--g) 9vh; }
+  .who h2 { align-self: center; font-size: clamp(3rem, 9.4vw, 11rem); line-height: .86; max-width: 12.5ch; }
+  .who-sub { justify-self: center; text-align: center; max-width: 46rem; }
+  .who-p { font-size: clamp(1.25rem, 1.8vw, 1.7rem); }
+  .who .note { margin-top: 1.4rem; font-family: var(--f-sub); font-size: clamp(1.04rem, 1.15vw, 1.14rem); line-height: 1.5; color: var(--silver); text-wrap: balance; }
+  .who .note strong { color: var(--pearl); font-weight: 600; }
+  @media (max-width: 600px) { .who h2 { font-size: clamp(2.8rem, 13vw, 3.9rem); } .who { padding-top: 12vh; gap: 6vh; } }
+
+  /* TEAM: a close-up. Four faces in one dark strip, edge to edge, lit one by one by the same lamp;
+     the names come up underneath like credits, then the two facts cut in like a title card. */
+  .team { padding: 16vh 0 12vh; }
+  .team h2 { padding: 0 var(--g); font-size: clamp(2.6rem, 5.4vw, 5.6rem); }
+  .cast-wrap { position: relative; margin-top: clamp(1.8rem, 5vh, 3.2rem); }
+  .cast { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+  .cast li { position: relative; }
+  .shot { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--night); isolation: isolate; }
+  /* one film stock for all four: near-monochrome, a hard contrast curve, and everything behind the head crushed to black */
+  .shot img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(.9) sepia(.08) contrast(1.26) brightness(var(--ex, 1)); }
+  .shot::after {
+    content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background:
+      radial-gradient(80% 66% at 50% 36%, rgba(6, 7, 9, 0) 38%, rgba(6, 7, 9, .45) 68%, rgba(6, 7, 9, .9) 100%),
+      linear-gradient(180deg, rgba(6, 7, 9, .55) 0%, rgba(6, 7, 9, 0) 30%, rgba(6, 7, 9, 0) 60%, rgba(6, 7, 9, 1) 100%);
+  }
+  .lamp { position: absolute; inset: 0; z-index: 3; pointer-events: none; background: var(--night); opacity: 0; }
+  .mo .lamp { opacity: .95; transition: opacity 1.5s var(--out) var(--d, 0s); }
+  .mo .cast-wrap.in .lamp { opacity: 0; }
+  .mo .cast-wrap.in .shot img { animation: lit 1.9s var(--out) var(--d, 0s) both; }
+  @keyframes lit { 0% { filter: grayscale(.9) sepia(.08) contrast(1.26) brightness(calc(var(--ex, 1) * .7)); } 45% { filter: grayscale(.9) sepia(.08) contrast(1.26) brightness(calc(var(--ex, 1) * 1.14)); } 100% { filter: grayscale(.9) sepia(.08) contrast(1.26) brightness(var(--ex, 1)); } }
+  .credit { position: relative; z-index: 4; margin-top: -2.2rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: .3rem; padding: 0 .5rem; }
+  .mo .credit { opacity: 0; transition: opacity .9s var(--out) calc(var(--d, 0s) + .45s); }
+  .mo .cast-wrap.in .credit { opacity: 1; }
+  .credit .n { font-family: var(--f-title); font-weight: 760; font-size: clamp(1.9rem, 2.8vw, 2.9rem); line-height: .9; color: #fff; }
+  .credit .r { font-family: var(--f-sub); font-weight: 500; color: var(--silver); font-size: 1rem; }
+  .credit .b { color: var(--silver); font-size: .95rem; max-width: 22rem; }
+  .team-low { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 var(--g); margin-top: clamp(4rem, 12vh, 7.5rem); }
+  .facts { font-size: clamp(2rem, 3.3vw, 3.4rem); line-height: 1; max-width: 100%; }
+  @media (min-width: 900px) { .facts .cue { white-space: nowrap; } }
+  .facts .cue { transition: none; }
+  .facts .cue + .cue { margin-top: .22em; color: var(--silver); }
+  .vo { margin-top: clamp(3rem, 9vh, 5.5rem); max-width: 46rem; }
+  .vo .said-by { font-size: clamp(1.22rem, 1.7vw, 1.6rem); line-height: 1.42; text-wrap: pretty; }
+  @media (max-width: 860px) {
+    .cast { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.6rem; }
+    .credit { margin-top: -1.8rem; }
+    .credit .n { font-size: clamp(1.7rem, 8vw, 2.3rem); }
+    .credit .r { font-size: .92rem; }
+  }
+
+  /* JOIN: Monday is a title card, and the evening is a duration */
+  .monday { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; padding: 9vh 0 8vh; }
+  .monday h2 { padding: 0 var(--g); font-size: clamp(1.5rem, 2.6vw, 2.5rem); text-align: left; }
+  .showtime { margin: clamp(.8rem, 2.4vh, 1.6rem) 0 0; font-family: var(--f-title); font-weight: 800; font-size: clamp(6rem, min(21vw, 31vh), 19rem); line-height: .8; letter-spacing: -.012em; color: var(--pearl); }
+  .showtime > span { display: block; }
+  .showtime .t1 { display: flex; align-items: baseline; padding-left: var(--g); margin-left: -.035em; }
+  .showtime .to { flex: 1; display: flex; align-items: baseline; gap: .6em; min-width: 0; padding-left: .35em; font-family: var(--f-sub); font-weight: 500; font-size: clamp(1.15rem, 2.2vw, 2.1rem); line-height: 1; color: var(--silver); letter-spacing: 0; }
+  .showtime .rule { flex: 1; height: 1px; min-width: 0; margin-right: var(--g); background: rgba(196, 200, 206, .55); transform-origin: 0 50%; transform: translateY(-.32em) scaleX(var(--k, 1)); }
+  .showtime .t2 { text-align: right; margin-right: -.035em; padding-right: var(--g); will-change: transform; }
+  .js .cutin .tn, .js .cutin .to { opacity: 0; }
+  .js .cutin.in .tn { opacity: 1; }
+  .js .cutin.in .to { opacity: 1; transition: opacity .8s var(--out) .45s; }
+  .mon-body { margin: clamp(2.4rem, 7vh, 4.4rem) auto 0; padding: 0 var(--g); max-width: 50rem; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .mon-body .subtitle { font-size: clamp(1.25rem, 1.8vw, 1.7rem); }
+  .mon-body .subtitle strong { font-weight: 650; color: #fff; }
+  .mon-body .btn { margin-top: clamp(1.6rem, 4vh, 2.4rem); }
+  @media (max-width: 600px) { .mon-body .btn { width: 100%; } .monday { min-height: 0; padding: 14vh 0 12vh; } .showtime { font-size: 27vw; } }
+
+  .agenda { padding: 4vh var(--g) 14vh; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .agenda h3 { font-family: var(--f-sub); font-weight: 500; font-size: clamp(1.4rem, 2.3vw, 2.2rem); line-height: 1.2; }
+  .events { list-style: none; margin: clamp(1.8rem, 5vh, 3rem) 0 0; padding: 0; display: grid; gap: clamp(2.4rem, 6vh, 3.4rem); max-width: 46rem; }
+  .ev { display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+  .ev-d { font-family: var(--f-sub); font-weight: 600; font-size: 1.12rem; color: var(--text); line-height: 1.3; }
+  .ev-d small { font-weight: 500; font-size: 1.12rem; color: var(--silver); margin-right: .4em; }
+  .ev-t { font-family: var(--f-title); font-weight: 760; font-size: clamp(2.4rem, 4.4vw, 4.4rem); line-height: .95; }
+  .ev-l { color: var(--text); font-family: var(--f-sub); font-size: clamp(1.1rem, 1.4vw, 1.3rem); max-width: 32rem; }
+  .ev-a { display: inline-block; margin-top: .6rem; font-family: var(--f-sub); font-weight: 600; font-size: 1.08rem; }
+
+  /* TEAMS: shot, reverse shot. The question on the left; a beat; the answer cuts in hard on the right.
+     Then a held black frame with the pitch underneath as subtitles. */
+  .teams { padding: 14vh var(--g) 16vh; }
+  .dialogue { list-style: none; margin: 0; padding: 0; min-height: min(62vh, 40rem); display: flex; flex-direction: column; justify-content: space-between; gap: 3rem; }
+  .dialogue li { font-family: var(--f-sub); font-weight: 500; font-size: clamp(2rem, 4.7vw, 5.2rem); line-height: 1.04; letter-spacing: -.01em; color: var(--sub); max-width: 13ch; text-wrap: balance; }
+  .dialogue .l2 { align-self: flex-end; text-align: right; color: var(--silver); }
+  .js .dialogue .l1 { opacity: 0; transform: translateY(8px); transition: opacity .9s var(--out), transform 1.1s var(--out); }
+  .js .dialogue .l2 { opacity: 0; }
+  .js .dialogue.l1-in .l1 { opacity: 1; transform: none; }
+  .js .dialogue.l2-in .l2 { opacity: 1; }
+  /* the cut: one frame of over-exposure on the answer while the question dips, the way a reverse shot lands */
+  .mo .dialogue.l2-in .l2 { animation: cutin .42s steps(1, end) both, expo .5s var(--out) .04s both; }
+  .mo .dialogue.l2-in .l1 { animation: dip .6s var(--out) both; }
+  @keyframes cutin { 0% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes expo { 0% { filter: brightness(2.4) blur(.6px); } 100% { filter: none; } }
+  @keyframes dip { 0% { opacity: .35; } 100% { opacity: 1; } }
+  .teams-body { margin: clamp(6rem, 20vh, 12rem) auto 0; max-width: 50rem; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .teams h2 { font-size: clamp(2.6rem, 5.6vw, 6rem); max-width: 14ch; }
+  .tsubs { margin-top: clamp(2rem, 6vh, 3.4rem); display: grid; gap: 1.1rem; }
+  .tsubs .subtitle { font-size: clamp(1.22rem, 1.7vw, 1.6rem); }
+  .tsubs .ask { margin-top: .8rem; color: var(--silver); font-size: clamp(1.08rem, 1.3vw, 1.24rem); }
+  .btn.big { min-height: 66px; padding: 1em 1.9em 1em 1.6em; font-size: clamp(1.12rem, 1.3vw, 1.26rem); gap: .8em; }
+  .btn.big .wa-ico { width: 1.4em; height: 1.4em; }
+  .teams-body .btn { margin-top: 2.2rem; }
+  .js .tsubs .cue { opacity: 0; transition: opacity 1s var(--out); }
+  .js .tsubs.play .cue { opacity: 1; }
+  @media (max-width: 600px) { .teams-body .btn { width: 100%; } .dialogue { min-height: 52vh; } .dialogue li { font-size: clamp(1.9rem, 9vw, 2.6rem); max-width: 12ch; } }
+
+  /* CLOSING: a held frame, the second title card of the film. The light comes back as big as it opened. */
+  .close-track { position: relative; height: calc(100vh + 40vh); height: calc(100svh + 40svh); }
+  .close-stage { position: sticky; top: 0; height: 100vh; height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 56px var(--g) 3vh; }
+  .close-slot { display: block; width: clamp(220px, min(44vmin, 46vh), 500px); aspect-ratio: 1; flex: none; }
+  .closing h2 { margin-top: clamp(1.6rem, 5vh, 3.4rem); font-size: clamp(2.3rem, 4.6vw, 5rem); line-height: .94; max-width: 26ch; }
+  .closing h2 .cue { transition: none; }
+  .closing .btn { margin-top: clamp(1.4rem, 3.6vh, 2.4rem); }
+  .js .closing .btn { opacity: 0; transition: opacity 1.1s var(--out), background-color .35s ease, box-shadow .5s var(--out); }
+  .js .closing.play .btn { opacity: 1; transition-delay: 2.6s, 0s, 0s; }
+  @media (min-width: 701px) { .closing h2 .cue { white-space: nowrap; } }
+  @media (max-width: 700px) { .close-slot { width: min(64vw, 33svh, 270px); } .closing h2 { font-size: clamp(2.2rem, 10.4vw, 3.2rem); } }
+  html:not(.mo) .close-track { height: auto; }
+  html:not(.mo) .close-stage { position: relative; min-height: 100vh; min-height: 100svh; }
+  /* the flash lifts the exposure of the whole frame for a moment */
+  .bloom { position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: 0; mix-blend-mode: screen;
+    background: radial-gradient(circle at var(--bx, 50%) var(--by, 40%), rgba(255, 250, 242, 1) 0%, rgba(255, 250, 242, .5) 35%, rgba(255, 250, 242, .18) 100%); }
+
+  /* FOOTER: the end credits. Roles on the left of a centre axis, names on the right. */
+  footer { padding: clamp(1rem, 4vh, 3rem) var(--g) calc(2.5rem + env(safe-area-inset-bottom, 0px)); text-align: center; color: var(--silver); font-size: .98rem; display: flex; flex-direction: column; align-items: center; }
+  .cr-wm { font-family: var(--f-title); font-weight: 760; font-size: clamp(2.2rem, 4.4vw, 3.6rem); line-height: 1; color: var(--pearl); }
+  .cr-line { margin-top: .6rem; font-family: var(--f-sub); }
+  .credits { margin: clamp(2.4rem, 6vh, 3.4rem) 0 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 1.6rem; row-gap: .55rem; width: min(100%, 40rem); }
+  .credits > div { display: contents; }
+  .credits dt { text-align: right; font-family: var(--f-sub); font-size: .95rem; color: var(--dim); line-height: 1.35; padding-top: .62rem; }
+  .credits dd { margin: 0; text-align: left; font-family: var(--f-sub); font-weight: 600; font-size: 1.05rem; color: var(--pearl); line-height: 1.35; padding-top: .55rem; text-wrap: balance; }
+  .credits .lang { margin: -.55rem 0 0 -.45rem; }
+  .crisis { margin-top: clamp(2.6rem, 7vh, 4rem); max-width: 31rem; color: var(--pearl); font-size: 1.02rem; line-height: 1.55; text-wrap: pretty; }
+  .crisis strong { font-weight: 650; }
+  .cr-legal { margin-top: 2.6rem; font-size: .9rem; color: var(--dim); }
+  @media (max-width: 420px) { .credits { column-gap: 1rem; } .credits dt { font-size: .9rem; } .credits dd { font-size: 1rem; } }
+
+  /* BREATH: the house lights go down, the eclipse becomes the breath */
+  .bo-black { position: fixed; inset: 0; z-index: 80; background: #000; opacity: 0; transition: opacity 1.1s ease; }
+  html.breathing #light { z-index: 81; }
+  .bo-ui { position: fixed; inset: 0; z-index: 82; pointer-events: none; }
+  .bar { position: absolute; left: 0; right: 0; height: 11vh; min-height: 64px; background: #000; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--g); transition: transform 1.1s var(--io); pointer-events: auto; }
+  .bar.top { top: 0; transform: translateY(-100%); padding-top: env(safe-area-inset-top, 0px); box-sizing: content-box; }
+  .bar.bot { bottom: 0; height: 16vh; min-height: 96px; transform: translateY(100%); justify-content: center; padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: content-box; pointer-events: none; }
+  html.bo-in .bo-black { opacity: 1; }
+  html.bo-in .bar { transform: none; }
+  .bo-btn {
+    display: inline-flex; align-items: center; gap: .55rem; background: none; border: 0; cursor: pointer; min-height: 44px; padding: .4rem .2rem;
+    font-family: var(--f-sub); font-weight: 600; font-size: 1rem; color: var(--silver); transition: color .3s;
+  }
+  .bo-btn:hover { color: var(--pearl); }
+  .bo-btn svg { width: 20px; height: 20px; }
+  /* feathered letterbox: the corona fades into the bars instead of being cut by a hard edge */
+  .bar.top::after, .bar.bot::before { content: ""; position: absolute; left: 0; right: 0; height: clamp(40px, 9vh, 110px); pointer-events: none; }
+  .bar.top::after { top: 100%; background: linear-gradient(#000, rgba(0, 0, 0, .55) 40%, rgba(0, 0, 0, 0)); }
+  .bar.bot::before { bottom: 100%; background: linear-gradient(0deg, #000, rgba(0, 0, 0, .55) 40%, rgba(0, 0, 0, 0)); }
+  /* sound: a small waveform that lies flat when off and moves when on */
+  .snd { gap: .7rem; font-size: 1.04rem; }
+  .wave { display: inline-flex; align-items: center; gap: 3px; height: 20px; }
+  .wave i { width: 2px; height: calc(var(--h) * .38); border-radius: 1px; background: currentColor; opacity: .7; transition: height .5s var(--out), opacity .5s; }
+  .snd[aria-pressed="true"] .wave i { opacity: 1; }
+  .snd[aria-pressed="true"] .wave i { height: var(--h); }
+  .mo .snd[aria-pressed="true"] .wave i { animation: wv 1.6s var(--io) infinite alternate; animation-delay: var(--dl); }
+  @keyframes wv { from { transform: scaleY(.45); } to { transform: scaleY(1); } }
+  .snd-hint { font-family: var(--f-sub); font-size: 1rem; color: var(--pearl); opacity: 0; transform: translateX(-6px); transition: opacity .9s var(--out), transform .9s var(--out); pointer-events: none; }
+  .snd-hint.on { opacity: .9; transform: none; }
+  .bar-l { display: flex; align-items: center; gap: 1rem; }
+  @media (max-width: 560px) { .snd-hint { display: none; } }
+  /* the three breaths, under the words */
+  .bo-dots { display: flex; justify-content: center; gap: 12px; margin-top: 14px; }
+  .bo-dots i { width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.25px rgba(236, 238, 241, .5); transition: background-color .8s ease, box-shadow .8s ease, transform .8s var(--out); }
+  .bo-dots i.now { box-shadow: inset 0 0 0 1.25px var(--pearl); transform: scale(1.25); }
+  .bo-dots i.done { background: var(--pearl); box-shadow: inset 0 0 0 1.25px var(--pearl); }
+  .bar.bot { flex-direction: column; }
+  .bo-dots { opacity: 0; transition: opacity .9s ease; }
+  .bo-dots.on { opacity: 1; }
+  /* the words live in the black bar itself, like real subtitles */
+  .bo-sub { margin: 0; text-align: center; font-size: clamp(2.1rem, 3.3vw, 3.3rem); line-height: 1; letter-spacing: .01em; opacity: 0; transition: opacity .55s ease; text-shadow: none; }
+  .bo-sub.on { opacity: 1; }
+  .bo-end { position: absolute; left: var(--g); right: var(--g); bottom: calc(max(16vh, 96px) + 3vh + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: center; text-align: center; gap: .9rem; pointer-events: none; opacity: 0; transition: opacity 1.2s ease; }
+  .bo-end.on { opacity: 1; pointer-events: auto; }
+  .bo-end .q { font-family: var(--f-sub); font-weight: 500; font-size: clamp(2rem, 3.8vw, 3.6rem); line-height: 1.08; max-width: 18ch; color: var(--sub); text-wrap: balance; }
+  .bo-end .s { font-family: var(--f-sub); color: var(--silver); max-width: 26rem; opacity: 0; transition: opacity 1.2s ease 1.8s; }
+  .bo-end.on .s { opacity: 1; }
+  /* "continue" is there from the start, quietly; after a while it comes forward */
+  .bo-go { margin-top: .6rem; opacity: .38; transition: opacity 1.6s var(--out); }
+  .bo-end.go .bo-go { opacity: 1; }
+  .bo-go .btn .arr { transition: transform .6s var(--out); }
+  .mo .bo-end.go .bo-go .arr { animation: nudge 2.6s var(--io) 3; }
+  @keyframes nudge { 0%, 100% { transform: none; } 50% { transform: translateY(4px); } }
+  html.bo-text-out .bo-sub, html.bo-text-out .bo-end { opacity: 0; transition: opacity .5s ease; }
+  html.bo-text-out .bar.top { transform: translateY(-100%); }
+  html.bo-text-out .bar.bot { transform: translateY(100%); }
+  html.bo-leave .bo-black { opacity: 0; transition-duration: 1.4s; }
+  html.breathing, html.breathing body { overflow: hidden; }
+  html.breathing .nav { opacity: 0; pointer-events: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .btn:hover .arr { animation: none; }
+    .bar { transition-duration: .01s; }
+  }
+</style>
+</head>
+<body>
+<canvas id="light" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav pre" id="nav">
+  <a class="wm" href="#top">Inner Shadow Circle</a>
+  <nav class="links" aria-label="Menu">
+    <a href="#cirkel"><span data-l="nl">De cirkel</span><span data-l="en">The circle</span></a>
+    <a href="#voor-wie"><span data-l="nl">Voor wie</span><span data-l="en">Who it’s for</span></a>
+    <a href="#wij"><span data-l="nl">Wij</span><span data-l="en">Us</span></a>
+    <a href="#agenda" data-events-link hidden><span data-l="nl">Agenda</span><span data-l="en">Events</span></a>
+    <a href="#teams"><span data-l="nl">Teams</span><span data-l="en">Teams</span></a>
+  </nav>
+  <div class="nav-r">
+    <div class="lang" role="group" aria-label="Taal / Language">
+      <button type="button" data-set="nl" aria-pressed="true">NL</button>
+      <button type="button" data-set="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="btn line nav-cta" id="nav-cta" data-signup href="#meedoen"><span data-l="nl">Aanmelden</span><span data-l="en">Sign up</span></a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- 1. OPENING: the light above, the title card below -->
+  <section class="hero" id="hero" aria-labelledby="hero-title">
+    <button class="feel" type="button" id="feel-open" aria-haspopup="dialog">
+      <span class="disc" id="hero-slot"></span>
+      <span class="invite-t">
+        <span class="sr"><span data-l="nl">Voel eerst:</span><span data-l="en">Feel first:</span></span>
+        <span class="l"><span><span data-l="nl">Adem eerst even mee met het licht</span><span data-l="en">Breathe with the light first</span></span></span>
+        <span class="m"><i aria-hidden="true"></i><span data-l="nl">1 minuut</span><span data-l="en">1 minute</span></span>
+      </span>
+    </button>
+    <h1 class="card sub-wait" id="hero-title">
+      <span data-l="nl"><span class="cue">De meeste mensen denken,</span><span class="cue">zodat ze niet hoeven <span class="br">te voelen.</span></span></span>
+      <span data-l="en"><span class="cue">Most people think,</span><span class="cue">so they don’t have <span class="br">to feel.</span></span></span>
+    </h1>
+    <p class="hero-sub late">
+      <span data-l="nl">Schaduwwerk in een groep: via het lijf naar wat je normaal nooit hardop zegt.</span>
+      <span data-l="en">Shadow work in a group: through the body, to what you never say out loud.</span>
+    </p>
+    <div class="hero-act late l3">
+      <a class="btn" id="hero-cta" data-signup href="#meedoen"><span data-l="nl">Meld je aan voor maandag</span><span data-l="en">Sign up for Monday</span><span class="arr" aria-hidden="true">&rarr;</span></a>
+      <p class="hero-meta"><span data-l="nl">Elke maandag, 18:30 tot 22:00, gratis</span><span data-l="en">Every Monday, 18:30 to 22:00, free</span></p>
+    </div>
+  </section>
+
+  <!-- 2. WHAT YOU DON'T SAY -->
+  <section id="onuitgesproken" aria-labelledby="unsaid-title">
+    <div class="said-track" id="said-track">
+      <div class="said-stage">
+        <ol class="said" id="said">
+          <li class="t-open">
+            <h2 class="card title" id="unsaid-title" tabindex="-1">
+              <span data-l="nl">Iedereen draagt een zin mee die nog nooit hardop is gezegd.</span>
+              <span data-l="en">Everyone carries a sentence they have never said out loud.</span>
+            </h2>
+          </li>
+          <li class="v envy"><p class="line"><span data-l="nl">Als het mijn beste vriend goed gaat, voel ik eerst iets wat geen blijdschap is.</span><span data-l="en">When my best friend does well, the first thing I feel isn’t joy.</span></p></li>
+          <li class="v comp"><p class="line"><span data-l="nl"><span class="p1">Ik hou bij wie het beter doet dan ik.</span> <span class="p2">Zelfs bij mijn eigen broer.</span></span><span data-l="en"><span class="p1">I keep score of who’s doing better than me.</span> <span class="p2">Even with my own brother.</span></span></p></li>
+          <li class="v grief"><p class="line"><span data-l="nl"><span class="w">Ik heb nooit</span> <span class="w">om mijn vader gerouwd.</span> <span class="p2"><span class="w">Ik ben gewoon</span> <span class="w">harder gaan werken.</span></span></span><span data-l="en"><span class="w">I never grieved</span> <span class="w">my father.</span> <span class="p2"><span class="w">I just started</span> <span class="w">working harder.</span></span></span></p></li>
+          <li class="v fear"><p class="line"><span data-l="nl">Ik ben doodsbang dat ze er ooit achter komen dat ik niet genoeg ben.</span><span data-l="en">I’m terrified they’ll find out one day that I’m not enough.</span></p></li>
+          <li class="v shame"><p class="line"><span data-l="nl">Ik schaam me voor hoe graag ik gezien wil worden.</span><span data-l="en">I’m ashamed of how badly I want to be seen.</span></p></li>
+          <li class="v anger"><p class="line"><span data-l="nl">Soms ben ik zo kwaad dat ik er zelf van schrik.</span><span data-l="en">Sometimes I get so angry it scares me.</span></p></li>
+          <li class="cut">
+            <p class="cutline card"><span data-l="nl">In de cirkel zeg je hem hardop, en niemand kijkt weg.</span><span data-l="en">In the circle you say it out loud, and nobody looks away.</span></p>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. THE BODY AND THE CIRCLE -->
+  <section id="cirkel" aria-labelledby="circle-title">
+    <div class="circle-track" id="circle-track">
+      <div class="circle-stage">
+        <canvas id="circle-canvas" aria-hidden="true"></canvas>
+        <ol class="cues" id="circle-cues">
+          <li class="cue-card">
+            <h2 class="card" id="circle-title"><span data-l="nl">We hebben allemaal al genoeg gepraat.</span><span data-l="en">We’ve all done enough talking.</span></h2>
+          </li>
+          <li class="subtitle"><span data-l="nl">Je kunt je pijn tot in detail uitleggen en hem nog steeds niet voelen. Dat kennen we van onszelf.</span><span data-l="en">You can explain your pain in detail and still not feel it. We know that one from ourselves.</span></li>
+          <li class="subtitle"><span data-l="nl">Daarom vertragen we, tot je merkt wat er in je lijf gebeurt: een dichte keel, of die knoop in je maag die er al jaren zit.</span><span data-l="en">So we slow down, until you notice what’s happening in your body: a tight throat, or that knot in your stomach that’s been there for years.</span></li>
+          <li class="subtitle"><span data-l="nl">Je komt binnen zoals je overal binnenkomt, met je verhaal al klaar en je schouders opgetrokken.</span><span data-l="en">You walk in the way you walk in everywhere, your story ready and your shoulders up.</span></li>
+          <li class="subtitle"><span data-l="nl">We gaan in een cirkel zitten, nooit met meer dan twaalf, zodat iedereen elkaar kan aankijken.</span><span data-l="en">We sit down in a circle, never more than twelve of us, so everyone can see everyone.</span></li>
+          <li class="subtitle"><span data-l="nl">Iemand stapt naar het midden. De rest van de groep blijft erbij, met volle aandacht.</span><span data-l="en">Someone steps into the center. The rest of the group stays with them, with full attention.</span></li>
+          <li class="subtitle"><span data-l="nl">Dan neemt het lijf het over. Stilte, diepe rust, tranen, trillen, schreeuwen, vechten. Het mag allemaal, en de groep voelt wat er nodig is.</span><span data-l="en">Then the body takes over. Silence, deep rest, tears, shaking, screaming, fighting. All of it is allowed, and the group feels what’s needed.</span></li>
+          <li class="subtitle"><span data-l="nl">Daarna schuif je terug in de cirkel en is een ander aan de beurt. Je zit er niet meer alleen mee.</span><span data-l="en">Then you slide back into the circle and it’s someone else’s turn. You’re not on your own with it anymore.</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. WHO IT IS FOR: a wide shot -->
+  <section class="who" id="voor-wie" aria-labelledby="who-title">
+    <h2 class="card fade" id="who-title"><span data-l="nl">Voor iedereen die bereid is om echt te kijken.</span><span data-l="en">For anyone who’s willing to really look.</span></h2>
+    <div class="who-sub fade d2">
+      <p class="who-p subtitle">
+        <span data-l="nl">Jong of oud, Nederlands of Engels: we zitten door elkaar. Nieuwsgierigheid is een mooi begin, maar bereidheid is wat je op je plek houdt als je eigenlijk weg wilt.</span>
+        <span data-l="en">Young or old, Dutch or English, we all sit together. Curiosity is a nice start, but willingness is what keeps you in your seat when you actually want to leave.</span>
+      </p>
+      <p class="note">
+        <span data-l="nl"><strong>Dit is geen therapie</strong> en geen medische of psychologische behandeling. Zit je in een acute crisis, kijk dan onderaan de pagina waar je terechtkunt.</span>
+        <span data-l="en"><strong>This isn’t therapy</strong>, and it isn’t medical or psychological treatment. If you’re in acute crisis, see the bottom of this page for where to get help right now.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- 5. THE FOUR OF US: a close-up -->
+  <section class="team" id="wij" aria-labelledby="team-title">
+    <h2 class="card fade" id="team-title"><span data-l="nl">Met z’n vieren.</span><span data-l="en">The four of us.</span></h2>
+    <div class="cast-wrap" id="cast-wrap">
+      <ul class="cast" id="cast"></ul>
+    </div>
+    <div class="team-low">
+      <p class="facts card sub-wait" id="facts">
+        <span data-l="nl"><span class="cue">Er zitten altijd minstens twee van ons in de cirkel.</span><span class="cue">Nooit meer dan twaalf mensen, want het werk kan intens worden.</span></span>
+        <span data-l="en"><span class="cue">There are always at least two of us in the circle.</span><span class="cue">Never more than twelve people, because the work can get intense.</span></span>
+      </p>
+      <div class="vo fade">
+        <p class="said-by subtitle" data-l="nl">We zitten hier niet als coaches aan de zijlijn. Al twee jaar zitten we zelf elke week in de cirkel, en sinds kort doen we de deur open voor anderen. Samen brengen we zo’n tien jaar meditatie, retreats, ademwerk, Focusing, delenwerk en TRE mee.</p>
+        <p class="said-by subtitle" data-l="en">We are not coaches on the sidelines. For two years we have sat in the circle ourselves every week, and recently we opened it to others. Between us we bring around ten years of meditation, retreats, breathwork, Focusing, parts work and TRE.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. JOIN -->
+  <section class="join" id="meedoen" aria-labelledby="join-title">
+    <div class="monday">
+      <h2 class="subtitle" id="join-title"><span data-l="nl">Elke maandag een cirkel.</span><span data-l="en">A circle every Monday.</span></h2>
+      <p class="showtime cutin" id="showtime"><span class="t1"><span class="tn">18:30</span><span class="to"><span><span data-l="nl">tot</span><span data-l="en">to</span></span><span class="rule" aria-hidden="true"></span></span></span><span class="t2">22:00</span></p>
+      <div class="mon-body fade">
+        <p class="subtitle"><span data-l="nl"><strong>De maandagcirkel is gratis.</strong> Je meldt je aan via een kort intakeformulier en krijgt daarna alle details, ook waar we zitten.</span><span data-l="en"><strong>The Monday circle is free.</strong> You sign up through a short intake form, and then you get all the details, including where we are.</span></p>
+        <a class="btn big" data-signup href="#meedoen"><span data-l="nl">Meld je aan voor maandag</span><span data-l="en">Sign up for Monday</span><span class="arr" aria-hidden="true">&rarr;</span></a>
+      </div>
+    </div>
+
+    <div class="agenda" id="agenda" hidden>
+      <h3 class="subtitle"><span data-l="nl">Soms doen we iets groters.</span><span data-l="en">Sometimes we do something bigger.</span></h3>
+      <ul class="events" id="events"></ul>
+    </div>
+
+    <div class="teams" id="teams" aria-labelledby="teams-title">
+      <ul class="dialogue" id="dialogue">
+        <li class="l1"><span data-l="nl">Hoe gaat het eigenlijk in het team?</span><span data-l="en">So how’s the team doing, really?</span></li>
+        <li class="l2"><span data-l="nl">Goed hoor. Prima.</span><span data-l="en">Good. Fine, really.</span></li>
+      </ul>
+      <div class="teams-body">
+        <h2 class="card fade" id="teams-title"><span data-l="nl">Je team zegt ook niet alles.</span><span data-l="en">Your team doesn’t say everything either.</span></h2>
+        <div class="tsubs" id="tsubs">
+          <p class="subtitle"><span data-l="nl"><span class="cue">In elk team leeft wat niemand hardop zegt: wie zich achtergesteld voelt, wie stiekem aan het concurreren is. Dat kost elke dag energie.</span></span><span data-l="en"><span class="cue">Every team carries what nobody says out loud: who feels passed over, who’s quietly competing. That costs energy, every single day.</span></span></p>
+          <p class="subtitle"><span data-l="nl"><span class="cue">In de cirkel komt het eruit, in het lijf in plaats van in een vergadering. Als je elke dag met elkaar werkt, is dat goud waard.</span></span><span data-l="en"><span class="cue">In the circle it comes out, in the body instead of in a meeting. When you work together every day, that’s worth a lot.</span></span></p>
+          <p class="subtitle ask"><span data-l="nl"><span class="cue">Wil je een cirkel voor je team, of iets op maat? Stuur ons een appje.</span></span><span data-l="en"><span class="cue">Want a circle for your team, or something made to measure? Send us a message.</span></span></p>
+        </div>
+        <a class="btn big" data-wa="team" href="https://wa.me/31630269017" target="_blank" rel="noopener">
+          <svg class="wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm0 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 4.54 0 8.24 3.7 8.24 8.24 0 4.55-3.7 8.24-8.24 8.24Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.16.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.16.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z"/></svg>
+          <span data-l="nl">App ons over je team</span><span data-l="en">WhatsApp us about your team</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CLOSING -->
+  <section class="closing" id="einde" aria-labelledby="closing-title">
+    <div class="close-track" id="close-track">
+      <div class="close-stage" id="close-stage">
+        <span class="close-slot" id="close-slot" aria-hidden="true"></span>
+        <h2 class="card sub-wait" id="closing-title">
+          <span data-l="nl"><span class="cue">Het licht was er altijd al.</span><span class="cue">Je moest alleen de schaduw in.</span></span>
+          <span data-l="en"><span class="cue">The light was always there.</span><span class="cue">You just had to step into the shadow.</span></span>
+        </h2>
+        <a class="btn" data-signup href="#meedoen"><span data-l="nl">Kom maandag</span><span data-l="en">Come on Monday</span><span class="arr" aria-hidden="true">&rarr;</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="bloom" id="bloom" aria-hidden="true"></div>
+
+<!-- 8. FOOTER -->
+<footer>
+  <p class="cr-wm">Inner Shadow Circle</p>
+  <p class="cr-line"><span data-l="nl">Schaduwwerk in een groep. Vanuit Groningen, maar we trekken rond.</span><span data-l="en">Shadow work in a group. Based in Groningen, but we move around.</span></p>
+  <dl class="credits">
+    <div><dt><span data-l="nl">begeleiding</span><span data-l="en">facilitators</span></dt><dd>Marko, Max, Natan, Thomas</dd></div>
+    <div><dt>WhatsApp</dt><dd><a class="ulink" data-wa="general" href="https://wa.me/31630269017" target="_blank" rel="noopener">+31 6 30269017</a></dd></div>
+    <div><dt><span data-l="nl">taal</span><span data-l="en">language</span></dt><dd>
+      <div class="lang" role="group" aria-label="Taal / Language">
+        <button type="button" data-set="nl" aria-pressed="true">NL</button>
+        <button type="button" data-set="en" aria-pressed="false">EN</button>
+      </div></dd></div>
+  </dl>
+  <p class="crisis">
+    <span data-l="nl"><strong>Zit je nu in nood?</strong> Wacht dan niet op een cirkel. Bel 113 Zelfmoordpreventie op <strong>113</strong> of gratis op <strong>0800-0113</strong>, dag en nacht.</span>
+    <span data-l="en"><strong>In crisis right now?</strong> Don’t wait for a circle. In the Netherlands, call 113 Suicide Prevention on <strong>113</strong> or free on <strong>0800-0113</strong>, day and night.</span>
+  </p>
+  <p class="cr-legal">&copy; 2026 Inner Shadow Circle</p>
+</footer>
+
+<!-- Feel first -->
+<div id="bo" hidden>
+  <div class="bo-black"></div>
+  <div class="bo-ui" role="dialog" aria-modal="true" aria-labelledby="bo-label">
+    <span class="sr" id="bo-label"><span data-l="nl">Voel eerst: drie keer ademen</span><span data-l="en">Feel first: three breaths</span></span>
+    <div class="bar top">
+      <div class="bar-l">
+      <button class="bo-btn snd" type="button" id="bo-sound" aria-pressed="false">
+        <span class="wave" aria-hidden="true"><i style="--h:9px;--dl:0s"></i><i style="--h:16px;--dl:-.4s"></i><i style="--h:12px;--dl:-.9s"></i><i style="--h:18px;--dl:-.2s"></i><i style="--h:8px;--dl:-1.1s"></i></span>
+        <span><span data-l="nl">Geluid:</span><span data-l="en">Sound:</span> <span class="state">uit</span></span>
+      </button>
+      <span class="snd-hint" id="snd-hint" aria-hidden="true"><span data-l="nl">Een zachte klank erbij? Zet het geluid aan.</span><span data-l="en">A soft tone with it? Turn the sound on.</span></span>
+      </div>
+      <button class="bo-btn" type="button" id="bo-close">
+        <span data-l="nl">Stoppen</span><span data-l="en">Stop</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="bo-end" id="bo-end">
+      <p class="q"><span data-l="nl">Wat merk je nu, in je lijf?</span><span data-l="en">What do you notice now, in your body?</span></p>
+      <p class="s"><span data-l="nl">Er is geen goed antwoord. Blijf er even bij, en lees dan verder.</span><span data-l="en">There’s no right answer. Stay with it for a moment, then read on.</span></p>
+      <div class="bo-go">
+        <button class="btn line" type="button" id="bo-next"><span data-l="nl">Verder</span><span data-l="en">Continue</span><span class="arr" aria-hidden="true">&darr;</span></button>
+      </div>
+    </div>
+    <div class="bar bot"><p class="bo-sub subtitle" id="bo-sub" aria-live="polite"></p><span class="bo-dots" id="bo-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG: edit these values. Everything else follows from here.
+   ============================================================ */
+const CONFIG = {
+  // Intake form for the free Monday circle. REPLACE 'SIGNUP_URL' with the real link.
+  // While it still says 'SIGNUP_URL', every sign-up button opens WhatsApp with a ready message instead.
+  SIGNUP_URL: 'SIGNUP_URL',
+
+  whatsapp: '31630269017',
+  whatsappText: {
+    general: { nl: 'Hoi! Ik heb een vraag over Inner Shadow Circle.', en: 'Hi! I have a question about Inner Shadow Circle.' },
+    team:    { nl: 'Hoi! Ik ben benieuwd naar een cirkel voor ons team.', en: "Hi! I'm curious about a circle for our team." },
+    signup:  { nl: 'Hoi! Ik wil me graag aanmelden voor de maandagcirkel.', en: "Hi! I'd like to sign up for the Monday circle." }
+  },
+
+  // Paid events. Leave empty and the whole events block (and its menu link) disappears.
+  // Example:
+  // { date: '2026-11-21', title: { nl: 'Dagcirkel', en: 'Day circle' },
+  //   line: { nl: 'Een hele dag in de cirkel.', en: 'A whole day in the circle.' }, url: 'https://...' }
+  events: [],
+
+  // Facilitators. pos / scale / origin are hand-tuned crops (4:5 frame) so the four heads line up.
+  // exposure evens out the four photos under one shared grade (1 = as shot). Add a bio later if you like.
+  team: [
+    { photo: '../../images/team/marko.jpg',           pos: '52% 28%', exposure: 1.06, name: 'Marko',  bio: { nl: '', en: '' } },
+    { photo: '../../images/team/max-field-clean.jpg', pos: '55% 30%', exposure: .96,  name: 'Max',    bio: { nl: '', en: '' } },
+    { photo: '../../images/team/natan.jpg',           pos: '50% 22%', exposure: .86,  name: 'Natan',  bio: { nl: '', en: '' } },
+    { photo: '../../images/team/thomas-white-shirt-face-original.png', pos: '50% 50%', scale: 1.25, origin: '50% 2%', exposure: .8, name: 'Thomas', bio: { nl: '', en: '' } }
+  ]
+};
+
+/* preview helper: add ?demo-events to the URL to see the events block with one sample event */
+if (/[?&]demo-events/.test(location.search) && !CONFIG.events.length) {
+  CONFIG.events.push({ date: '2026-11-21', title: { nl: 'Dagcirkel', en: 'Day circle' }, line: { nl: 'Een hele dag in de cirkel, van de ochtend tot de avond.', en: 'A whole day in the circle, from morning to evening.' }, url: 'https://wa.me/31630269017' });
+}
+
+(function () {
+'use strict';
+const root = document.documentElement;
+const RM = root.classList.contains('rm');
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const seg = (a, b, x) => clamp((x - a) / (b - a));
+const smooth = (a, b, x) => { const t = seg(a, b, x); return t * t * (3 - 2 * t); };
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const easeSine = t => -(Math.cos(Math.PI * t) - 1) / 2;
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+const lerp = (a, b, t) => a + (b - a) * t;
+const damp = (k, dt) => 1 - Math.pow(1 - k, dt / 16.667);
+const lang = () => root.classList.contains('en') ? 'en' : 'nl';
+/* one flag for "this visitor already saw the opening in this session": the second time it plays faster */
+let SEEN = false;
+try { SEEN = sessionStorage.getItem('isc-film-seen') === '1'; sessionStorage.setItem('isc-film-seen', '1'); } catch (e) {}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ---------- links ---------- */
+const waUrl = key => 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(CONFIG.whatsappText[key][lang()]);
+const signupReady = CONFIG.SIGNUP_URL && CONFIG.SIGNUP_URL !== 'SIGNUP_URL';
+function updateLinks() {
+  $$('[data-wa]').forEach(a => { a.href = waUrl(a.dataset.wa); });
+  $$('[data-signup]').forEach(a => {
+    a.href = signupReady ? CONFIG.SIGNUP_URL : waUrl('signup');
+    a.target = '_blank'; a.rel = 'noopener';
+  });
+}
+
+/* ---------- language ---------- */
+function setLang(l) {
+  root.classList.toggle('en', l === 'en');
+  root.lang = l;
+  try { localStorage.setItem('isc-lang', l); } catch (e) {}
+  $$('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.set === l)));
+  updateLinks();
+  renderEvents();
+  if (window.__breathRelang) window.__breathRelang();
+}
+$$('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.set)));
+
+/* ---------- events: each one a small title card ---------- */
+function renderEvents() {
+  const box = $('#agenda'), list = $('#events'), navLink = $('[data-events-link]');
+  const evs = (CONFIG.events || []).filter(e => e && e.date);
+  if (!evs.length) { box.hidden = true; navLink.hidden = true; list.innerHTML = ''; return; }
+  box.hidden = false; navLink.hidden = false;
+  const l = lang(), loc = l === 'en' ? 'en-GB' : 'nl-NL';
+  list.innerHTML = evs.map(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    const ok = !isNaN(d);
+    const wd = ok ? d.toLocaleDateString(loc, { weekday: 'long' }) : '';
+    const big = ok ? d.toLocaleDateString(loc, { day: 'numeric', month: 'short' }).replace('.', '') : e.date;
+    const t = (e.title && e.title[l]) || '', ln = (e.line && e.line[l]) || '';
+    const more = l === 'en' ? 'More info and sign-up' : 'Meer info en aanmelden';
+    return `<li class="ev"><p class="ev-d">${wd ? `<small>${esc(wd)}</small>` : ''}${esc(big)}</p><div><p class="ev-t">${esc(t)}</p>${ln ? `<p class="ev-l">${esc(ln)}</p>` : ''}${e.url ? `<a class="ev-a ulink" href="${esc(e.url)}" target="_blank" rel="noopener">${more}</a>` : ''}</div></li>`;
+  }).join('');
+}
+
+/* ---------- team ---------- */
+$('#cast').innerHTML = CONFIG.team.map((p, i) => `
+  <li style="--d:${(i * .28).toFixed(2)}s">
+    <div class="shot" style="--ex:${p.exposure || 1}"><img src="${esc(p.photo)}" alt="${esc(p.name)}" decoding="async" style="object-position:${p.pos};transform:scale(${p.scale || 1});transform-origin:${p.origin || '50% 50%'}"><span class="lamp" aria-hidden="true"></span></div>
+    <div class="credit">
+      <span class="n">${esc(p.name)}</span>
+      <span class="r"><span data-l="nl">begeleider</span><span data-l="en">facilitator</span></span>
+      ${p.bio && (p.bio.nl || p.bio.en) ? `<p class="b"><span data-l="nl">${esc(p.bio.nl)}</span><span data-l="en">${esc(p.bio.en)}</span></p>` : ''}
+    </div>
+  </li>`).join('');
+
+setLang(lang());
+
+/* ---------- quiet reveals ---------- */
+function playCues(el, gap) {
+  if (el.classList.contains('play')) return;
+  const per = {};
+  $$('.cue', el).forEach(c => {
+    const k = c.closest('[data-l]') ? c.closest('[data-l]').dataset.l : 'x';
+    per[k] = (per[k] || 0) + 1;
+    c.style.transitionDelay = RM ? '0s' : ((per[k] - 1) * gap) + 'ms';
+  });
+  el.classList.add('play');
+}
+const io = new IntersectionObserver(entries => entries.forEach(en => {
+  if (!en.isIntersecting) return;
+  en.target.classList.add('in');
+  io.unobserve(en.target);
+}), { threshold: 0, rootMargin: '0px 0px -12% 0px' });
+$$('.fade').forEach(el => io.observe(el));
+
+/* the Monday times: 18:30 cuts in after a beat of black; 22:00 travels in from the right edge as you scroll,
+   so the evening reads as a stretch of time */
+(function () {
+  const st = $('#showtime'), t2 = $('.t2', st), rule = $('.rule', st);
+  if (RM) { st.classList.add('in'); return; }
+  new IntersectionObserver((es, ob) => es.forEach(e => {
+    if (e.isIntersecting) { ob.disconnect(); setTimeout(() => st.classList.add('in'), 300); }
+  }), { threshold: .45 }).observe(st);
+  let tk = false;
+  function upd() {
+    tk = false;
+    const r = t2.getBoundingClientRect(), H = innerHeight;
+    const k = easeOut(seg(H * 1.02, H * .55, r.top));
+    t2.style.transform = k >= 1 ? '' : `translate3d(${((1 - k) * 62).toFixed(2)}vw,0,0)`;
+    rule.style.setProperty('--k', k.toFixed(4));
+  }
+  addEventListener('scroll', () => { if (!tk) { tk = true; requestAnimationFrame(upd); } }, { passive: true });
+  addEventListener('resize', upd);
+  upd();
+})();
+
+/* scroll is the projector: each line owns a band of the track and fades in and out with it.
+   weights set how much scroll each line gets; f is the share of a band spent fading. */
+function Bands(weights, f) {
+  const tot = weights.reduce((a, b) => a + b, 0);
+  const edges = []; let acc = 0;
+  weights.forEach(w => { edges.push([acc / tot, (acc + w) / tot]); acc += w; });
+  return {
+    edges,
+    op(i, p) {
+      const [a, b] = edges[i], fw = (b - a) * f;
+      const fin = i === 0 ? 1 : smooth(a, a + fw, p);
+      const fout = i === edges.length - 1 ? 1 : 1 - smooth(b - fw, b, p);
+      return fin * fout;
+    },
+    local(i, p) { const [a, b] = edges[i]; return clamp((p - a) / (b - a)); },
+    index(p) { for (let i = 0; i < edges.length; i++) if (p < edges[i][1]) return i; return edges.length - 1; }
+  };
+}
+
+/* the unsaid: one band of scroll per frame. Shared by the voices and by the light.
+                title envy comp grief fear shame anger cut */
+const SB = Bands([.8,  1,   1.15, 1.2, 1,   1.05, .9,   1.1], .17);
+const SAID_HARD = [false, false, false, false, false, false, true, true];
+function saidOp(i, p) {
+  if (!SAID_HARD[i]) return SB.op(i, p);
+  const [a, b] = SB.edges[i], loc = SB.local(i, p), fw = (b - a) * .17;
+  const fout = i === SB.edges.length - 1 ? 1 : 1 - smooth(b - fw, b, p);
+  return (loc > .1 && p >= a ? 1 : 0) * fout;
+}
+/* where the light sits for each voice: a moon mostly outside the frame, so only a thin lit limb crosses an edge */
+const SLIVER = [null,
+  (W, H) => { const R = Math.max(W, H) * .5; return { x: W + R * .64, y: -R * .62, R, cor: .42, k: .75 }; },          // envy: top right corner
+  (W, H) => { const R = Math.max(W * .5, H * .7); return { x: W * .5, y: -R * .95, R, cor: .38, k: .7 }; },          // competition: over the top edge
+  (W, H) => { const R = Math.max(W * .6, H * .8); return { x: W * .5, y: H + R * .94, R, cor: .4, k: .75 }; },      // grief: a low horizon
+  (W, H) => { const R = Math.max(H * .7, W * .45); return { x: W + R * .94, y: H * .52, R, cor: .42, k: .75 }; },     // fear: the right edge
+  (W, H) => { const R = Math.max(W, H) * .45; return { x: -R * .62, y: H + R * .6, R, cor: .34, k: .65 }; },          // shame: bottom left, far away
+  (W, H) => { const R = Math.max(H * .8, W * .5); return { x: -R * .965, y: H * .45, R, cor: .62, k: .8 }; },          // anger: hard from the left
+  null];
+/* the circle scene writes the geometry of its ring here, so the light can sit inside it */
+const CIRC = { x: 0, y: 0, R: 0, op: 0, cor: 0 };
+
+/* ---------- nav ---------- */
+const nav = $('#nav'), heroEl = $('#hero');
+let lastY = scrollY;
+function onNav() {
+  const y = scrollY;
+  nav.classList.toggle('scrolled', y > 30);
+  if (y > innerHeight * .7 && y > lastY + 6) nav.classList.add('away');
+  else if (y < lastY - 6 || y < innerHeight * .7) nav.classList.remove('away');
+  lastY = y;
+}
+addEventListener('scroll', onNav, { passive: true });
+/* the nav steps out of the way while the big Monday numbers are on screen */
+new IntersectionObserver(es => es.forEach(e => nav.classList.toggle('hush', e.isIntersecting)), { rootMargin: '0px 0px -20% 0px' }).observe($('#showtime'));
+
+/* ============================================================
+   THE LIGHT: a total eclipse rendered in WebGL.
+   Opening: dark, Baily's beads, the diamond ring flash, then the corona.
+   Then it stays on as a dim key light over the unsaid sentences, sinking slowly,
+   and goes out on the cut "In de cirkel zeg je hem hardop".
+   Closing: the light returns on the opposite limb.
+   ============================================================ */
+const Light = (function () {
+  let cv = $('#light');
+  const heroSlot = $('#hero-slot'), closeSlot = $('#close-slot'), closeTrack = $('#close-track'), closeStage = $('#close-stage'), closing = $('#einde');
+  const saidTrack = $('#said-track'), bloomEl = $('#bloom');
+  let gl = null, c2 = null, U = {}, dpr = 1, W = 0, H = 0, raf = 0, last = 0;
+  const S = { cx: 0, cy: 0, R: 100, corona: 0, dia: 0, diaA: -2.45, beads: 0, breath: 0, hover: 0, moonX: 0, moonY: 0 };
+  let tx = 0, ty = 0, sx = 0, sy = 0, hoverT = 0;
+  let breathAmt = 0, breathTarget = 0, breathV = 0, bv = 0, ask = 0, askT = 0;
+  let heroBloom = false, closeBloom = false, pulseT = 0;
+  S.bm = 0; S.bv = 0;
+  let simT = 40, rate = 1, rateT = 1, glow = 1, glowT = 1;
+  let introStart = -1, introDone = RM;
+  let closeStart = 0, closeFired = false;
+  const SPEED = SEEN ? .62 : 1;
+
+  const VS = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+  const FS = `
+precision highp float;
+uniform vec2 uC; uniform float uR; uniform float uT; uniform float uCor; uniform float uDia; uniform float uDiaA;
+uniform float uBeads; uniform float uBr; uniform float uHov; uniform vec2 uMoon; uniform float uBlk;
+uniform float uBm; uniform float uBv;
+float h31(vec3 p){ p = fract(p * .1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
+float vn(vec3 x){
+  vec3 i = floor(x), f = fract(x); f = f * f * (3. - 2. * f);
+  return mix(mix(mix(h31(i), h31(i + vec3(1,0,0)), f.x), mix(h31(i + vec3(0,1,0)), h31(i + vec3(1,1,0)), f.x), f.y),
+             mix(mix(h31(i + vec3(0,0,1)), h31(i + vec3(1,0,1)), f.x), mix(h31(i + vec3(0,1,1)), h31(i + vec3(1,1,1)), f.x), f.y), f.z);
+}
+/* a helmet streamer: broad at the limb, tapering to a long thin ray */
+float streamer(float th, float c, float w0, float L, float x){
+  float d = atan(sin(th - c), cos(th - c));
+  float w = w0 / (1. + x * 3.2);
+  return exp(-d * d / (w * w)) * exp(-x / L);
+}
+/* one short diffraction spike pair through the diamond, along direction a */
+float spike(vec2 q, float a, float L){
+  vec2 t = vec2(cos(a), sin(a));
+  float along = abs(dot(q, t)), perp = abs(dot(q, vec2(-t.y, t.x))) * uR;
+  return exp(-perp / (.7 + along * uR * .02)) * exp(-along / L);
+}
+void main(){
+  vec2 fc = gl_FragCoord.xy;
+  vec2 p = (fc - uC) / uR;
+  float r = length(p);
+  vec3 bg = mix(vec3(.0235, .0275, .0353), vec3(0.), uBlk);
+  vec3 col = vec3(0.);
+  if (r < 9.) {
+    float ang = atan(p.y, p.x);
+    float x = max(r - 1., 0.);
+    float lr = log(max(r, 1.));
+    /* the whole corona turns slowly (about a degree every two seconds); the solar axis is tilted */
+    float rot = uT * .0085;
+    float th = ang + rot - .38;
+    vec2 d = vec2(cos(ang + rot), sin(ang + rot));
+    /* breathing: on the in-breath the corona reaches 1.55x further and burns 1.8x brighter around a moon that never moves;
+       on the out-breath it pulls back to a thin rim */
+    float hovK = 1. + .14 * max(uHov, 0.) + .34 * min(uHov, 0.);
+    float reachK = mix(1. + .1 * uBr, mix(.16, 1.55, uBv), uBm) * hovK;
+    float gain = mix(.84 + .3 * uBr, mix(.14, 1.8, uBv), uBm) + .2 * max(uHov, 0.) + .4 * min(uHov, 0.);
+    float limbK = min(reachK, 1.);
+    /* fine radial texture: many thin rays, very little contrast close to the limb */
+    float r1 = vn(vec3(d * 46., lr * .35 - uT * .006));
+    float r2 = vn(vec3(d * 128., lr * .25 + uT * .004 + 11.));
+    float rays = .55 * r1 + .45 * r2;
+    float tex = mix(1., .62 + .76 * rays, clamp(x * 2., 0., 1.));
+    /* inner (K) corona: bright, smooth, a little flattened toward the equator */
+    float eqw = pow(abs(cos(th)), 2.);
+    float inner = exp(-x / (.045 * limbK)) * 1.15 + exp(-x / ((.13 + .07 * eqw) * reachK)) * .55;
+    float body = exp(-x / ((.2 + .5 * eqw) * reachK)) * (.12 + .5 * eqw);
+    /* the streamers drift: the long plume splits into three of different lengths that wander apart and back */
+    float m1 = .85 + .15 * sin(uT * .05), m2 = .8 + .2 * sin(uT * .037 + 2.);
+    float a1 = .06 + .16 * sin(uT * .021);
+    float st = streamer(th, a1, .26, (.82 + .26 * sin(uT * .017)) * reachK, x) * .9 * m1
+             + streamer(th, a1 + .3 + .14 * sin(uT * .029 + 1.), .15, (.62 + .2 * sin(uT * .023 + 2.)) * reachK, x) * .55
+             + streamer(th, a1 - .34 + .12 * sin(uT * .033 + 4.), .12, .42 * reachK, x) * .42
+             + streamer(th, 3.25 + .14 * sin(uT * .019 + 3.), .30, .95 * reachK, x) * .85 * m2
+             + streamer(th, 2.55 + .1 * sin(uT * .027), .14, .48 * reachK, x) * .38;
+    float pol = pow(abs(sin(th)), 7.);
+    float brush = pol * exp(-x / (.17 * reachK)) * pow(vn(vec3(d * 78., lr * .2 + uT * .005 + 9.)), 1.4) * 1.5;
+    float I = (inner * (.9 + .25 * r1) + body * tex + st * tex + brush) * uCor * gain;
+    vec3 cIn = vec3(1., .968, .92), cOut = vec3(.72, .79, .93);
+    col += mix(cOut, cIn, exp(-x * 2.6)) * I;
+    /* a faint sky glow that rises with the in-breath and leaves the frame darker on the out-breath */
+    col += vec3(.5, .56, .68) * .05 * uBm * uBv * uBv * exp(-x / 2.4) * uCor;
+    /* chromosphere and a few prominences right on the limb */
+    float chrom = exp(-pow((r - 1.) / .009, 2.));
+    float pn = vn(vec3(d * 6.5, 20. + uT * .012));
+    float prom = smoothstep(.68, .88, pn) * exp(-x / (.016 + .04 * r2)) * step(.995, r);
+    col += vec3(1., .26, .2) * (chrom * .5 + prom * 1.4) * uCor * mix(1., .75 + .5 * uBv, uBm);
+    vec2 m = p - uMoon;
+    float rm = length(m);
+    float mr = 1.007;
+    float moon = smoothstep(mr, mr + 1.3 / uR, rm);
+    col *= moon;
+    float am = atan(m.y, m.x);
+    float ad = atan(sin(am - uDiaA), cos(am - uDiaA));
+    float beads = exp(-pow(ad / .2, 2.)) * exp(-pow((rm - mr) * uR / 1.6, 2.)) * pow(.5 + .5 * sin(ad * 64. + 1.3), 3.) * (.15 + 1.6 * pow(vn(vec3(ad * 22., 3., 5.)), 2.));
+    col += vec3(1., .93, .86) * uBeads * beads * 5.;
+    /* the diamond: a point, a soft round bloom, and six short diffraction spikes (no lens streak) */
+    vec2 dp = uMoon + vec2(cos(uDiaA), sin(uDiaA)) * (mr + .004);
+    vec2 q = p - dp;
+    float dd = length(q);
+    float core = exp(-pow(dd * uR / 4.5, 2.));
+    float halo = 1. / (1. + pow(dd * 7., 2.));
+    float wide = 1. / (1. + pow(dd * 1.6, 2.));
+    float spk = spike(q, .26, .17) + spike(q, .26 + 1.0472, .13) + spike(q, .26 + 2.0944, .15);
+    col += vec3(1., .985, .96) * uDia * (core * 9. + halo * 1.5 + wide * .45 + spk * .9);
+    col += vec3(1., .96, .9) * uBeads * halo * .25;
+  }
+  col = 1. - exp(-col * 1.12);
+  col = bg + col * (1. - bg);
+  col += (h31(vec3(fc, floor(uT * 24.))) - .5) / 255.;
+  gl_FragColor = vec4(col, 1.);
+}`;
+
+  function buildGL() {
+    try { gl = cv.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false, premultipliedAlpha: false, powerPreference: 'high-performance' }); } catch (e) { gl = null; }
+    if (!gl) return false;
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; };
+    const vs = sh(gl.VERTEX_SHADER, VS), fs = sh(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) return false;
+    const pr = gl.createProgram(); gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
+    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return false;
+    gl.useProgram(pr);
+    const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    ['uC', 'uR', 'uT', 'uCor', 'uDia', 'uDiaA', 'uBeads', 'uBr', 'uHov', 'uMoon', 'uBlk', 'uBm', 'uBv'].forEach(n => { U[n] = gl.getUniformLocation(pr, n); });
+    return true;
+  }
+  if (!buildGL()) {
+    gl = null;
+    const fresh = document.createElement('canvas'); fresh.id = 'light'; fresh.setAttribute('aria-hidden', 'true');
+    cv.replaceWith(fresh); cv = fresh; c2 = cv.getContext('2d');
+  }
+
+  function resize() {
+    const w = innerWidth, h = cv.clientHeight || innerHeight;
+    if (w === W && h === H) return;
+    W = w; H = h;
+    dpr = Math.min(devicePixelRatio || 1, 1.75);
+    if (W * H * dpr * dpr > 2.6e6) dpr = Math.sqrt(2.6e6 / (W * H));
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    if (gl) gl.viewport(0, 0, cv.width, cv.height);
+    kick();
+  }
+
+  function heroParams(now) {
+    if (introDone) return { cor: 1, dia: 0, beads: 0, a: -2.45 };
+    if (introStart < 0) return { cor: 0, dia: 0, beads: 0, a: -2.45 };
+    const el = (now - introStart) / SPEED;
+    const beads = smooth(250, 1250, el) * (1 - smooth(1450, 2300, el));
+    const dia = el < 1200 ? 0 : el < 1480 ? easeOut((el - 1200) / 280) : Math.exp(-(el - 1480) / 430);
+    const cor = smooth(1350, 3600, el);
+    if (el > 4200) introDone = true;
+    return { cor, dia, beads, a: -2.45 };
+  }
+  function closeParams(now) {
+    if (!closeFired) return { cor: 1, dia: 0, beads: 0, a: .62 };
+    if (RM) return { cor: 1, dia: .06, beads: 0, a: .62 };
+    const el = now - closeStart;
+    const beads = smooth(0, 1000, el) * (1 - smooth(1300, 2400, el));
+    const flash = el < 950 ? 0 : el < 1200 ? easeOut((el - 950) / 250) : Math.exp(-(el - 1200) / 600);
+    const rest = .07 * smooth(1300, 3200, el);
+    return { cor: 1, dia: Math.max(flash, rest), beads, a: .62 };
+  }
+  function fireClose() {
+    if (closeFired) return;
+    closeFired = true; closeStart = performance.now();
+    setTimeout(() => { playCues($('#closing-title'), 1500); closing.classList.add('play'); }, RM ? 0 : 1150);
+  }
+
+  function bloom(x, y) {
+    if (RM || !bloomEl.animate) return;
+    bloomEl.style.setProperty('--bx', x.toFixed(0) + 'px'); bloomEl.style.setProperty('--by', y.toFixed(0) + 'px');
+    bloomEl.animate([{ opacity: 0 }, { opacity: .06, offset: .22 }, { opacity: 0 }], { duration: 950, easing: 'cubic-bezier(.16,1,.3,1)' });
+  }
+  function frame(now) {
+    raf = 0;
+    const dt = Math.min(64, last ? now - last : 16.7); last = now;
+    // on the held breath everything stops: drift, parallax, grain
+    const still = rate < .5 && breathAmt > .5;
+    if (!still) { sx += (tx - sx) * damp(.04, dt); sy += (ty - sy) * damp(.04, dt); }
+    S.hover += (hoverT - S.hover) * damp(hoverT < S.hover ? .16 : .05, dt);
+    breathAmt += (breathTarget - breathAmt) * (RM ? 1 : damp(.035, dt));
+    bv += (breathV - bv) * (RM ? 1 : damp(.12, dt));
+    ask += (askT - ask) * (RM ? 1 : damp(.03, dt));
+    rate += (rateT - rate) * damp(.08, dt);
+    glow += (glowT - glow) * (1 - Math.exp(-dt / 1100));
+    if (!RM) simT += dt / 1000 * rate;
+    const narrow = W < 760;
+
+    const hs = heroSlot.getBoundingClientRect();
+    const st = saidTrack.getBoundingClientRect();
+    const ct = closeTrack.getBoundingClientRect(), cst = closeStage.getBoundingClientRect();
+    const closeF = smooth(H * .95, H * .3, ct.top) * (1 - smooth(-H * .05, -H * .45, cst.top));
+    if (!closeFired && ct.top < H * .14 && ct.bottom > H * .5) fireClose();
+
+    // the film light: the hero, then a dim key light over the first title card of the unsaid, which sets as the first voice comes in
+    const into = RM ? 0 : smooth(H * .95, H * .05, st.top);
+    const sp = clamp(-st.top / Math.max(1, st.height - H));
+    const e0 = SB.edges[0][1], f0 = (e0 - SB.edges[0][0]) * .3;
+    const setF = RM ? 0 : smooth(e0 - f0, e0, sp);
+    const filmF = RM ? 1 - smooth(0, H * .8, scrollY) : (1 - setF) * (st.bottom > 0 ? 1 : 0);
+
+    const idle = RM ? .4 : .28 * (.5 - .5 * Math.cos(simT / 13 * Math.PI * 2));
+    let cx, cy, R, op, P, br = idle;
+    {
+      const hp = heroParams(now);
+      const kx = W * .5;
+      const ky = H * (narrow ? .19 : .2) + setF * H * .05;
+      const kR = narrow ? Math.min(W * .15, 62) : Math.min(W, H) * .085;
+      const hx = hs.left + hs.width / 2, hy = hs.top + hs.height / 2, hR = hs.width / 2;
+      cx = lerp(hx, kx, into); cy = lerp(hy, ky, into); R = lerp(hR, kR, into);
+      P = { cor: lerp(hp.cor, .5, into), dia: hp.dia * (1 - into), beads: hp.beads * (1 - into), a: hp.a };
+      op = filmF;
+      br = idle * (1 - into);
+      if (!heroBloom && hp.dia > .5 && into < .2) { heroBloom = true; bloom(cx + Math.cos(hp.a) * R, cy - Math.sin(hp.a) * R); }
+    }
+    // the voices: only a sliver of the light at the edge of the frame, coming from somewhere else for every person
+    if (!RM && st.bottom > 0 && sp > e0) {
+      const bi = SB.index(sp), mk = SLIVER[bi];
+      if (mk) {
+        const L = mk(W, H), o = L.k * saidOp(bi, sp) * (narrow ? .8 : 1);
+        if (narrow) L.cor *= .7;
+        if (o > op) { cx = L.x; cy = L.y; R = L.R; op = o; P = { cor: L.cor, dia: 0, beads: 0, a: -2.45 }; br = 0; }
+      }
+    }
+    // the circle: the ring of people sits on the limb of a dim eclipse
+    if (CIRC.op > op) {
+      cx = CIRC.x; cy = CIRC.y; R = CIRC.R; op = CIRC.op; P = { cor: CIRC.cor, dia: 0, beads: 0, a: -2.45 }; br = 0;
+    }
+    if (closeF > op) {
+      const cs = closeSlot.getBoundingClientRect();
+      P = closeParams(now); op = closeF; br = idle;
+      cx = cs.left + cs.width / 2; cy = cs.top + cs.height / 2; R = cs.width / 2;
+      if (!closeBloom && closeFired && P.dia > .5) { closeBloom = true; bloom(cx + Math.cos(P.a) * R, cy - Math.sin(P.a) * R); }
+    }
+    if (breathAmt > .001) {
+      // the breath gets its own, much larger frame: the moon stays fixed and the light grows around it
+      const bR = narrow ? Math.min(W * .27, H * .15) : Math.min(W, H) * .19;
+      const bcy = H * (narrow ? .42 : .43) - ask * H * (narrow ? .1 : .12);
+      cx = lerp(cx, W * .5, breathAmt); cy = lerp(cy, bcy, breathAmt);
+      R = lerp(R, bR * (1 - .28 * ask), breathAmt);
+      op = lerp(op, 1, breathAmt);
+      P = { cor: lerp(P.cor, 1, breathAmt), dia: P.dia * (1 - breathAmt), beads: P.beads * (1 - breathAmt), a: P.a };
+    }
+    const par = RM ? 0 : 1;
+    cx += sx * 18 * par; cy += sy * 12 * par;
+    S.cx = cx; S.cy = cy; S.R = R; S.corona = P.cor * glow; S.dia = P.dia; S.beads = P.beads; S.diaA = P.a; S.breath = br;
+    S.moonX = -sx * .014 * par; S.moonY = sy * .014 * par;
+    S.bm = breathAmt; S.bv = RM ? .62 : bv;
+    cv.style.opacity = op.toFixed(3);
+    if (op > .004) draw(RM ? 40 : simT);
+    const moving = !RM && (op > .004 || breathAmt > .001) && !document.hidden;
+    const settling = Math.abs(breathTarget - breathAmt) > .001 || Math.abs(askT - ask) > .001 || Math.abs(hoverT - S.hover) > .001 || Math.abs(glowT - glow) > .002 || (introStart >= 0 && !introDone);
+    if (moving || settling) raf = requestAnimationFrame(frame);
+  }
+
+  function draw(t) {
+    if (gl) {
+      gl.uniform2f(U.uC, S.cx * dpr, (H - S.cy) * dpr);
+      gl.uniform1f(U.uR, S.R * dpr);
+      gl.uniform1f(U.uT, t);
+      gl.uniform1f(U.uCor, S.corona);
+      gl.uniform1f(U.uDia, S.dia);
+      gl.uniform1f(U.uDiaA, S.diaA);
+      gl.uniform1f(U.uBeads, S.beads);
+      gl.uniform1f(U.uBr, S.breath);
+      gl.uniform1f(U.uHov, S.hover);
+      gl.uniform2f(U.uMoon, S.moonX, S.moonY);
+      gl.uniform1f(U.uBlk, breathAmt);
+      gl.uniform1f(U.uBm, S.bm);
+      gl.uniform1f(U.uBv, S.bv);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    } else if (c2) {
+      c2.setTransform(dpr, 0, 0, dpr, 0, 0);
+      c2.fillStyle = '#060709'; c2.fillRect(0, 0, W, H);
+      const R = S.R, bk = lerp(1, lerp(.2, 1.8, S.bv), S.bm), k = S.corona * (.85 + .3 * S.breath) * bk;
+      const g = c2.createRadialGradient(S.cx, S.cy, R * .98, S.cx, S.cy, R * lerp(3 + 1.5 * S.breath, lerp(1.4, 4.6, S.bv), S.bm));
+      g.addColorStop(0, `rgba(250,246,238,${.95 * k})`); g.addColorStop(.12, `rgba(225,232,245,${.4 * k})`); g.addColorStop(1, 'rgba(200,210,235,0)');
+      c2.fillStyle = g; c2.beginPath(); c2.arc(S.cx, S.cy, R * 4.5, 0, Math.PI * 2); c2.fill();
+      c2.fillStyle = '#000'; c2.beginPath(); c2.arc(S.cx, S.cy, R, 0, Math.PI * 2); c2.fill();
+      if (S.dia > .01) {
+        const a = -S.diaA, px = S.cx + Math.cos(a) * R, py = S.cy + Math.sin(a) * R;
+        const dg = c2.createRadialGradient(px, py, 0, px, py, R * 1.4);
+        dg.addColorStop(0, `rgba(255,255,255,${S.dia})`); dg.addColorStop(1, 'rgba(255,255,255,0)');
+        c2.fillStyle = dg; c2.beginPath(); c2.arc(px, py, R * 1.4, 0, Math.PI * 2); c2.fill();
+      }
+    }
+  }
+
+  function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+
+  addEventListener('resize', resize);
+  addEventListener('scroll', kick, { passive: true });
+  document.addEventListener('visibilitychange', kick);
+  addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    tx = e.clientX / innerWidth - .5; ty = e.clientY / innerHeight - .5; kick();
+  }, { passive: true });
+  function onTilt(e) {
+    if (e.gamma == null || e.beta == null) return;
+    tx = clamp(e.gamma / 40, -.5, .5); ty = clamp((e.beta - 50) / 40, -.5, .5); kick();
+  }
+  let tiltOn = false, tiltAsked = false;
+  function enableTilt() {
+    if (tiltOn || tiltAsked || RM || !window.DeviceOrientationEvent) return;
+    const D = window.DeviceOrientationEvent;
+    if (typeof D.requestPermission === 'function') {
+      // iOS needs a deliberate tap. We ask once, on the first tap anywhere; a "no" just means no tilt.
+      tiltAsked = true;
+      try { D.requestPermission().then(s => { if (s === 'granted') { tiltOn = true; addEventListener('deviceorientation', onTilt, { passive: true }); } }).catch(() => {}); } catch (e) {}
+    } else { tiltOn = true; addEventListener('deviceorientation', onTilt, { passive: true }); }
+  }
+  if (window.DeviceOrientationEvent) {
+    if (typeof window.DeviceOrientationEvent.requestPermission === 'function') addEventListener('touchend', enableTilt, { passive: true, once: true });
+    else enableTilt();
+  }
+
+  resize();
+  return {
+    startIntro(now) { introStart = now; kick(); },
+    hover(v) { hoverT = v; kick(); },
+    breathMode(on) { breathTarget = on ? 1 : 0; kick(); },
+    setBreath(v) { breathV = v; },
+    rate(v) { rateT = v; },
+    glow(v) { glowT = v; kick(); },
+    ask(v) { askT = v; kick(); },
+    pulse() { if (RM) return; hoverT = .85; kick(); clearTimeout(pulseT); pulseT = setTimeout(() => { if (hoverT === .85) hoverT = 0; kick(); }, 900); },
+    enableTilt,
+    kick
+  };
+})();
+
+/* ---------- opening sequence: waits for the fonts and the first paint, so the diamond ring is never missed ----------
+   0.25s Baily's beads, 1.25s the diamond ring and the first line of the title with the menu,
+   2.25s the second line, 2.7s the sign-up, 3.3s the invitation to breathe first. */
+(function () {
+  const h1 = $('#hero-title');
+  let shown = false;
+  const T = [];
+  function showAll(fast) {
+    if (shown) return; shown = true;
+    const k = SEEN ? .7 : 1;
+    playCues(h1, fast ? 200 : 1000 * k);
+    nav.classList.remove('pre');
+    T.push(setTimeout(() => heroEl.classList.add('ready'), fast ? 150 : 1450 * k));
+    T.push(setTimeout(() => { heroEl.classList.add('invite'); if (!fast) Light.pulse(); }, fast ? 450 : 2050 * k));
+  }
+  if (RM) { showAll(true); return; }
+  const fontsReady = new Promise(res => {
+    const l = $('#gf');
+    const faces = () => document.fonts ? Promise.all(['760 1em "Sofia Sans Extra Condensed"', '500 1em "Sofia Sans Semi Condensed"'].map(f => document.fonts.load(f))) : Promise.resolve();
+    const done = () => faces().then(res, res);
+    if (!l || l.media === 'all') done(); else { l.addEventListener('load', done); l.addEventListener('error', res); }
+    setTimeout(res, 2200);
+  });
+  let tm = 0, started = false;
+  const skip = () => { clearTimeout(tm); showAll(true); off(); };
+  const off = () => { removeEventListener('wheel', skip); removeEventListener('touchmove', skip); removeEventListener('keydown', skip); };
+  // if the frame loop never starts (background tab, stalled GPU), the words must still show up
+  setTimeout(() => { if (!started) { started = true; Light.startIntro(performance.now() - 5000); showAll(true); } }, 4000);
+  fontsReady.then(() => requestAnimationFrame(() => requestAnimationFrame(now => {
+    if (started) return; started = true;
+    const k = SEEN ? .62 : 1;
+    Light.startIntro(now);
+    if (!shown) tm = setTimeout(() => showAll(false), 1250 * k);
+    addEventListener('wheel', skip, { passive: true, once: true });
+    addEventListener('touchmove', skip, { passive: true, once: true });
+    addEventListener('keydown', skip, { once: true });
+  })));
+})();
+
+/* the nav keeps its sign-up quiet (outlined) while the big one in the opening is on screen, then fills */
+(function () {
+  const cta = $('#nav-cta'), hero = $('#hero-cta');
+  new IntersectionObserver(es => es.forEach(e => {
+    cta.classList.toggle('line', e.isIntersecting || e.boundingClientRect.top > 0);
+  })).observe(hero);
+})();
+
+/* teams: the question, a beat, then the answer as a hard cut, like a reverse shot */
+(function () {
+  const dl = $('#dialogue');
+  if (RM) { dl.classList.add('l1-in', 'l2-in'); return; }
+  new IntersectionObserver((es, ob) => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    ob.disconnect();
+    dl.classList.add('l1-in');
+    setTimeout(() => dl.classList.add('l2-in'), 2100);
+  }), { threshold: .45 }).observe(dl);
+})();
+
+/* ---------- the unsaid: a title card, six voices, then the cut ----------
+   Every line owns a band of scroll (SB, above). Each person gets one physical quality on top of the fade:
+   envy is a rack focus, competition cuts across the frame, grief arrives phrase by phrase at subtitle pace,
+   fear pushes in slowly, shame takes its time to come into focus, anger and the last line are hard cuts. */
+(function () {
+  if (!root.classList.contains('mo')) return;
+  const track = $('#said-track'), items = $$('#said li');
+  const lines = items.map(li => $('.line', li));
+  const kind = items.map(li => ['envy', 'comp', 'grief', 'fear', 'shame', 'anger'].find(k => li.classList.contains(k)) || '');
+  const p2s = items.map(li => $$('.p2', li));
+  const words = items.map(li => $$('.w', li));
+  let tk = false;
+  function update() {
+    tk = false;
+    const r = track.getBoundingClientRect();
+    const p = clamp(-r.top / Math.max(1, r.height - innerHeight));
+    items.forEach((li, i) => {
+      const o = saidOp(i, p);
+      li.style.opacity = o < .003 ? '0' : o.toFixed(3);
+      li.style.visibility = o < .003 ? 'hidden' : '';
+      if (o < .003 || !lines[i]) return;
+      const loc = SB.local(i, p), ln = lines[i];
+      switch (kind[i]) {
+        case 'envy': { const f = 1 - smooth(.08, .34, loc); ln.style.filter = f > .01 ? `blur(${(f * 7).toFixed(2)}px)` : ''; break; }
+        case 'comp': p2s[i].forEach(e => { e.style.opacity = loc > .42 ? '1' : '0'; }); break;
+        case 'grief': {
+          // four phrases, each landing on its own beat
+          words[i].forEach((w, k) => { const lang = w.closest('[data-l]'); const idx = $$('.w', lang).indexOf(w); w.style.opacity = smooth(.1 + idx * .13, .16 + idx * .13, loc).toFixed(3); });
+          break;
+        }
+        case 'fear': ln.style.transform = `scale(${(1 + .035 * easeSine(loc)).toFixed(4)})`; break;
+        case 'shame': { const f = 1 - smooth(.06, .5, loc); ln.style.filter = f > .01 ? `blur(${(f * 3.5).toFixed(2)}px)` : ''; break; }
+      }
+    });
+  }
+  addEventListener('scroll', () => { if (!tk) { tk = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener('resize', update);
+  update();
+})();
+
+/* ---------- the circle: twelve people, seen from above ----------
+   A title card and two subtitles over an empty room. Then they walk in from the edges on short curved paths, stand around,
+   and sit down in a ring; as the ring closes, the light comes back behind it. One moves into the middle, onto the black moon,
+   and the others lean in. When the body takes over, the middle glows and the corona breathes with it.
+   Then that person slides back to their seat and someone else steps in: it's their turn. */
+(function () {
+  const track = $('#circle-track'), c = $('#circle-canvas'), cues = $$('#circle-cues li');
+  const ctx = c.getContext('2d');
+  //              title slow  walk  sit  centre body turn
+  //              title talk  slow  walk sit centre body  turn
+  const CB = Bands([1.15, 1,    1,    1,   1,  1,     1.25, 1.4], .17);
+  const at = (i, f) => { const [a, b] = CB.edges[i]; return a + (b - a) * f; };
+  const BW = CB.edges[4][1] - CB.edges[4][0];
+  const N = 12, CEN = 5, CEN2 = 10, TAU = Math.PI * 2;
+  let seed = 31; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const sc = Array.from({ length: N }, (_, i) => {
+    const a = i / N * TAU + rnd() * .9, rr = .45 + rnd() * .55;
+    const from = a + (rnd() - .5) * 1.1;
+    const bend = (rnd() < .5 ? -1 : 1) * (.18 + rnd() * .22);
+    return { x: Math.cos(a) * rr, y: Math.sin(a) * rr, p: rnd() * TAU, s: .6 + rnd() * .8, b: rnd() * TAU, d: rnd(), from, bend };
+  });
+  let target = 0, prog = 0, raf = 0, last = 0, w = 0, h = 0, dpr = 1, visible = false;
+  function size() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    w = c.clientWidth; h = c.clientHeight;
+    c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  }
+  function cuesAt(p) {
+    if (RM) { const k = CB.index(p); cues.forEach((li, i) => { li.style.opacity = i === k ? '1' : '0'; li.style.visibility = i === k ? '' : 'hidden'; }); return; }
+    cues.forEach((li, i) => { const o = CB.op(i, p); li.style.opacity = o < .003 ? '0' : o.toFixed(3); li.style.visibility = o < .003 ? 'hidden' : ''; });
+  }
+  function measure() {
+    const r = track.getBoundingClientRect();
+    target = clamp(-r.top / Math.max(1, r.height - innerHeight));
+    visible = r.top < innerHeight && r.bottom > 0;
+    if (!visible) CIRC.op = 0;
+    cuesAt(target);
+    if (RM) { const k = CB.index(target), [a, b] = CB.edges[k]; prog = a + (b - a) * .8; }
+  }
+  const mixc = (a, b, t) => a.map((v, i) => Math.round(lerp(v, b[i], t)));
+  const PEARL = [236, 230, 222], WARM = [255, 136, 104];
+  function draw(now) {
+    const t = RM ? 0 : now;
+    const p = prog;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, w, h);
+    const narrow = w < 760;
+    const cx = w * .5, cy = narrow ? h * .4 : h * .44;
+    const Rc = narrow ? Math.min(w * .36, h * .2) : Math.min(h * .3, w * .22);
+    const spX = narrow ? w * .38 : Math.min(w * .3, Rc * 2.1), spY = narrow ? h * .2 : h * .32;
+    const far = Math.hypot(w, h) * .62;
+    const tight = 1.08 - .08 * smooth(at(4, 0), at(4, .3), p);
+    const ringDraw = ease(seg(at(4, .1), at(4, .75), p));
+    // the first person steps in, and later goes back to their seat
+    const m = ease(seg(at(5, .08), at(5, .5), p)) * (1 - ease(seg(at(7, .04), at(7, .34), p)));
+    // the second person steps in for their turn
+    const m2 = ease(seg(at(7, .42), at(7, .72), p));
+    const lean = smooth(at(5, .25), at(5, .65), p) * (1 - smooth(at(7, .02), at(7, .3), p)) + .85 * smooth(at(7, .5), at(7, .78), p);
+    const B = smooth(at(6, 0), at(6, .18), p) * (1 - smooth(at(6, .86), at(7, .06), p));
+    const warmC = smooth(at(5, .1), at(5, .5), p);
+    const after = smooth(at(7, .04), at(7, .4), p);
+    const dotR = narrow ? 5.4 : 7.6;
+    const ph = RM ? .25 : (t / 3400) % 1;
+    const pulse = B * Math.pow(Math.sin(Math.PI * ph), 6);
+    const pts = [];
+    for (let i = 0; i < N; i++) {
+      const s = sc[i];
+      const wk = RM && p > at(3, .5) ? 1 : easeOut(seg(at(3, -.1) + s.d * .4 * BW, at(3, .55) + s.d * .3 * BW, p));
+      const a0 = -Math.PI / 2 + i * TAU / N;
+      const sx0 = cx + lerp(Math.cos(a0) * Rc * 1.25, s.x * spX, .45) * tight, sy0 = cy + lerp(Math.sin(a0) * Rc * 1.25, s.y * spY, .45) * tight;
+      const ex = cx + Math.cos(s.from) * far, ey = cy + Math.sin(s.from) * far * .8;
+      const mx = (ex + sx0) / 2, my = (ey + sy0) / 2, ddx = sx0 - ex, ddy = sy0 - ey;
+      const kx = mx - ddy * s.bend, ky = my + ddx * s.bend;
+      const u = wk, iu = 1 - u;
+      let wx = iu * iu * ex + 2 * iu * u * kx + u * u * sx0;
+      let wy = iu * iu * ey + 2 * iu * u * ky + u * u * sy0;
+      const idle = RM ? 0 : smooth(.9, 1, wk) * 3;
+      wx += Math.sin(t * .00023 * s.s + s.p) * idle; wy += Math.cos(t * .0002 * s.s + s.p * 1.3) * idle;
+      const g = ease(seg(at(4, .05) + i * .012 * BW, at(4, .55) + i * .012 * BW, p));
+      const rx = cx + Math.cos(a0) * Rc, ry = cy + Math.sin(a0) * Rc;
+      let x = wx + (rx - wx) * g, y = wy + (ry - wy) * g;
+      const mm = i === CEN ? m : i === CEN2 ? m2 : 0;
+      if (mm > 0) {
+        x += (cx - x) * mm; y += (cy - y) * mm;
+        if (i === CEN && B > 0 && !RM) { x += (Math.sin(t * .031) + Math.sin(t * .047) * .6) * 2 * B; y += (Math.cos(t * .037) + Math.sin(t * .053) * .6) * 2 * B; }
+      } else if (lean > 0) {
+        const k = (.1 + .04 * pulse) * lean;
+        x += (cx - x) * k; y += (cy - y) * k;
+      }
+      pts.push({ x, y, wk, mm });
+    }
+    // hand the ring to the light: the moon sits just inside the ring of people
+    const sr = c.getBoundingClientRect();
+    const tr = track.getBoundingClientRect();
+    CIRC.x = sr.left + cx; CIRC.y = sr.top + cy; CIRC.R = Rc * .72;
+    CIRC.op = RM ? 0 : smooth(at(4, .05), at(4, .8), p) * (1 - smooth(innerHeight * .75, innerHeight * .25, tr.bottom));
+    CIRC.cor = .3 + .25 * B + .35 * pulse + .08 * after;
+    // the circle itself, drawn as people take their seats
+    if (ringDraw > 0) {
+      const rc = mixc([236, 238, 241], WARM, .4 * after);
+      ctx.strokeStyle = `rgba(${rc},${.16 + .06 * after + .1 * pulse})`; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(cx, cy, Rc * (1 - .1 * lean), -Math.PI / 2, -Math.PI / 2 + TAU * ringDraw); ctx.stroke();
+    }
+    // the warmth in the middle
+    if (B > 0) {
+      const q = pts[CEN];
+      ctx.globalCompositeOperation = 'lighter';
+      const hr = Rc * (.5 + .12 * pulse);
+      const hg = ctx.createRadialGradient(q.x, q.y, 0, q.x, q.y, hr);
+      hg.addColorStop(0, `rgba(255,160,120,${(.22 + .22 * pulse) * B})`); hg.addColorStop(.4, `rgba(255,140,100,${.07 * B})`); hg.addColorStop(1, 'rgba(255,120,90,0)');
+      ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(q.x, q.y, hr, 0, TAU); ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    // the people
+    for (let i = 0; i < N; i++) {
+      const q = pts[i];
+      if (q.wk <= 0) continue;
+      const inMid = q.mm > .5;
+      const a = (RM ? 1 : smooth(0, .25, q.wk)) * (inMid ? 1 : 1 - .1 * lean);
+      const breathe = RM ? 1 : 1 + .08 * Math.sin(t * .0012 + sc[i].b);
+      const r = dotR * (1 + .8 * q.mm) * breathe;
+      // the one who has been in the middle keeps a little of the warmth
+      const col = i === CEN ? mixc(PEARL, WARM, warmC * (1 - .5 * after)) : i === CEN2 ? mixc(PEARL, WARM, .28 * m2) : mixc(PEARL, WARM, .45 * pulse);
+      const gl = i === CEN ? .5 * B + .5 * pulse : .7 * pulse;
+      if (gl > .01) {
+        ctx.globalCompositeOperation = 'lighter';
+        const gg = ctx.createRadialGradient(q.x, q.y, r * .6, q.x, q.y, r * 4.5);
+        gg.addColorStop(0, `rgba(255,180,145,${.45 * gl * a})`); gg.addColorStop(1, 'rgba(255,170,130,0)');
+        ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(q.x, q.y, r * 4.5, 0, TAU); ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      ctx.fillStyle = `rgba(${col},${clamp(a * (inMid ? 1 : .9 + .1 * pulse))})`;
+      ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, TAU); ctx.fill();
+    }
+  }
+  function frame(now) {
+    raf = 0;
+    const dt = Math.min(64, last ? now - last : 16.7); last = now;
+    if (!RM) prog += (target - prog) * damp(.07, dt);
+    draw(now);
+    Light.kick();
+    if (!RM && (visible || Math.abs(target - prog) > .0005)) raf = requestAnimationFrame(frame);
+  }
+  const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+  addEventListener('scroll', () => { measure(); if (visible || RM) kick(); }, { passive: true });
+  addEventListener('resize', () => { size(); measure(); kick(); });
+  size(); measure(); if (!RM) prog = target; kick();
+})();
+
+/* ---------- the cast: one light passes over the four faces ---------- */
+(function () {
+  const wrap = $('#cast-wrap');
+  const facts = $('#facts');
+  // the two facts land as a hard cut, a beat after the fourth face is lit
+  new IntersectionObserver((es, ob) => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    ob.disconnect();
+    wrap.classList.add('in');
+    setTimeout(() => playCues(facts, RM ? 0 : 900), RM ? 0 : 3000);
+  }), { threshold: .3 }).observe(wrap);
+  // and if someone scrolls straight past the faces, the facts still show up when they reach them
+  new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { ob.disconnect(); setTimeout(() => playCues(facts, RM ? 0 : 900), RM ? 0 : 600); } }), { threshold: 1 }).observe(facts);
+  // the teams pitch: subtitles, one after another
+  const ts = $('#tsubs');
+  new IntersectionObserver((es, ob) => es.forEach(e => { if (e.isIntersecting) { ob.disconnect(); playCues(ts, 1100); } }), { threshold: .25 }).observe(ts);
+})();
+
+/* ============================================================
+   SOUND: a singing bowl and a soft drone, Web Audio only. Off by default.
+   ============================================================ */
+const Sound = (function () {
+  let ctx = null, master = null, verb = null, padGain = null, padFilter = null, on = false;
+  function ir(sec) {
+    const len = Math.round(ctx.sampleRate * sec), b = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) { const d = b.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+    return b;
+  }
+  function init() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    ctx = new AC();
+    master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+    verb = ctx.createConvolver(); verb.buffer = ir(3.4);
+    const wet = ctx.createGain(); wet.gain.value = .32; verb.connect(wet); wet.connect(master);
+    padFilter = ctx.createBiquadFilter(); padFilter.type = 'lowpass'; padFilter.frequency.value = 380; padFilter.Q.value = .4;
+    padGain = ctx.createGain(); padGain.gain.value = 0;
+    [[98, 'sine', .5], [146.83, 'sine', .28], [196.4, 'triangle', .07]].forEach(([f, type, g]) => {
+      const o = ctx.createOscillator(), gg = ctx.createGain(); o.type = type; o.frequency.value = f; gg.gain.value = g;
+      o.connect(gg); gg.connect(padFilter); o.start();
+    });
+    padFilter.connect(padGain); padGain.connect(master); padGain.connect(verb);
+    return true;
+  }
+  function bowl(strength) {
+    if (!ctx || !on) return;
+    const t = ctx.currentTime + .02, f0 = 196;
+    [[1, 1, 9], [2.71, .42, 6.5], [5.18, .2, 4], [8.6, .08, 2.6]].forEach(([ratio, amp, dur]) => {
+      [-.6, .6].forEach(det => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = f0 * ratio + det;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(amp * strength * .085, t + .015);
+        g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        o.connect(g); g.connect(master); g.connect(verb);
+        o.start(t); o.stop(t + dur + .1);
+      });
+    });
+  }
+  return {
+    toggle() {
+      on = !on;
+      if (on) {
+        if (!ctx && !init()) { on = false; return false; }
+        ctx.resume();
+        master.gain.cancelScheduledValues(ctx.currentTime);
+        master.gain.setTargetAtTime(1, ctx.currentTime, .25);
+        bowl(.6);
+      } else if (ctx) {
+        master.gain.cancelScheduledValues(ctx.currentTime);
+        master.gain.setTargetAtTime(0, ctx.currentTime, .15);
+      }
+      return on;
+    },
+    breath(v) { if (ctx && on) { padGain.gain.setTargetAtTime(.025 + v * .06, ctx.currentTime, .3); padFilter.frequency.setTargetAtTime(300 + v * 900, ctx.currentTime, .35); } },
+    bowl(s) { bowl(s); },
+    stop() { if (ctx) { master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setTargetAtTime(0, ctx.currentTime, .3); } },
+    resume() { if (ctx && on) { master.gain.setTargetAtTime(1, ctx.currentTime, .3); } },
+    get on() { return on; }
+  };
+})();
+
+/* ============================================================
+   FEEL FIRST: letterbox closes, the eclipse becomes the breath.
+   ============================================================ */
+(function () {
+  const bo = $('#bo'), sub = $('#bo-sub'), endEl = $('#bo-end');
+  const openBtn = $('#feel-open'), closeBtn = $('#bo-close'), sndBtn = $('#bo-sound'), nextBtn = $('#bo-next');
+  const IN = 4500, HOLD = 2500, OUT = 6000, CYC = IN + HOLD + OUT, N = 3, PRE = 3400, GO = 4500;
+  const TXT = {
+    nl: { settle: 'Ga even goed zitten. Laat je schouders zakken.', in: 'adem in', hold: 'vasthouden', out: 'adem uit', on: 'aan', off: 'uit' },
+    en: { settle: 'Get comfortable. Let your shoulders drop.', in: 'breathe in', hold: 'hold', out: 'breathe out', on: 'on', off: 'off' }
+  };
+  let raf = 0, t0 = 0, state = 'idle', cue = '', endAt = 0, leaving = false, rmTimer = 0;
+
+  /* hovering the light: the corona reaches out a little. Pressing it: the corona pulls in, like a held breath. */
+  let over = false;
+  openBtn.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { over = true; Light.hover(1); } });
+  openBtn.addEventListener('pointerleave', () => { over = false; Light.hover(0); });
+  openBtn.addEventListener('pointerdown', () => Light.hover(-1));
+  openBtn.addEventListener('pointercancel', () => Light.hover(over ? 1 : 0));
+  addEventListener('pointerup', () => { if (state === 'idle') Light.hover(over ? 1 : 0); });
+  openBtn.addEventListener('focus', () => Light.hover(1));
+  openBtn.addEventListener('blur', () => Light.hover(0));
+
+  function setCue(k) {
+    if (k === cue) return;
+    cue = k;
+    sub.classList.remove('on');
+    const l = lang();
+    setTimeout(() => {
+      if (cue !== k) return;
+      sub.textContent = k ? TXT[l][k] : '';
+      if (k) sub.classList.add('on');
+      if (k === 'in') hint.classList.remove('on');
+    }, k === 'in' || k === 'settle' ? 260 : 200);
+    if (k === 'in') Sound.bowl(1);
+    Light.rate(k === 'hold' ? 0 : 1);
+    if (RM) Light.glow(k === 'in' || k === 'hold' ? 1 : .55);
+  }
+  window.__breathRelang = () => {
+    if (state === 'idle') return;
+    if (cue) sub.textContent = TXT[lang()][cue];
+    sndState();
+  };
+  function sndState() {
+    sndBtn.querySelector('.state').textContent = TXT[lang()][Sound.on ? 'on' : 'off'];
+    sndBtn.setAttribute('aria-pressed', String(Sound.on));
+  }
+  sndState();
+
+  /* three beads inside the lower limb: the breath you are on glows softly, the ones behind you stay lit */
+  const dotsEl = $('#bo-dots'), dotEls = $$('i', dotsEl), hint = $('#snd-hint');
+  let hinted = false;
+  function progress(k) {
+    dotsEl.classList.toggle('on', k >= 0 && k < N);
+    dotEls.forEach((d, i) => { d.classList.toggle('done', i < k); d.classList.toggle('now', i === k); });
+  }
+  function tick(now) {
+    raf = 0;
+    if (state !== 'run') return;
+    const el = now - t0;
+    let v = 0;
+    if (el < PRE) {
+      setCue(el > 600 ? 'settle' : '');
+      // once per visit, while settling in: a quiet pointer to the sound
+      if (!hinted && !Sound.on && el > 900) { hinted = true; hint.classList.add('on'); setTimeout(() => hint.classList.remove('on'), 3600); }
+      v = .55 * (1 - easeSine(clamp(el / PRE)));
+    }
+    else if (el < PRE + N * CYC) {
+      const e = el - PRE, k = Math.floor(e / CYC), ph = e % CYC;
+      progress(k);
+      if (ph < IN) { setCue('in'); v = easeSine(ph / IN); }
+      else if (ph < IN + HOLD) { setCue('hold'); v = 1; }
+      else { setCue('out'); v = 1 - easeSine((ph - IN - HOLD) / OUT); }
+    } else {
+      progress(N);
+      if (!endAt) { endAt = now; setCue(''); endEl.classList.add('on'); Light.ask(1); Sound.bowl(.7); }
+      // no timer: the light keeps breathing very slowly, and "Continue" only appears after a while
+      v = .42 + .1 * Math.sin((now - endAt) / 9000 * Math.PI * 2);
+      v = lerp(.0, v, smooth(0, 2500, now - endAt));
+      if (now - endAt > GO && !endEl.classList.contains('go')) endEl.classList.add('go');
+    }
+    Light.setBreath(v);
+    Sound.breath(v);
+    raf = requestAnimationFrame(tick);
+  }
+
+  function open() {
+    if (state !== 'idle') return;
+    Light.enableTilt();
+    state = 'run'; leaving = false; endAt = 0; cue = '';
+    sub.textContent = ''; sub.classList.remove('on'); endEl.classList.remove('on', 'go');
+    progress(-1);
+    bo.hidden = false;
+    root.classList.remove('bo-leave', 'bo-text-out');
+    root.classList.add('breathing');
+    Light.hover(0);
+    Light.setBreath(0);
+    Light.breathMode(true);
+    if (RM) Light.glow(.55);
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('bo-in')));
+    Sound.resume();
+    sndState();
+    closeBtn.focus({ preventScroll: true });
+    t0 = performance.now() + 700;
+    if (RM) runReduced(); else raf = requestAnimationFrame(tick);
+  }
+  function runReduced() {
+    // no movement: the light stays where it is and only grows brighter and dimmer, slowly
+    let i = 0;
+    const seq = ['settle'];
+    for (let k = 0; k < N; k++) seq.push('in', 'hold', 'out');
+    const dur = { settle: PRE, in: IN, hold: HOLD, out: OUT };
+    const step = () => {
+      if (state !== 'run') return;
+      if (i >= seq.length) {
+        progress(N);
+        setCue(''); endEl.classList.add('on'); Light.ask(1); Light.glow(.8); Sound.bowl(.7);
+        rmTimer = setTimeout(() => endEl.classList.add('go'), GO); return;
+      }
+      const k = seq[i++];
+      const b = Math.floor((i - 2) / 3);
+      progress(k === 'settle' ? -1 : b);
+      setCue(k);
+      Sound.breath(k === 'out' || k === 'settle' ? 0 : 1);
+      rmTimer = setTimeout(step, dur[k]);
+    };
+    step();
+  }
+  /* leaving: the words go, then (still under black) the page moves to the unsaid frame,
+     and the breathing light settles in place as its dim key light before the black lifts */
+  function finish(toUnsaid) {
+    if (state === 'idle' || leaving) return;
+    leaving = true; state = 'leaving';
+    cancelAnimationFrame(raf); raf = 0; clearTimeout(rmTimer);
+    Sound.stop();
+    Light.rate(1);
+    root.classList.add('bo-text-out');
+    if (toUnsaid) {
+      const target = $('#onuitgesproken');
+      window.scrollTo({ top: target.getBoundingClientRect().top + scrollY, behavior: 'instant' });
+      nav.classList.add('away');
+    }
+    Light.breathMode(false);
+    Light.ask(0);
+    Light.glow(1);
+    Light.setBreath(0);
+    progress(-1);
+    setTimeout(() => root.classList.add('bo-leave'), RM ? 0 : 550);
+    setTimeout(() => {
+      root.classList.remove('breathing', 'bo-in', 'bo-leave', 'bo-text-out');
+      bo.hidden = true; state = 'idle'; leaving = false;
+      sub.classList.remove('on'); endEl.classList.remove('on', 'go');
+      if (toUnsaid) { nav.classList.add('away'); $('#unsaid-title').focus({ preventScroll: true }); }
+      else openBtn.focus({ preventScroll: true });
+    }, RM ? 60 : 2050);
+  }
+  function proceed() { finish(true); }
+  openBtn.addEventListener('click', open);
+  closeBtn.addEventListener('click', () => finish(false));
+  nextBtn.addEventListener('click', proceed);
+  sndBtn.addEventListener('click', () => { Sound.toggle(); sndState(); hint.classList.remove('on'); });
+  document.addEventListener('keydown', e => {
+    if (state === 'idle') return;
+    if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    if (e.key === 'Tab') {
+      const f = [sndBtn, closeBtn].concat(endEl.classList.contains('on') ? [nextBtn] : []);
+      const i = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(i + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
+    }
+  });
+})();
+
+})();
+</script>
+</body>
+</html>

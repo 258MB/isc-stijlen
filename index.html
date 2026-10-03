@@ -1,0 +1,1257 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Inner Shadow Circle: schaduwwerk in de kring. Een kring voor wat je niet zegt."></head><body style="margin:0">
+<title>Inner Shadow Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..500;1,6..72,200..500&family=Hanken+Grotesk:wght@300..500&family=IBM+Plex+Mono:wght@300;400&display=swap">
+<script>
+  (function () {
+    var lang = 'nl';
+    try { var s = localStorage.getItem('isc-lang'); if (s) lang = s; } catch (e) {}
+    if (lang === 'en') document.documentElement.classList.add('en');
+    document.documentElement.lang = lang;
+  })();
+</script>
+<style>
+  /* Layout: asymmetric editorial column on a single dark ground; one sticky scroll scene (the circle) as the orchestrated moment. */
+  :root {
+    --umbra: #0d0b0c;       /* ground: the darkest part of the shadow */
+    --penumbra: #171314;    /* raised surfaces */
+    --bone: #ebe4da;        /* text */
+    --ash: #968b84;         /* secondary text */
+    --corona: #e2c9a0;      /* the light at the edge: accent, used sparingly */
+    --ember: #7a2e28;       /* the body, heat: tiny details only */
+    --line: rgba(235, 228, 218, 0.12);
+    --line-strong: rgba(235, 228, 218, 0.26);
+
+    --f-display: "Newsreader", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --f-body: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    --gutter: clamp(16px, 5vw, 72px);
+    --measure: 36rem;
+    color-scheme: dark;
+  }
+  html { scroll-behavior: smooth; background: var(--umbra); }
+  body {
+    background: var(--umbra);
+    color: var(--bone);
+    font-family: var(--f-body);
+    font-weight: 340;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: .07; mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  ::selection { background: var(--corona); color: var(--umbra); }
+  a { color: inherit; }
+  :focus-visible { outline: 1px solid var(--corona); outline-offset: 4px; }
+
+  [hidden] { display: none !important; }
+  /* language switching */
+  :root:not(.en) [data-l="en"], :root.en [data-l="nl"] { display: none !important; }
+
+  .wrap { padding-inline: var(--gutter); max-width: 1320px; margin-inline: auto; }
+  .label {
+    font-family: var(--f-mono); font-weight: 300; font-size: .72rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--ash);
+  }
+  .display, h1, h2, h3 { font-family: var(--f-display); font-weight: 250; letter-spacing: -.01em; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.5rem, 6.4vw, 5.9rem); line-height: 1.02; font-variation-settings: "opsz" 72; }
+  h2 { font-size: clamp(2rem, 4.4vw, 3.6rem); line-height: 1.06; font-variation-settings: "opsz" 60; }
+  h3 { font-size: 1.45rem; line-height: 1.2; font-weight: 320; font-variation-settings: "opsz" 24; }
+  em, .it { font-style: italic; }
+  p { margin: 0; max-width: var(--measure); }
+  .lede { font-size: clamp(1.1rem, 1.5vw, 1.28rem); line-height: 1.6; color: var(--bone); }
+  .muted { color: var(--ash); }
+  section { position: relative; }
+  .sec { padding-block: clamp(96px, 14vw, 200px); }
+  .stack { display: flex; flex-direction: column; gap: 1.4rem; }
+
+  /* buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: .8em; cursor: pointer;
+    font-family: var(--f-mono); font-size: .76rem; letter-spacing: .16em; text-transform: uppercase; font-weight: 400;
+    color: var(--umbra); background: var(--bone); border: 1px solid var(--bone);
+    padding: 1.05em 1.6em; text-decoration: none; transition: background .4s, color .4s, border-color .4s;
+  }
+  .btn:hover { background: var(--corona); border-color: var(--corona); }
+  .btn.ghost { background: transparent; color: var(--bone); border-color: var(--line-strong); }
+  .btn.ghost:hover { border-color: var(--corona); color: var(--corona); }
+  .btn .arrow { transition: transform .4s; }
+  .btn:hover .arrow { transform: translateX(4px); }
+
+  /* NAV */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    padding-top: env(safe-area-inset-top, 0px);
+    transition: background .5s, border-color .5s;
+    border-bottom: 1px solid transparent;
+  }
+  .nav.solid { background: rgba(13, 11, 12, .82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-color: var(--line); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; height: 68px; }
+  .brand { display: flex; align-items: center; gap: .75rem; text-decoration: none; color: var(--bone); }
+  .brand svg { width: 30px; height: 30px; }
+  .wordmark { font-family: var(--f-display); font-weight: 300; font-size: 1rem; letter-spacing: .26em; white-space: nowrap; text-transform: uppercase; padding-left: .1em; }
+  .nav-links { display: flex; gap: 1.8rem; list-style: none; margin: 0; padding: 0; }
+  .nav-links a { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; text-decoration: none; color: var(--ash); transition: color .3s; }
+  .nav-links a:hover { color: var(--bone); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .lang { display: flex; border: 1px solid var(--line-strong); }
+  .lang button {
+    background: none; border: 0; color: var(--ash); cursor: pointer; font-family: var(--f-mono); font-size: .68rem; letter-spacing: .12em; padding: .55em .8em;
+  }
+  :root:not(.en) .lang [data-set="nl"], :root.en .lang [data-set="en"] { color: var(--umbra); background: var(--bone); }
+  .nav .btn { padding: .8em 1.2em; font-size: .68rem; }
+  @media (max-width: 980px) { .nav-links { display: none; } }
+  @media (max-width: 440px) { .nav .btn { display: none; } }
+
+  /* HERO */
+  .hero { min-height: min(92vh, 900px); display: flex; align-items: flex-end; padding-top: 110px; padding-bottom: clamp(56px, 8vw, 110px); overflow: hidden; }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .hero .wrap { position: relative; width: 100%; }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 3rem; align-items: end; }
+  .hero h1 .soft { color: var(--ash); font-style: italic; font-weight: 220; }
+  .hero-sub { margin-top: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: .9rem; }
+  .hero-aside { justify-self: end; max-width: 19rem; border-left: 1px solid var(--line-strong); padding-left: 1.25rem; display: flex; flex-direction: column; gap: .6rem; }
+  .hero-aside .def { font-family: var(--f-display); font-size: 1.05rem; line-height: 1.5; font-weight: 300; color: var(--bone); max-width: none; }
+  .hero-aside .def i { color: var(--corona); }
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-aside { justify-self: start; }
+    .hero { min-height: auto; padding-top: 58vw; }
+  }
+
+  /* UNSAID */
+  .unsaid-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 6vw, 6rem); }
+  .unsaid-intro { position: sticky; top: 110px; align-self: start; display: flex; flex-direction: column; gap: 1.6rem; }
+  .confessions { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .confessions li {
+    font-family: var(--f-display); font-style: italic; font-weight: 250; font-size: clamp(1.5rem, 2.7vw, 2.35rem); line-height: 1.22;
+    padding-block: 1.3rem; border-top: 1px solid var(--line); color: var(--ash);
+    transition: color 1.4s ease, padding-left 1.4s ease;
+    display: grid; grid-template-columns: 3.2rem minmax(0, 1fr); align-items: baseline;
+  }
+  .confessions li:last-child { border-bottom: 1px solid var(--line); }
+  .confessions li .k { font-family: var(--f-mono); font-style: normal; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ash); opacity: .7; }
+  .confessions li.on { color: var(--bone); }
+  .confessions li.on .k { color: var(--corona); opacity: 1; }
+  .unsaid-after { margin-top: 3rem; }
+  @media (max-width: 860px) { .unsaid-grid { grid-template-columns: 1fr; } .unsaid-intro { position: static; } .confessions li { grid-template-columns: 1fr; gap: .3rem; } }
+
+  /* BODY */
+  .body-sec { border-top: 1px solid var(--line); }
+  .body-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 6vw, 6rem); align-items: start; }
+  .body-grid .stack p + p { margin-top: 0; }
+  .sensations { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem; }
+  .sensations span { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .08em; color: var(--ash); border: 1px solid var(--line); padding: .45em .8em; }
+  .phases { margin-top: clamp(4rem, 8vw, 7rem); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line-strong); }
+  .phase { padding: 1.8rem 1.8rem 0 0; display: flex; flex-direction: column; gap: .8rem; }
+  .phase + .phase { padding-left: 1.8rem; border-left: 1px solid var(--line); }
+  .phase .n { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .14em; color: var(--corona); }
+  .phase p { color: var(--ash); font-size: 1rem; }
+  @media (max-width: 860px) {
+    .body-grid { grid-template-columns: 1fr; }
+    .phases { grid-template-columns: 1fr; }
+    .phase, .phase + .phase { padding: 1.6rem 0; border-left: 0; border-bottom: 1px solid var(--line); }
+  }
+
+  /* COOKER: the orchestrated scroll scene */
+  .cooker { border-top: 1px solid var(--line); }
+  .cooker-head { padding-top: clamp(96px, 14vw, 180px); display: flex; flex-direction: column; gap: 1.4rem; }
+  .cooker-scene { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 2rem; }
+  .cooker-stage { position: sticky; top: 0; height: 100vh; height: 100svh; display: flex; align-items: center; }
+  .cooker-stage canvas { width: 100%; aspect-ratio: 1; max-width: 100%; max-height: 82vh; display: block; }
+  .steps { display: flex; flex-direction: column; }
+  .step { min-height: 78vh; display: flex; flex-direction: column; justify-content: center; gap: 1rem; opacity: .38; transition: opacity .8s ease; }
+  .step.on { opacity: 1; }
+  .step .label { color: var(--corona); }
+  .step:last-child { min-height: 90vh; }
+  @media (max-width: 860px) {
+    .cooker-scene { grid-template-columns: 1fr; }
+    .cooker-stage { height: 46vh; top: 60px; z-index: 1; background: linear-gradient(var(--umbra) 82%, transparent); justify-content: center; }
+    .cooker-stage canvas { max-height: 42vh; width: auto; height: 42vh; }
+    .step { min-height: 62vh; }
+  }
+
+  /* TOGETHER */
+  .together { border-top: 1px solid var(--line); }
+  .together-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(2rem, 6vw, 6rem); }
+  .pull {
+    font-family: var(--f-display); font-weight: 250; font-style: italic; font-size: clamp(1.7rem, 3.2vw, 2.7rem); line-height: 1.18;
+    color: var(--bone); max-width: 22ch; text-wrap: balance;
+  }
+  .pull::before { content: ""; display: block; width: 44px; height: 1px; background: var(--corona); margin-bottom: 1.6rem; }
+  .together-side { align-self: end; display: flex; flex-direction: column; gap: 1.4rem; }
+  @media (max-width: 860px) { .together-grid { grid-template-columns: 1fr; } }
+
+  /* LINEAGE */
+  .lineage { background: var(--penumbra); border-block: 1px solid var(--line); }
+  .lineage-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(2rem, 6vw, 6rem); }
+  .lineage .big { font-family: var(--f-display); font-weight: 250; font-size: clamp(1.5rem, 2.6vw, 2.2rem); line-height: 1.3; max-width: 30ch; }
+  .lineage .big b { font-weight: 400; font-style: italic; }
+  .lineage .fine { font-size: .9rem; color: var(--ash); max-width: 44rem; }
+  .lineage .fine a { color: var(--bone); text-underline-offset: 3px; text-decoration-color: var(--line-strong); }
+  .lineage .fine a:hover { text-decoration-color: var(--corona); }
+  @media (max-width: 860px) { .lineage-grid { grid-template-columns: 1fr; } }
+
+  /* READINESS */
+  .ready-head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(2rem, 6vw, 6rem); align-items: end; }
+  .ready-cols { margin-top: clamp(3rem, 6vw, 5rem); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line-strong); }
+  .ready-col { padding-top: 2rem; display: flex; flex-direction: column; gap: 1.2rem; }
+  .ready-col + .ready-col { padding-left: 2.5rem; border-left: 1px solid var(--line); }
+  .ready-col:first-child { padding-right: 2.5rem; }
+  .ready-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .ready-col li { padding: 1rem 0 1rem 1.9rem; border-bottom: 1px solid var(--line); position: relative; max-width: 34rem; }
+  .ready-col li::before { content: ""; position: absolute; left: 0; top: 1.72rem; width: 10px; height: 10px; border-radius: 50%; }
+  .ready-yes li::before { border: 1px solid var(--corona); background: var(--corona); }
+  .ready-no li { color: var(--ash); }
+  .ready-no li::before { border: 1px solid var(--ash); }
+  .disclaimer { margin-top: 3rem; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1.2rem; padding: 1.6rem; border: 1px solid var(--line); max-width: 52rem; }
+  .disclaimer p { font-size: .95rem; color: var(--ash); max-width: none; }
+  .disclaimer strong { color: var(--bone); font-weight: 450; }
+  @media (max-width: 860px) {
+    .ready-head { grid-template-columns: 1fr; }
+    .ready-cols { grid-template-columns: 1fr; }
+    .ready-col + .ready-col { padding-left: 0; border-left: 0; margin-top: 2.5rem; }
+    .ready-col:first-child { padding-right: 0; }
+  }
+
+  /* TEAM */
+  .team { border-top: 1px solid var(--line); }
+  .team-head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(2rem, 6vw, 6rem); align-items: end; }
+  .team-grid { margin-top: clamp(3rem, 6vw, 5rem); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; }
+  .person { display: flex; flex-direction: column; gap: .9rem; }
+  .portrait {
+    aspect-ratio: 4 / 5; max-width: 100%; border: 1px dashed var(--line-strong); display: grid; place-items: center; position: relative;
+    background: radial-gradient(circle at 50% 42%, rgba(226, 201, 160, .06), transparent 60%);
+  }
+  .portrait { border: 1px solid var(--line); overflow: hidden; }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) sepia(.18) contrast(1.06) brightness(.82); transition: filter 1.2s ease; }
+  .portrait::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 35%, transparent 45%, rgba(13, 11, 12, .55)); pointer-events: none; transition: opacity 1.2s ease; }
+  .person:hover .portrait img { filter: none; }
+  .person:hover .portrait::after { opacity: .4; }
+  .portrait .label { position: absolute; bottom: .8rem; left: .9rem; font-size: .6rem; }
+  .person h3 { font-size: 1.3rem; }
+  .person p { font-size: .92rem; color: var(--ash); }
+  @media (max-width: 980px) { .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .team-head { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .nav .wordmark { font-size: .78rem; letter-spacing: .14em; } }
+  @media (max-width: 480px) { .team-grid { grid-template-columns: 1fr 1fr; gap: 1rem; } }
+
+  /* FORMATS */
+  .formats { border-top: 1px solid var(--line); }
+  .format-grid { margin-top: clamp(3rem, 6vw, 5rem); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); }
+  .format { padding: 2rem; display: flex; flex-direction: column; gap: 1rem; }
+  .format + .format { border-left: 1px solid var(--line); }
+  .format.feature { background: var(--penumbra); }
+  .format .price { font-family: var(--f-display); font-weight: 250; font-size: 2.6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+  .format .price small { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .1em; color: var(--ash); margin-left: .4em; }
+  .format dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .5rem 1rem; font-size: .9rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  .format dt { font-family: var(--f-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ash); padding-top: .2em; }
+  .format dd { margin: 0; }
+  .format p { font-size: .96rem; color: var(--ash); }
+  .format .tag { align-self: flex-start; font-family: var(--f-mono); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--corona); border: 1px solid rgba(226, 201, 160, .4); padding: .35em .7em; }
+  @media (max-width: 900px) { .format-grid { grid-template-columns: 1fr; } .format + .format { border-left: 0; border-top: 1px solid var(--line); } }
+
+  .dates { margin-top: clamp(3rem, 6vw, 5rem); }
+  .dates-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .dates-wrap { overflow-x: auto; }
+  .dates-table th { text-align: left; font-family: var(--f-mono); font-weight: 300; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ash); padding: 0 1rem .9rem 0; border-bottom: 1px solid var(--line-strong); white-space: nowrap; }
+  .dates-table td { padding: 1.15rem 1rem 1.15rem 0; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+  .dates-table td.d { font-family: var(--f-display); font-size: 1.25rem; font-weight: 300; }
+  .dates-table td.m { font-family: var(--f-mono); font-size: .78rem; color: var(--ash); }
+  .spots { display: inline-flex; gap: 3px; vertical-align: middle; margin-right: .6rem; }
+  .spots i { width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--ash); }
+  .spots i.f { background: var(--corona); border-color: var(--corona); }
+  .dates-table .pick { font-family: var(--f-mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; background: none; border: 1px solid var(--line-strong); color: var(--bone); padding: .7em 1em; cursor: pointer; transition: border-color .3s, color .3s; }
+  .dates-table .pick:hover { border-color: var(--corona); color: var(--corona); }
+  .dates-table tr.full td { color: var(--ash); }
+  .dates-table tr.full .pick { opacity: .4; pointer-events: none; }
+
+  /* APPLY */
+  .apply { background: var(--penumbra); border-top: 1px solid var(--line); }
+  .apply-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 6vw, 6rem); }
+  .apply-intro { position: sticky; top: 110px; align-self: start; display: flex; flex-direction: column; gap: 1.4rem; }
+  .route { list-style: none; margin: 1rem 0 0; padding: 0; display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+  .route li { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: .8rem; padding: 1rem 0; border-bottom: 1px solid var(--line); font-size: .95rem; }
+  .route li span:first-child { font-family: var(--f-mono); font-size: .7rem; color: var(--corona); padding-top: .25em; }
+  .route li span:last-child { color: var(--ash); }
+  .route li b { color: var(--bone); font-weight: 450; }
+  form { display: flex; flex-direction: column; gap: 2.6rem; }
+  fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.1rem; min-width: 0; }
+  legend { padding: 0; margin-bottom: 1.1rem; font-family: var(--f-display); font-size: 1.5rem; font-weight: 300; }
+  legend .label { display: block; margin-bottom: .4rem; font-family: var(--f-mono); font-size: .66rem; color: var(--corona); }
+  .field { display: flex; flex-direction: column; gap: .5rem; }
+  .field > label, .field > .flabel { font-family: var(--f-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ash); }
+  .field .hint { font-size: .85rem; color: var(--ash); }
+  input[type="text"], input[type="email"], input[type="tel"], textarea {
+    font: inherit; color: var(--bone); background: transparent; border: 0; border-bottom: 1px solid var(--line-strong);
+    padding: .7rem 0; border-radius: 0; width: 100%; transition: border-color .3s;
+  }
+  textarea { min-height: 7rem; resize: vertical; line-height: 1.6; }
+  input:focus, textarea:focus { outline: none; border-color: var(--corona); }
+  .row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem; }
+  @media (max-width: 560px) { .row2 { grid-template-columns: 1fr; } }
+  .choices { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+  .choice { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: 1rem .2rem; border-bottom: 1px solid var(--line); cursor: pointer; transition: background .3s; }
+  .choice:hover { background: rgba(235, 228, 218, .03); }
+  .choice input { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 1px solid var(--ash); border-radius: 50%; margin: 0; display: grid; place-items: center; cursor: pointer; }
+  .choice input:checked { border-color: var(--corona); }
+  .choice input:checked::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--corona); }
+  .choice .c-main { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+  .choice .c-title { font-family: var(--f-display); font-size: 1.15rem; font-weight: 300; }
+  .choice .c-meta { font-family: var(--f-mono); font-size: .7rem; color: var(--ash); letter-spacing: .04em; }
+  .choice .c-price { font-family: var(--f-mono); font-size: .8rem; color: var(--ash); font-variant-numeric: tabular-nums; }
+  .checks { display: flex; flex-direction: column; gap: .2rem; }
+  .check { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 1rem; align-items: start; padding: .8rem 0; cursor: pointer; font-size: .98rem; }
+  .check input { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 1px solid var(--ash); margin: .3rem 0 0; display: grid; place-items: center; cursor: pointer; }
+  .check input:checked { border-color: var(--corona); background: var(--corona); }
+  .check input:checked::after { content: ""; width: 4px; height: 8px; border: solid var(--umbra); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg) translate(-1px, -1px); }
+  .form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 1.4rem; }
+  .form-foot .muted { font-size: .85rem; max-width: 24rem; }
+  .err { color: #e59a8f; font-size: .9rem; }
+  .sent { border: 1px solid var(--line-strong); padding: clamp(1.6rem, 4vw, 3rem); display: flex; flex-direction: column; gap: 1.2rem; }
+  .sent svg { width: 56px; height: 56px; color: var(--corona); }
+  .proto { font-family: var(--f-mono); font-size: .66rem; letter-spacing: .1em; color: var(--ash); border-top: 1px solid var(--line); padding-top: 1rem; }
+  @media (max-width: 860px) { .apply-grid { grid-template-columns: 1fr; } .apply-intro { position: static; } }
+
+  /* FAQ */
+  .faq-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(2rem, 6vw, 6rem); }
+  details { border-bottom: 1px solid var(--line); }
+  details:first-child { border-top: 1px solid var(--line); }
+  summary { list-style: none; cursor: pointer; padding: 1.4rem 2.5rem 1.4rem 0; position: relative; font-family: var(--f-display); font-size: 1.3rem; font-weight: 300; line-height: 1.3; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: ""; position: absolute; right: .3rem; top: 50%; width: 12px; height: 12px; margin-top: -6px; border: 1px solid var(--ash); border-radius: 50%; transition: background .3s, border-color .3s; }
+  details[open] summary::after { background: var(--corona); border-color: var(--corona); }
+  details p { padding: 0 0 1.6rem; color: var(--ash); }
+  @media (max-width: 860px) { .faq-grid { grid-template-columns: 1fr; } }
+
+  /* CLOSING + FOOTER */
+  .closing { text-align: left; border-top: 1px solid var(--line); overflow: hidden; }
+  .closing canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .9; }
+  .closing .wrap { position: relative; display: flex; flex-direction: column; gap: 2rem; align-items: flex-start; }
+  .closing h2 { font-size: clamp(2.4rem, 5.6vw, 5rem); max-width: 16ch; }
+  footer { border-top: 1px solid var(--line); padding-block: 3.5rem 3rem; }
+  .foot-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem; }
+  .foot-grid p, .foot-grid li { font-size: .88rem; color: var(--ash); }
+  .foot-grid ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; }
+  .foot-grid a { text-decoration: none; }
+  .foot-grid a:hover { color: var(--bone); }
+  .crisis { border-left: 1px solid var(--ember); padding-left: 1rem; }
+  .crisis strong { color: var(--bone); font-weight: 450; }
+  .copy-mail { background: none; border: 0; padding: 0; color: var(--bone); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-strong); }
+  .legal { margin-top: 3rem; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; }
+  @media (max-width: 860px) { .foot-grid { grid-template-columns: 1fr; } }
+
+  /* BREATH overlay */
+  .breath { position: fixed; inset: 0; z-index: 200; background: var(--umbra); display: grid; place-items: center; padding: 24px; }
+  .breath canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .breath-text { position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.2rem; max-width: 30rem; }
+  .breath-cue { font-family: var(--f-display); font-style: italic; font-weight: 250; font-size: clamp(2rem, 5vw, 3.4rem); transition: opacity 1.2s; }
+  .breath-close { position: absolute; top: calc(20px + env(safe-area-inset-top, 0px)); right: 20px; z-index: 2; background: none; border: 1px solid var(--line-strong); color: var(--ash); font-family: var(--f-mono); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; padding: .7em 1em; cursor: pointer; }
+  .breath-close:hover { color: var(--bone); border-color: var(--bone); }
+  .breath-end p { color: var(--ash); margin-inline: auto; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .confessions li, .step, .breath-cue { transition: none; }
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <mask id="crescent-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+      <rect width="64" height="64" fill="#fff"/>
+      <circle cx="33.9" cy="30.4" r="13.1" fill="#000"/>
+    </mask>
+    <symbol id="mark" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="27" fill="none" stroke="currentColor" stroke-width=".6" opacity=".32"/>
+      <g fill="currentColor">
+        <circle cx="32" cy="5" r="1.7"/>
+        <circle cx="51.09" cy="12.91" r="1.7"/>
+        <circle cx="59" cy="32" r="1.7"/>
+        <circle cx="51.09" cy="51.09" r="1.7"/>
+        <circle cx="32" cy="59" r="1.7"/>
+        <circle cx="12.91" cy="51.09" r="1.7"/>
+        <circle cx="5" cy="32" r="1.7"/>
+        <circle cx="12.91" cy="12.91" r="1.7"/>
+      </g>
+      <circle cx="32" cy="32" r="14" fill="currentColor" mask="url(#crescent-mask)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Inner Shadow Circle">
+      <svg aria-hidden="true"><use href="#mark"/></svg>
+      <span class="wordmark">Inner Shadow Circle</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#onuitgesproken"><span data-l="nl">Het werk</span><span data-l="en">The work</span></a></li>
+      <li><a href="#kring"><span data-l="nl">De kring</span><span data-l="en">The circle</span></a></li>
+      <li><a href="#voor-wie"><span data-l="nl">Voor wie</span><span data-l="en">Who it's for</span></a></li>
+      <li><a href="#wij"><span data-l="nl">Wij</span><span data-l="en">Us</span></a></li>
+      <li><a href="#data"><span data-l="nl">Data</span><span data-l="en">Dates</span></a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-set="nl">NL</button>
+        <button type="button" data-set="en">EN</button>
+      </div>
+      <a class="btn" href="#aanmelden"><span data-l="nl">Aanmelden</span><span data-l="en">Apply</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title">
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <p class="label" style="margin-bottom:1.6rem">
+            <span data-l="nl">Schaduwwerk in de kring</span><span data-l="en">Shadow work in circle</span>
+          </p>
+          <h1 id="hero-title">
+            <span data-l="nl">De meeste mensen denken, <span class="soft">zodat ze niet hoeven te voelen.</span></span>
+            <span data-l="en">Most of us think, <span class="soft">so we don't have to feel.</span></span>
+          </h1>
+          <div class="hero-sub">
+            <p class="lede" data-l="nl">Inner Shadow Circle is een kring voor de delen van jou die nooit hardop worden gezegd. Jaloezie. Competitie. Verdriet. Angst. Schaamte. We gaan er samen naartoe, in het lichaam, tot ze hun greep verliezen.</p>
+            <p class="lede" data-l="en">Inner Shadow Circle is a circle for the parts of you that never get said out loud. Envy. Competition. Grief. Fear. Shame. We go there together, in the body, until they lose their grip.</p>
+            <div class="hero-actions">
+              <a class="btn" href="#aanmelden"><span data-l="nl">Meld je aan voor een kring</span><span data-l="en">Apply for a circle</span><span class="arrow" aria-hidden="true">→</span></a>
+              <button class="btn ghost" type="button" id="breath-open"><span data-l="nl">Voel eerst</span><span data-l="en">Feel first</span></button>
+            </div>
+          </div>
+        </div>
+        <aside class="hero-aside">
+          <span class="label">scha·duw <span data-l="nl">(zn.)</span><span data-l="en">/ shad·ow (n.)</span></span>
+          <p class="def" data-l="nl">Alles in jou wat je liever niet laat zien. Niet het donker zelf, maar wat erin ligt. Pas als je er samen in stapt, wordt het licht zichtbaar dat er altijd al was.</p>
+          <p class="def" data-l="en">Everything in you that you would rather not show. Not the dark itself, but what lies in it. Only when you step into it together does the light appear that was there all along.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE UNSAID -->
+  <section class="sec" id="onuitgesproken" aria-labelledby="unsaid-title">
+    <div class="wrap unsaid-grid">
+      <div class="unsaid-intro">
+        <p class="label"><span data-l="nl">Wat je niet zegt</span><span data-l="en">What you don't say</span></p>
+        <h2 id="unsaid-title">
+          <span data-l="nl">Iedereen draagt een zin mee die nog nooit hardop is gezegd.</span>
+          <span data-l="en">Everyone carries a sentence they have never said out loud.</span>
+        </h2>
+      </div>
+      <div>
+        <ol class="confessions" id="confessions">
+          <li><span class="k"><span data-l="nl">Jaloezie</span><span data-l="en">Envy</span></span><span><span data-l="nl">Ik ben jaloers op het leven van mijn beste vriend.</span><span data-l="en">I'm jealous of my best friend's life.</span></span></li>
+          <li><span class="k"><span data-l="nl">Competitie</span><span data-l="en">Rivalry</span></span><span><span data-l="nl">Ik moet winnen. Ook van de mensen van wie ik hou.</span><span data-l="en">I need to win. Even against the people I love.</span></span></li>
+          <li><span class="k"><span data-l="nl">Verdriet</span><span data-l="en">Grief</span></span><span><span data-l="nl">Ik heb nooit om mijn vader gerouwd. Ik werd gewoon druk.</span><span data-l="en">I never grieved my father. I just got busy.</span></span></li>
+          <li><span class="k"><span data-l="nl">Angst</span><span data-l="en">Fear</span></span><span><span data-l="nl">Ik ben doodsbang dat ik niet genoeg ben.</span><span data-l="en">I'm terrified that I'm not enough.</span></span></li>
+          <li><span class="k"><span data-l="nl">Schaamte</span><span data-l="en">Shame</span></span><span><span data-l="nl">Ik schaam me voor hoe graag ik gezien wil worden.</span><span data-l="en">I'm ashamed of how badly I want to be seen.</span></span></li>
+          <li><span class="k"><span data-l="nl">Woede</span><span data-l="en">Rage</span></span><span><span data-l="nl">Soms ben ik zo kwaad dat ik er zelf van schrik.</span><span data-l="en">Sometimes I'm so angry it scares me.</span></span></li>
+        </ol>
+        <div class="unsaid-after stack">
+          <p class="lede" data-l="nl">Alleen gedragen stuurt zo'n zin je leven van onderaf. Hij bepaalt wie je belt en wie niet, waar je te hard voor werkt, wanneer je dichtklapt. Hardop gezegd in een kring, en gezien zonder dat iemand wegkijkt, komt hij in beweging.</p>
+          <p class="lede" data-l="en">Carried alone, a sentence like that runs your life from underneath. It decides who you call and who you don't, what you overwork for, when you shut down. Said out loud in a circle, and seen without anyone looking away, it starts to move.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BODY -->
+  <section class="sec body-sec" id="lichaam" aria-labelledby="body-title">
+    <div class="wrap">
+      <div class="body-grid">
+        <div class="stack">
+          <p class="label"><span data-l="nl">Geen praatgroep</span><span data-l="en">Not a talking group</span></p>
+          <h2 id="body-title"><span data-l="nl">Je lichaam weet het al.</span><span data-l="en">Your body already knows.</span></h2>
+        </div>
+        <div class="stack">
+          <p data-l="nl">De meeste mensen leven vanaf hun nek naar boven. We kunnen onze pijn tot in detail uitleggen en hem toch niet voelen. Vraag iemand waar verdriet in het lichaam zit, en het wordt vaak stil. Er is wel iets. We hebben alleen lang geleden geleerd om er niet bij te zijn.</p>
+          <p data-l="en">Most of us live from the neck up. We can explain our pain in detail and still not feel it. Ask someone where sadness sits in their body and they often go quiet. Something is there. We just learned, a long time ago, to leave.</p>
+          <p data-l="nl">Praten is vaak precies de manier waarop we gevoel op afstand houden. Daarom vertragen we tot je merkt wat er onder het verhaal gebeurt. Daar gebeurt het werk. Tranen, trillen, woede, lachen, stilte: alles mag komen.</p>
+          <p data-l="en">Talking is often exactly how we keep feeling at a distance. So we slow down until you notice what is happening underneath the story. That's where the work happens. Tears, shaking, anger, laughter, silence: all of it is allowed.</p>
+          <div class="sensations" aria-label="Sensations">
+            <span data-l="nl">dichte keel</span><span data-l="en">tight throat</span>
+            <span data-l="nl">kaken op elkaar</span><span data-l="en">clenched jaw</span>
+            <span data-l="nl">ingehouden adem</span><span data-l="en">held breath</span>
+            <span data-l="nl">knoop in je maag</span><span data-l="en">knot in the stomach</span>
+            <span data-l="nl">hitte op je borst</span><span data-l="en">heat in the chest</span>
+            <span data-l="nl">koude handen</span><span data-l="en">cold hands</span>
+          </div>
+        </div>
+      </div>
+      <div class="phases">
+        <div class="phase">
+          <span class="n">I</span>
+          <h3><span data-l="nl">Opmerken</span><span data-l="en">Notice</span></h3>
+          <p data-l="nl">Wat gebeurt er nu, in je lijf, terwijl je dit vertelt? Niet waarom. Alleen wat.</p>
+          <p data-l="en">What is happening in your body right now, as you say this? Not why. Only what.</p>
+        </div>
+        <div class="phase">
+          <span class="n">II</span>
+          <h3><span data-l="nl">Blijven</span><span data-l="en">Stay</span></h3>
+          <p data-l="nl">Het moment waarop je normaal een grap maakt, wegkijkt of gaat uitleggen. Daar blijven we.</p>
+          <p data-l="en">The moment you would normally make a joke, look away or start explaining. That's where we stay.</p>
+        </div>
+        <div class="phase">
+          <span class="n">III</span>
+          <h3><span data-l="nl">Laten bewegen</span><span data-l="en">Let it move</span></h3>
+          <p data-l="nl">Wat jarenlang is vastgehouden, wil ergens heen. We geven het ruimte tot het klaar is.</p>
+          <p data-l="en">What has been held for years wants to go somewhere. We give it room until it's done.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE CIRCLE / PRESSURE COOKER -->
+  <section class="cooker" id="kring" aria-labelledby="cooker-title">
+    <div class="wrap">
+      <div class="cooker-head">
+        <p class="label"><span data-l="nl">Hoe een kring werkt</span><span data-l="en">How a circle works</span></p>
+        <h2 id="cooker-title"><span data-l="nl">Een snelkookpan voor wat je binnenhoudt.</span><span data-l="en">A pressure cooker for what you hold in.</span></h2>
+      </div>
+      <div class="cooker-scene" id="cooker-scene">
+        <div class="cooker-stage"><canvas id="cooker-canvas" aria-hidden="true"></canvas></div>
+        <div class="steps" id="steps">
+          <div class="step on">
+            <span class="label"><span data-l="nl">Binnenkomen</span><span data-l="en">Arriving</span></span>
+            <h3><span data-l="nl">Iedereen komt binnen met een pantser.</span><span data-l="en">Everyone walks in wearing armor.</span></h3>
+            <p class="muted" data-l="nl">Een goede baan, een grap op het juiste moment, een verhaal dat klopt. We kennen onze rol zo goed dat we vergeten dat het een rol is.</p>
+            <p class="muted" data-l="en">A good job, a well-timed joke, a story that holds together. We know our role so well we forget it's a role.</p>
+          </div>
+          <div class="step">
+            <span class="label"><span data-l="nl">De kring</span><span data-l="en">The circle</span></span>
+            <h3><span data-l="nl">We vormen de kring.</span><span data-l="en">We form the circle.</span></h3>
+            <p class="muted" data-l="nl">Eerst de afspraken. Wat hier gezegd wordt, blijft hier. Niemand wordt gerepareerd. Niemand hoeft iets. Iedereen blijft.</p>
+            <p class="muted" data-l="en">Agreements first. What is said here stays here. Nobody gets fixed. Nobody has to do anything. Everybody stays.</p>
+          </div>
+          <div class="step">
+            <span class="label"><span data-l="nl">Het midden</span><span data-l="en">The center</span></span>
+            <h3><span data-l="nl">Eén persoon. Alle aandacht.</span><span data-l="en">One person. All of the attention.</span></h3>
+            <p class="muted" data-l="nl">Eén van jullie gaat het midden in. De hele kring kijkt, ademt en blijft. Onder zoveel aandacht wordt het moeilijk om naar je hoofd te vluchten.</p>
+            <p class="muted" data-l="en">One of you steps into the center. The whole circle watches, breathes and stays. Under that much attention, it gets hard to escape into your head.</p>
+          </div>
+          <div class="step">
+            <span class="label"><span data-l="nl">De druk</span><span data-l="en">The pressure</span></span>
+            <h3><span data-l="nl">De druk doet het werk.</span><span data-l="en">The pressure does the work.</span></h3>
+            <p class="muted" data-l="nl">Wat jaren heeft gesudderd, komt naar boven. Wij bewaken het tempo en de veiligheid. Jij hoeft maar één ding te doen: niet weggaan.</p>
+            <p class="muted" data-l="en">What has been simmering for years comes to the surface. We guard the pace and the safety. You only have to do one thing: not leave.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOGETHER -->
+  <section class="sec together" id="samen" aria-labelledby="together-title">
+    <div class="wrap together-grid">
+      <div class="stack">
+        <p class="label"><span data-l="nl">Waarom samen</span><span data-l="en">Why together</span></p>
+        <h2 id="together-title"><span data-l="nl">Alleen kun je het begrijpen. Samen kom je erdoorheen.</span><span data-l="en">Alone, you can understand it. Together, you get through it.</span></h2>
+        <p data-l="nl">Je kunt dit werk alleen proberen, en waarschijnlijk heb je dat al gedaan. Een dagboek, therapie, een app die vraagt hoe je je voelt. Het helpt. Maar schaamte groeit in het geheim en verliest haar kracht zodra ze gezien wordt.</p>
+        <p data-l="en">You can try this work alone, and you probably have. A journal, therapy, an app that asks how you feel. It helps. But shame grows in secret, and it loses its power the moment it is seen.</p>
+        <p data-l="nl">En terwijl één persoon werkt, werkt de rest mee. In andermans verdriet herken je je eigen verdriet. In andermans jaloezie zie je de jouwe. Niemand zit hier alleen voor zichzelf.</p>
+        <p data-l="en">And while one person works, everyone else is working too. In someone else's grief you recognise your own. In someone else's envy you see yours. Nobody sits in this circle only for themselves.</p>
+      </div>
+      <div class="together-side">
+        <p class="pull" data-l="nl">Je zegt het onzegbare, en de mensen om je heen blijven zitten. Dan leert je zenuwstelsel wat geen boek je kan leren: ik kan zo gezien worden, en blijven.</p>
+        <p class="pull" data-l="en">You say the unsayable, and the people around you stay seated. Then your nervous system learns what no book can teach it: I can be seen like this, and stay.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LINEAGE -->
+  <section class="sec lineage" id="herkomst" aria-labelledby="lineage-title">
+    <div class="wrap lineage-grid">
+      <div class="stack">
+        <p class="label" id="lineage-title"><span data-l="nl">Waar dit vandaan komt</span><span data-l="en">Where this comes from</span></p>
+      </div>
+      <div class="stack">
+        <p class="big" data-l="nl">In de documentaire <b>The Work</b> (2017) zitten gedetineerden en mensen van buiten vier dagen samen in een kring in Folsom State Prison. Harde mannen breken open, en de bezoekers net zo goed. Het liet zien wat een kring kan dragen.</p>
+        <p class="big" data-l="en">In the documentary <b>The Work</b> (2017), inmates and people from outside sit together in a circle for four days inside Folsom State Prison. Hardened men break open, and so do the visitors. It showed what a circle can hold.</p>
+        <p class="lede" data-l="nl">Wij werken niet in een gevangenis. De meeste muren waar wij tegenaan lopen, hebben we zelf gebouwd.</p>
+        <p class="lede" data-l="en">We don't work in a prison. Most of the walls we run into, we built ourselves.</p>
+        <p class="fine" data-l="nl">Inner Shadow Circle is geïnspireerd op de manier van werken van <a href="https://insidecircle.org" target="_blank" rel="noopener">Inside Circle</a>, de organisatie achter die kringen. We zijn zelfstandig en niet aan hen verbonden.</p>
+        <p class="fine" data-l="en">Inner Shadow Circle is inspired by the way of working of <a href="https://insidecircle.org" target="_blank" rel="noopener">Inside Circle</a>, the organisation behind those circles. We are independent and not affiliated with them.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- READINESS -->
+  <section class="sec" id="voor-wie" aria-labelledby="ready-title">
+    <div class="wrap">
+      <div class="ready-head">
+        <div class="stack">
+          <p class="label"><span data-l="nl">Voor wie</span><span data-l="en">Who it's for</span></p>
+          <h2 id="ready-title"><span data-l="nl">Dit is niet voor iedereen. Dat is de bedoeling.</span><span data-l="en">This is not for everyone. That's intentional.</span></h2>
+        </div>
+        <div>
+          <p data-l="nl">Inner Shadow Circle werkt alleen als je bereid bent. Bereid om te voelen wat je al jaren ontwijkt, om gezien te worden door mensen die je nog niet kent, en om te blijven als het ongemakkelijk wordt. Nieuwsgierigheid is een begin. Het is niet genoeg.</p>
+          <p data-l="en">Inner Shadow Circle only works if you are willing. Willing to feel what you've avoided for years, to be seen by people you don't know yet, and to stay when it gets uncomfortable. Curiosity is a start. It isn't enough.</p>
+        </div>
+      </div>
+      <div class="ready-cols">
+        <div class="ready-col ready-yes">
+          <h3><span data-l="nl">Het past bij je als</span><span data-l="en">It fits you if</span></h3>
+          <ul>
+            <li><span data-l="nl">je je patronen allang begrijpt en ze toch blijft leven.</span><span data-l="en">you've understood your patterns for years and keep living them anyway.</span></li>
+            <li><span data-l="nl">je voelt dat je iets inhoudt, ook als je nog niet weet wat.</span><span data-l="en">you can feel yourself holding something back, even if you can't name it yet.</span></li>
+            <li><span data-l="nl">je bereid bent om ongemakkelijk te zijn waar anderen bij zijn.</span><span data-l="en">you're willing to be uncomfortable in front of other people.</span></li>
+            <li><span data-l="nl">je verantwoordelijkheid neemt voor je eigen proces.</span><span data-l="en">you take responsibility for your own process.</span></li>
+          </ul>
+        </div>
+        <div class="ready-col ready-no">
+          <h3><span data-l="nl">Het is (nu) niets voor je als</span><span data-l="en">It's not for you (right now) if</span></h3>
+          <ul>
+            <li><span data-l="nl">je in een acute crisis zit, of recent een psychose of suïcidale gedachten hebt gehad.</span><span data-l="en">you're in acute crisis, or have recently had a psychosis or suicidal thoughts.</span></li>
+            <li><span data-l="nl">je op zoek bent naar therapie, een diagnose of iemand die je komt fixen.</span><span data-l="en">you're looking for therapy, a diagnosis, or someone to fix you.</span></li>
+            <li><span data-l="nl">je komt omdat iemand anders vindt dat je moet.</span><span data-l="en">you're coming because someone else thinks you should.</span></li>
+            <li><span data-l="nl">je vooral wilt kijken hoe anderen het doen.</span><span data-l="en">you mainly want to watch how others do it.</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="disclaimer">
+        <span class="label" style="padding-top:.2rem">!</span>
+        <p data-l="nl"><strong>Inner Shadow Circle is geen therapie en geen medische of psychologische behandeling.</strong> Het vervangt geen zorg. Ben je onder behandeling van een therapeut of psychiater, overleg dan eerst met hen. Iedere deelnemer heeft vooraf een intakegesprek met één van ons, en we kunnen besluiten dat een kring op dit moment niet het juiste is.</p>
+        <p data-l="en"><strong>Inner Shadow Circle is not therapy and not a medical or psychological treatment.</strong> It does not replace care. If you're seeing a therapist or psychiatrist, talk to them first. Every participant has an intake call with one of us beforehand, and we may decide a circle isn't right for you at this moment.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="sec team" id="wij" aria-labelledby="team-title">
+    <div class="wrap">
+      <div class="team-head">
+        <div class="stack">
+          <p class="label"><span data-l="nl">Wie de kring houdt</span><span data-l="en">Who holds the circle</span></p>
+          <h2 id="team-title"><span data-l="nl">Wij zijn met z'n vieren.</span><span data-l="en">There are four of us.</span></h2>
+        </div>
+        <p data-l="nl">Wij zijn Marko, Max, Natan en Thomas. We zitten hier niet als coaches aan de zijlijn. Al twee jaar zitten we wekelijks zelf in de kring, en sinds kort openen we die voor anderen. Samen brengen we zo'n tien jaar mee uit meditatie, retraite, ademwerk, Focusing, parts work en TRE. We vragen niets van jou wat we zelf niet in het midden hebben gedaan.</p>
+        <p data-l="en">We are Marko, Max, Natan and Thomas. We are not coaches on the sidelines. For two years we have sat in the circle ourselves every week, and recently we opened it to others. Between us we bring around ten years of meditation, retreats, breathwork, Focusing, parts work and TRE. We won't ask anything of you that we haven't done in the center ourselves.</p>
+      </div>
+      <div class="team-grid" id="team-grid"></div>
+    </div>
+  </section>
+
+  <!-- FORMATS + DATES -->
+  <section class="sec formats" id="data" aria-labelledby="formats-title">
+    <div class="wrap">
+      <div class="stack">
+        <p class="label"><span data-l="nl">Kringen</span><span data-l="en">Circles</span></p>
+        <h2 id="formats-title"><span data-l="nl">Drie manieren om binnen te komen.</span><span data-l="en">Three ways in.</span></h2>
+      </div>
+      <div class="format-grid" id="format-grid"></div>
+
+      <div class="dates">
+        <p class="label" style="margin-bottom:1.4rem"><span data-l="nl">Komende data</span><span data-l="en">Upcoming dates</span></p>
+        <div class="dates-wrap">
+          <table class="dates-table">
+            <thead>
+              <tr>
+                <th><span data-l="nl">Datum</span><span data-l="en">Date</span></th>
+                <th><span data-l="nl">Kring</span><span data-l="en">Circle</span></th>
+                <th><span data-l="nl">Tijd</span><span data-l="en">Time</span></th>
+                <th><span data-l="nl">Taal</span><span data-l="en">Language</span></th>
+                <th><span data-l="nl">Plekken</span><span data-l="en">Places</span></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="dates-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPLY -->
+  <section class="sec apply" id="aanmelden" aria-labelledby="apply-title">
+    <div class="wrap apply-grid">
+      <div class="apply-intro">
+        <p class="label"><span data-l="nl">Aanmelden</span><span data-l="en">Apply</span></p>
+        <h2 id="apply-title"><span data-l="nl">Je boekt geen plek. Je meldt je aan.</span><span data-l="en">You don't book a seat. You apply.</span></h2>
+        <p data-l="nl">Omdat het werk alleen werkt met mensen die er echt klaar voor zijn, spreken we iedereen eerst. Zo weet jij waar je aan begint, en weten wij wie er in de kring zit.</p>
+        <p data-l="en">The work only works with people who are ready, so we speak with everyone first. That way you know what you're walking into, and we know who is sitting in the circle.</p>
+        <ol class="route">
+          <li><span>01</span><span data-l="nl"><b>Aanmelding.</b> Een paar eerlijke vragen. Vijf minuten.</span><span data-l="en"><b>Application.</b> A few honest questions. Five minutes.</span></li>
+          <li><span>02</span><span data-l="nl"><b>Intake.</b> Binnen drie werkdagen bellen we je, twintig minuten.</span><span data-l="en"><b>Intake.</b> Within three working days we call you, twenty minutes.</span></li>
+          <li><span>03</span><span data-l="nl"><b>Bevestiging.</b> Pas als we allebei ja zeggen, betaal je en is je plek zeker.</span><span data-l="en"><b>Confirmation.</b> Only when we both say yes do you pay and your place is secured.</span></li>
+        </ol>
+      </div>
+
+      <div id="apply-box">
+        <form id="apply-form" novalidate>
+          <fieldset>
+            <legend><span class="label"><span data-l="nl">Stap 1</span><span data-l="en">Step 1</span></span><span data-l="nl">Welke kring?</span><span data-l="en">Which circle?</span></legend>
+            <div class="choices" id="choices"></div>
+          </fieldset>
+
+          <fieldset>
+            <legend><span class="label"><span data-l="nl">Stap 2</span><span data-l="en">Step 2</span></span><span data-l="nl">Wie ben je?</span><span data-l="en">Who are you?</span></legend>
+            <div class="row2">
+              <div class="field">
+                <label for="f-name"><span data-l="nl">Naam</span><span data-l="en">Name</span></label>
+                <input type="text" id="f-name" name="name" autocomplete="name" required>
+              </div>
+              <div class="field">
+                <label for="f-email"><span data-l="nl">E-mail</span><span data-l="en">Email</span></label>
+                <input type="email" id="f-email" name="email" autocomplete="email" required>
+              </div>
+            </div>
+            <div class="field">
+              <label for="f-phone"><span data-l="nl">Telefoon, voor de intake</span><span data-l="en">Phone, for the intake</span></label>
+              <input type="tel" id="f-phone" name="phone" autocomplete="tel" required>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend><span class="label"><span data-l="nl">Stap 3</span><span data-l="en">Step 3</span></span><span data-l="nl">Eerlijk</span><span data-l="en">Honestly</span></legend>
+            <div class="field">
+              <label for="f-why"><span data-l="nl">Wat brengt je hier, nu?</span><span data-l="en">What brings you here, now?</span></label>
+              <textarea id="f-why" name="why" required></textarea>
+            </div>
+            <div class="field">
+              <label for="f-body"><span data-l="nl">Wat merk je in je lichaam terwijl je dit invult?</span><span data-l="en">What do you notice in your body as you fill this in?</span></label>
+              <span class="hint" data-l="nl">Optioneel. Er is geen goed antwoord. "Niets" is ook een antwoord.</span>
+              <span class="hint" data-l="en">Optional. There is no right answer. "Nothing" is an answer too.</span>
+              <textarea id="f-body" name="body"></textarea>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend><span class="label"><span data-l="nl">Stap 4</span><span data-l="en">Step 4</span></span><span data-l="nl">Bereid</span><span data-l="en">Willing</span></legend>
+            <div class="checks">
+              <label class="check"><input type="checkbox" id="c-1" required><span data-l="nl">Ik kom uit eigen wil, niet omdat iemand anders dat vindt.</span><span data-l="en">I'm coming of my own free will, not because someone else wants me to.</span></label>
+              <label class="check"><input type="checkbox" id="c-2" required><span data-l="nl">Ik begrijp dat Inner Shadow Circle geen therapie of medische behandeling is.</span><span data-l="en">I understand Inner Shadow Circle is not therapy or medical treatment.</span></label>
+              <label class="check"><input type="checkbox" id="c-3" required><span data-l="nl">Ik zit niet in een acute crisis. Is er iets wat jullie moeten weten, dan vertel ik het in de intake.</span><span data-l="en">I'm not in acute crisis. If there's something you should know, I'll share it in the intake.</span></label>
+              <label class="check"><input type="checkbox" id="c-4" required><span data-l="nl">Wat anderen in de kring delen, blijft bij mij.</span><span data-l="en">What others share in the circle stays with me.</span></label>
+            </div>
+          </fieldset>
+
+          <div class="form-foot">
+            <button class="btn" type="submit"><span data-l="nl">Verstuur aanmelding</span><span data-l="en">Send application</span><span class="arrow" aria-hidden="true">→</span></button>
+            <p class="muted" data-l="nl">Je betaalt nog niets. We lezen elke aanmelding zelf.</p>
+            <p class="muted" data-l="en">You don't pay anything yet. We read every application ourselves.</p>
+          </div>
+          <p class="err" id="form-err" hidden></p>
+        </form>
+
+        <div class="sent" id="sent" hidden>
+          <svg aria-hidden="true"><use href="#mark"/></svg>
+          <h3><span data-l="nl">Dank je. Dit was stap één.</span><span data-l="en">Thank you. That was step one.</span></h3>
+          <p class="muted" data-l="nl">Binnen drie werkdagen belt één van ons je voor de intake. Tot die tijd: let eens op wat je lichaam doet als je hieraan denkt.</p>
+          <p class="muted" data-l="en">Within three working days one of us will call you for the intake. Until then, notice what your body does when you think about this.</p>
+          <p class="proto" id="proto-note"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="sec" id="vragen" aria-labelledby="faq-title">
+    <div class="wrap faq-grid">
+      <div class="stack">
+        <p class="label"><span data-l="nl">Vragen</span><span data-l="en">Questions</span></p>
+        <h2 id="faq-title"><span data-l="nl">Wat mensen ons vragen.</span><span data-l="en">What people ask us.</span></h2>
+      </div>
+      <div>
+        <details>
+          <summary><span data-l="nl">Moet ik iets delen?</span><span data-l="en">Do I have to share?</span></summary>
+          <p data-l="nl">Niemand wordt gedwongen. Jij bepaalt wanneer je het midden in gaat. Maar wees eerlijk tegen jezelf: je komt niet om toe te kijken. Het werk vraagt dat je meedoet.</p>
+          <p data-l="en">Nobody is forced. You decide when you step into the center. But be honest with yourself: you're not coming to watch. The work asks you to take part.</p>
+        </details>
+        <details>
+          <summary><span data-l="nl">Is het veilig?</span><span data-l="en">Is it safe?</span></summary>
+          <p data-l="nl">We werken met duidelijke afspraken, een intake vooraf en kleine groepen. Er zijn altijd minstens twee begeleiders. Veilig betekent hier niet comfortabel. Het betekent dat je niet alleen bent in wat er gebeurt.</p>
+          <p data-l="en">We work with clear agreements, an intake beforehand and small groups. There are always at least two facilitators. Safe doesn't mean comfortable here. It means you are not alone in whatever happens.</p>
+        </details>
+        <details>
+          <summary><span data-l="nl">Wat gebeurt er met wat ik vertel?</span><span data-l="en">What happens to what I say?</span></summary>
+          <p data-l="nl">Het blijft in de kring. Dat geldt voor ons en voor iedere deelnemer, en iedereen spreekt dat vooraf uit.</p>
+          <p data-l="en">It stays in the circle. That goes for us and for every participant, and everyone commits to it beforehand.</p>
+        </details>
+        <details>
+          <summary><span data-l="nl">Is dit therapie?</span><span data-l="en">Is this therapy?</span></summary>
+          <p data-l="nl">Nee. Er wordt niets gediagnosticeerd en niets behandeld. Veel mensen combineren het met therapie; dan versterken ze elkaar vaak. Overleg in dat geval eerst met je behandelaar.</p>
+          <p data-l="en">No. Nothing is diagnosed and nothing is treated. Many people combine it with therapy, and the two often strengthen each other. In that case, talk to your therapist first.</p>
+        </details>
+        <details>
+          <summary><span data-l="nl">Wat als er iets groots loskomt?</span><span data-l="en">What if something big comes up?</span></summary>
+          <p data-l="nl">Dat mag, en dat gebeurt. We sluiten elke kring zorgvuldig af. Na een dagkring of weekend bel je binnen een week nog met één van ons om te landen.</p>
+          <p data-l="en">It's allowed, and it happens. We close every circle with care. After a day circle or a weekend, you'll have a call with one of us within a week to help you land.</p>
+        </details>
+        <details>
+          <summary><span data-l="nl">In welke taal?</span><span data-l="en">In which language?</span></summary>
+          <p data-l="nl">Nederlands of Engels. Het staat bij elke datum.</p>
+          <p data-l="en">Dutch or English. It's listed with every date.</p>
+        </details>
+        <details>
+          <summary><span data-l="nl">Wat als ik toch niet kan?</span><span data-l="en">What if I can't make it after all?</span></summary>
+          <p data-l="nl">Tot 14 dagen vooraf krijg je je geld terug. Daarna kun je je plek overdragen aan iemand die ook een intake heeft gehad, of doorschuiven naar een latere kring.</p>
+          <p data-l="en">Up to 14 days before, you get a full refund. After that you can transfer your place to someone who has also done an intake, or move to a later circle.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="sec closing" aria-labelledby="closing-title">
+    <canvas id="closing-canvas" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="label">Inner Shadow Circle</p>
+      <h2 id="closing-title"><span data-l="nl">Het licht was er altijd al. Je moest alleen de schaduw in.</span><span data-l="en">The light was always there. You just had to step into the shadow.</span></h2>
+      <a class="btn" href="#aanmelden"><span data-l="nl">Meld je aan</span><span data-l="en">Apply</span><span class="arrow" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="stack" style="gap:1rem">
+        <a class="brand" href="#top" aria-label="Inner Shadow Circle"><svg aria-hidden="true"><use href="#mark"/></svg><span class="wordmark">Inner Shadow Circle</span></a>
+        <p data-l="nl">Een kring voor wat je niet zegt.</p>
+        <p data-l="en">A circle for what you don't say.</p>
+        <p><span class="label" style="display:block;margin-bottom:.3rem">Contact</span><button type="button" class="copy-mail" id="copy-mail"></button> <span class="muted" id="copied" hidden><span data-l="nl">gekopieerd</span><span data-l="en">copied</span></span></p>
+      </div>
+      <ul>
+        <li><a href="#onuitgesproken"><span data-l="nl">Het werk</span><span data-l="en">The work</span></a></li>
+        <li><a href="#kring"><span data-l="nl">Hoe een kring werkt</span><span data-l="en">How a circle works</span></a></li>
+        <li><a href="#voor-wie"><span data-l="nl">Voor wie</span><span data-l="en">Who it's for</span></a></li>
+        <li><a href="#data"><span data-l="nl">Data en prijzen</span><span data-l="en">Dates and prices</span></a></li>
+        <li><a href="#vragen"><span data-l="nl">Vragen</span><span data-l="en">Questions</span></a></li>
+      </ul>
+      <div class="crisis">
+        <p data-l="nl"><strong>Zit je nu in nood?</strong> Wacht dan niet op een kring. Bel 113 Zelfmoordpreventie op <strong>113</strong> of gratis <strong>0800-0113</strong>, dag en nacht. Buiten Nederland: bel het alarmnummer.</p>
+        <p data-l="en"><strong>Are you in crisis right now?</strong> Don't wait for a circle. In the Netherlands, call 113 Suicide Prevention on <strong>113</strong> or free on <strong>0800-0113</strong>, day and night. Elsewhere, call your local emergency number.</p>
+      </div>
+    </div>
+    <div class="legal label">
+      <span>© 2026 Inner Shadow Circle</span>
+      <span data-l="nl">Schaduwwerk in de kring</span><span data-l="en">Shadow work in circle</span>
+    </div>
+  </div>
+</footer>
+
+<!-- BREATH overlay -->
+<div class="breath" id="breath" hidden role="dialog" aria-modal="true" aria-label="Breath">
+  <canvas id="breath-canvas" aria-hidden="true"></canvas>
+  <button class="breath-close" type="button" id="breath-close"><span data-l="nl">Sluiten</span><span data-l="en">Close</span></button>
+  <div class="breath-text">
+    <p class="label" id="breath-count"></p>
+    <p class="breath-cue" id="breath-cue"></p>
+    <div class="breath-end stack" id="breath-end" hidden>
+      <p class="lede" data-l="nl">Wat merkte je? Een spanning, een zucht, misschien helemaal niets. Daar beginnen we.</p>
+      <p class="lede" data-l="en">What did you notice? A tension, a sigh, maybe nothing at all. That's where we begin.</p>
+      <a class="btn ghost" href="#aanmelden" id="breath-apply" style="align-self:center"><span data-l="nl">Meld je aan</span><span data-l="en">Apply</span></a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG: everything the four of you will want to edit lives here.
+   ============================================================ */
+const CONFIG = {
+  email: 'hallo@innershadowcircle.nl',          // placeholder: replace with your real address
+  formEndpoint: '',                       // e.g. a Formspree / Tally / own-API URL once the site is hosted
+  formats: {
+    open:    { price: 45,  nl: { name: 'Open avond',  len: '3 uur',       size: 'max. 12', text: 'Proef het werk. Eén avond, een korte kring, één of twee mensen in het midden. Voor wie wil voelen of dit klopt.' },
+                            en: { name: 'Open evening', len: '3 hours',   size: 'max. 12', text: 'Taste the work. One evening, a short circle, one or two people in the center. For anyone who wants to feel whether this is right.' } },
+    day:     { price: 225, feature: true,
+                            nl: { name: 'Dagkring',    len: '1 dag, 10:00–18:00', size: 'max. 10', text: 'Een volle dag. Iedereen die wil, gaat het midden in. Inclusief lunch en een integratiegesprek binnen een week.' },
+                            en: { name: 'Day circle',  len: '1 day, 10:00–18:00', size: 'max. 10', text: 'A full day. Everyone who wants to steps into the center. Includes lunch and an integration call within a week.' } },
+    weekend: { price: 645, nl: { name: 'Weekend',     len: 'vr 17:00 – zo 16:00', size: 'max. 12', text: 'Het diepste werk. Twee en een halve dag, overnachting en maaltijden inbegrepen. Hier valt het pantser echt af.' },
+                            en: { name: 'Weekend',     len: 'Fri 17:00 – Sun 16:00', size: 'max. 12', text: 'The deepest work. Two and a half days, lodging and meals included. This is where the armor really comes off.' } }
+  },
+  dates: [   // sample dates: replace with real ones
+    { id: 'o-1016', format: 'open',    date: '2026-10-16', time: '19:30–22:30', lang: 'NL',    places: 12, taken: 7 },
+    { id: 'd-1031', format: 'day',     date: '2026-10-31', time: '10:00–18:00', lang: 'NL',    places: 10, taken: 6 },
+    { id: 'o-1113', format: 'open',    date: '2026-11-13', time: '19:30–22:30', lang: 'EN',    places: 12, taken: 3 },
+    { id: 'w-1127', format: 'weekend', date: '2026-11-27', time: 'vr/Fri – zo/Sun', lang: 'NL/EN', places: 12, taken: 9 },
+    { id: 'd-1212', format: 'day',     date: '2026-12-12', time: '10:00–18:00', lang: 'EN',    places: 10, taken: 10 }
+  ],
+  team: [
+    { photo: 'images/team/marko.jpg',           pos: '52% 28%', nl: { name: 'Marko',  role: 'Begeleider' }, en: { name: 'Marko',  role: 'Facilitator' } },
+    { photo: 'images/team/max-field-clean.jpg', pos: '55% 30%', nl: { name: 'Max',    role: 'Begeleider' }, en: { name: 'Max',    role: 'Facilitator' } },
+    { photo: 'images/team/natan.jpg',           pos: '50% 22%', nl: { name: 'Natan',  role: 'Begeleider' }, en: { name: 'Natan',  role: 'Facilitator' } },
+    { photo: 'images/team/thomas-white-shirt-face-original.png',          pos: '50% 50%', scale: 1.25, origin: '50% 2%', nl: { name: 'Thomas', role: 'Begeleider' }, en: { name: 'Thomas', role: 'Facilitator' } },
+  ]
+};
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const root = document.documentElement;
+const lang = () => root.classList.contains('en') ? 'en' : 'nl';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const both = (nl, en) => `<span data-l="nl">${esc(nl)}</span><span data-l="en">${esc(en)}</span>`;
+
+/* ---------- language ---------- */
+function setLang(l) {
+  root.classList.toggle('en', l === 'en');
+  root.lang = l;
+  try { localStorage.setItem('isc-lang', l); } catch (e) {}
+  renderDates();
+}
+document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.set)));
+
+/* ---------- nav ---------- */
+const nav = document.getElementById('nav');
+const onScrollNav = () => nav.classList.toggle('solid', window.scrollY > 40);
+window.addEventListener('scroll', onScrollNav, { passive: true }); onScrollNav();
+
+/* ---------- team ---------- */
+document.getElementById('team-grid').innerHTML = CONFIG.team.map(p => `
+  <div class="person">
+    <div class="portrait"><img src="${p.photo}" alt="${esc(p.nl.name)}" loading="lazy" style="object-position:${p.pos};transform:scale(${p.scale || 1});transform-origin:${p.origin || '50% 50%'}"></div>
+    <h3>${both(p.nl.name, p.en.name)}</h3>
+    <span class="label">${both(p.nl.role, p.en.role)}</span>
+  </div>`).join('');
+
+/* ---------- formats ---------- */
+const euro = n => '€ ' + n;
+document.getElementById('format-grid').innerHTML = Object.entries(CONFIG.formats).map(([k, f]) => `
+  <article class="format${f.feature ? ' feature' : ''}">
+    ${f.feature ? `<span class="tag">${both('Meest gekozen', 'Most chosen')}</span>` : ''}
+    <h3>${both(f.nl.name, f.en.name)}</h3>
+    <div class="price">${euro(f.price)}<small>${both('incl. btw', 'incl. VAT')}</small></div>
+    <p>${both(f.nl.text, f.en.text)}</p>
+    <dl>
+      <dt>${both('Duur', 'Length')}</dt><dd>${both(f.nl.len, f.en.len)}</dd>
+      <dt>${both('Groep', 'Group')}</dt><dd>${both(f.nl.size, f.en.size)}</dd>
+    </dl>
+  </article>`).join('');
+
+/* ---------- dates + choices ---------- */
+function fmtDate(iso, l) {
+  const d = new Date(iso + 'T12:00:00');
+  return d.toLocaleDateString(l === 'en' ? 'en-GB' : 'nl-NL', { weekday: 'short', day: 'numeric', month: 'long' });
+}
+function spotsDots(places, taken) {
+  let s = '<span class="spots" aria-hidden="true">';
+  for (let i = 0; i < places; i++) s += `<i class="${i < taken ? 'f' : ''}"></i>`;
+  return s + '</span>';
+}
+function renderDates() {
+  const l = lang();
+  let selected = (document.querySelector('input[name="circle"]:checked') || {}).value;
+  document.getElementById('dates-body').innerHTML = CONFIG.dates.map(d => {
+    const f = CONFIG.formats[d.format], left = d.places - d.taken, full = left <= 0;
+    const leftTxt = full ? both('Vol', 'Full') : both(`nog ${left}`, `${left} left`);
+    return `<tr class="${full ? 'full' : ''}">
+      <td class="d">${esc(fmtDate(d.date, l))}</td>
+      <td>${esc(f[l].name)} <span class="muted">· ${euro(f.price)}</span></td>
+      <td class="m">${esc(d.time)}</td>
+      <td class="m">${esc(d.lang)}</td>
+      <td class="m">${spotsDots(d.places, d.taken)}${leftTxt}</td>
+      <td><button class="pick" type="button" data-id="${d.id}" ${full ? 'disabled' : ''}>${full ? both('Wachtlijst', 'Waitlist') : both('Kies', 'Choose')}</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('choices').innerHTML = CONFIG.dates.filter(d => d.places > d.taken).map((d, i) => {
+    const f = CONFIG.formats[d.format];
+    const checked = selected ? selected === d.id : i === 0;
+    return `<label class="choice"><input type="radio" name="circle" id="r-${d.id}" value="${d.id}" ${checked ? 'checked' : ''}>
+      <span class="c-main"><span class="c-title">${esc(f[l].name)}</span><span class="c-meta">${esc(fmtDate(d.date, l))} · ${esc(d.time)} · ${esc(d.lang)}</span></span>
+      <span class="c-price">${euro(f.price)}</span></label>`;
+  }).join('');
+  document.querySelectorAll('.pick').forEach(b => b.addEventListener('click', () => {
+    const r = document.getElementById('r-' + b.dataset.id);
+    if (r) r.checked = true;
+    document.getElementById('aanmelden').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+  }));
+}
+renderDates();
+
+/* ---------- form ---------- */
+const form = document.getElementById('apply-form');
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = document.getElementById('form-err');
+  const l = lang();
+  const need = [['f-name', 'je naam', 'your name'], ['f-email', 'je e-mailadres', 'your email'], ['f-phone', 'je telefoonnummer', 'your phone number'], ['f-why', 'wat je hier brengt', 'what brings you here']];
+  const missing = need.filter(([id]) => !document.getElementById(id).value.trim());
+  const emailBad = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('f-email').value.trim());
+  const checksOk = ['c-1', 'c-2', 'c-3', 'c-4'].every(id => document.getElementById(id).checked);
+  const circle = (document.querySelector('input[name="circle"]:checked') || {}).value;
+  let msg = '';
+  if (!circle) msg = l === 'en' ? 'Choose a circle in step 1.' : 'Kies een kring bij stap 1.';
+  else if (missing.length) msg = l === 'en' ? `Still missing: ${missing.map(m => m[2]).join(', ')}.` : `Nog nodig: ${missing.map(m => m[1]).join(', ')}.`;
+  else if (emailBad) msg = l === 'en' ? 'That email address looks incomplete.' : 'Dat e-mailadres lijkt niet compleet.';
+  else if (!checksOk) msg = l === 'en' ? 'Tick all four statements in step 4. If one doesn\'t feel true, mail us instead and we\'ll talk.' : 'Vink alle vier de uitspraken aan bij stap 4. Klopt er één niet, mail ons dan en we praten erover.';
+  if (msg) { err.textContent = msg; err.hidden = false; if (missing.length) document.getElementById(missing[0][0]).focus(); return; }
+  err.hidden = true;
+
+  const data = Object.fromEntries(new FormData(form).entries());
+  data.lang = l;
+  let sent = false;
+  if (CONFIG.formEndpoint) {
+    try {
+      const r = await fetch(CONFIG.formEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data) });
+      sent = r.ok;
+    } catch (x) { sent = false; }
+    if (!sent) { err.textContent = l === 'en' ? `Sending failed. Please try again, or mail ${CONFIG.email}.` : `Versturen lukte niet. Probeer het opnieuw, of mail ${CONFIG.email}.`; err.hidden = false; return; }
+  }
+  form.hidden = true;
+  document.getElementById('proto-note').innerHTML = sent ? '' : both('Prototype: deze aanmelding is nergens naartoe gestuurd. Koppel een formulierdienst in CONFIG.formEndpoint.', 'Prototype: this application was not sent anywhere. Connect a form service in CONFIG.formEndpoint.');
+  document.getElementById('sent').hidden = false;
+  document.getElementById('apply-box').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+});
+
+/* ---------- copy email ---------- */
+const mailBtn = document.getElementById('copy-mail');
+mailBtn.textContent = CONFIG.email;
+mailBtn.addEventListener('click', () => {
+  const done = () => { const c = document.getElementById('copied'); c.hidden = false; setTimeout(() => c.hidden = true, 1800); };
+  navigator.clipboard?.writeText(CONFIG.email).then(done).catch(() => {
+    const r = document.createRange(); r.selectNodeContents(mailBtn); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  });
+});
+
+/* ---------- confessions: one sentence at a time ---------- */
+(function () {
+  const items = [...document.querySelectorAll('#confessions li')];
+  let i = 0;
+  items[0].classList.add('on');
+  if (reduceMotion) { items.forEach(li => li.classList.add('on')); return; }
+  setInterval(() => { items[i].classList.remove('on'); i = (i + 1) % items.length; items[i].classList.add('on'); }, 3400);
+})();
+
+/* ---------- canvas helpers ---------- */
+const COL = { bone: '235,228,218', corona: '226,201,160', ember: '122,46,40', umbra: '#0d0b0c' };
+function fit(c) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = c.clientWidth, h = c.clientHeight;
+  if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); }
+  const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h };
+}
+function rng(seed) { return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+function visibleLoop(el, draw) {
+  let on = false, raf = 0;
+  const tick = t => { draw(t); if (on && !reduceMotion) raf = requestAnimationFrame(tick); };
+  new IntersectionObserver(es => es.forEach(e => {
+    on = e.isIntersecting; cancelAnimationFrame(raf);
+    if (on) raf = requestAnimationFrame(tick);
+  })).observe(el);
+  window.addEventListener('resize', () => draw(performance.now()));
+  draw(reduceMotion ? 4000 : performance.now());
+}
+
+/* The eclipse: dark disc, corona rays, a ring of eight points. Breathes on an 11s cycle (5.5s in, 5.5s out). */
+function makeRays(n, seed) {
+  const r = rng(seed); const rays = [];
+  for (let i = 0; i < n; i++) rays.push({ a: r() * Math.PI * 2, l: .25 + Math.pow(r(), 2.2) * 1.5, w: .3 + r() * 1.1, p: r() * 6.28, s: .3 + r() * .7 });
+  return rays;
+}
+function drawEclipse(ctx, cx, cy, R, t, breath, opts = {}) {
+  const rays = opts.rays;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  // outer glow
+  let g = ctx.createRadialGradient(cx, cy, R * .9, cx, cy, R * (3.4 + breath * .5));
+  g.addColorStop(0, `rgba(${COL.corona},${.2 + breath * .06})`);
+  g.addColorStop(.25, `rgba(${COL.corona},.05)`);
+  g.addColorStop(1, `rgba(${COL.corona},0)`);
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R * 4, 0, Math.PI * 2); ctx.fill();
+  // rays
+  const rg = ctx.createRadialGradient(cx, cy, R, cx, cy, R * 2.7);
+  rg.addColorStop(0, `rgba(${COL.corona},.55)`);
+  rg.addColorStop(.35, `rgba(${COL.bone},.12)`);
+  rg.addColorStop(1, `rgba(${COL.bone},0)`);
+  ctx.strokeStyle = rg; ctx.lineCap = 'round';
+  const rot = t * .000012;
+  for (const ray of rays) {
+    const a = ray.a + rot;
+    const len = R * (1 + ray.l * (.72 + .28 * Math.sin(t * .00035 * ray.s + ray.p)) * (.88 + breath * .22));
+    ctx.lineWidth = ray.w;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * R * .98, cy + Math.sin(a) * R * .98);
+    ctx.lineTo(cx + Math.cos(a) * len, cy + Math.sin(a) * len);
+    ctx.stroke();
+  }
+  ctx.restore();
+  // the disc (umbra)
+  ctx.fillStyle = COL.umbra; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+  // rim
+  ctx.strokeStyle = `rgba(${COL.bone},.22)`; ctx.lineWidth = .7; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+  // lit crescent edge, lower-left, like the mark
+  ctx.save();
+  ctx.shadowColor = `rgba(${COL.corona},.9)`; ctx.shadowBlur = 18;
+  ctx.strokeStyle = `rgba(${COL.bone},${.65 + breath * .25})`; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.arc(cx, cy, R, Math.PI * .62, Math.PI * 1.02); ctx.stroke();
+  ctx.restore();
+}
+function drawOrbit(ctx, cx, cy, Ro, t, alpha = 1) {
+  ctx.strokeStyle = `rgba(${COL.bone},${.07 * alpha})`; ctx.lineWidth = .7;
+  ctx.beginPath(); ctx.arc(cx, cy, Ro, 0, Math.PI * 2); ctx.stroke();
+  const drift = t * .000018;
+  for (let i = 0; i < 8; i++) {
+    const a = -Math.PI / 2 + i * Math.PI / 4 + drift;
+    ctx.fillStyle = `rgba(${COL.bone},${.55 * alpha})`;
+    ctx.beginPath(); ctx.arc(cx + Math.cos(a) * Ro, cy + Math.sin(a) * Ro, 1.8, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+/* hero */
+(function () {
+  const c = document.getElementById('hero-canvas');
+  const rays = makeRays(240, 7);
+  let mx = 0, my = 0, tx = 0, ty = 0;
+  window.addEventListener('pointermove', e => { tx = (e.clientX / innerWidth - .5); ty = (e.clientY / innerHeight - .5); }, { passive: true });
+  visibleLoop(c, t => {
+    const { ctx, w, h } = fit(c);
+    mx += (tx - mx) * .03; my += (ty - my) * .03;
+    ctx.clearRect(0, 0, w, h);
+    const narrow = w < 860;
+    const cx = (narrow ? w * .5 : w * .72) + mx * 14, cy = (narrow ? h * .2 : h * .4) + my * 10;
+    const R = narrow ? Math.min(w * .17, 90) : Math.min(w, h) * .15;
+    const breath = .5 - .5 * Math.cos(t / 11000 * Math.PI * 2);
+    drawOrbit(ctx, cx - mx * 8, cy - my * 6, R * 2.6, t);
+    drawEclipse(ctx, cx, cy, R, t, breath, { rays });
+    // soft fade to ground at the bottom so text sits on dark
+    const f = ctx.createLinearGradient(0, h * .55, 0, h);
+    f.addColorStop(0, 'rgba(13,11,12,0)'); f.addColorStop(1, 'rgba(13,11,12,.85)');
+    ctx.fillStyle = f; ctx.fillRect(0, 0, w, h);
+  });
+})();
+
+/* the circle / pressure cooker: scroll-driven */
+(function () {
+  const c = document.getElementById('cooker-canvas');
+  const scene = document.getElementById('cooker-scene');
+  const steps = [...document.querySelectorAll('#steps .step')];
+  const N = 10, r = rng(21);
+  const scatter = Array.from({ length: N }, () => ({ x: (r() - .5) * 1.7, y: (r() - .5) * 1.7, p: r() * 6.28 }));
+  let prog = 0, target = 0;
+  function measure() {
+    const rect = scene.getBoundingClientRect();
+    const total = rect.height - innerHeight;
+    target = Math.min(1, Math.max(0, -rect.top / Math.max(1, total)));
+    const idx = Math.min(steps.length - 1, Math.floor(target * steps.length * .999));
+    steps.forEach((s, i) => s.classList.toggle('on', i === idx));
+  }
+  window.addEventListener('scroll', measure, { passive: true });
+  measure();
+  visibleLoop(c, t => {
+    const { ctx, w, h } = fit(c);
+    prog += (target - prog) * (reduceMotion ? 1 : .08);
+    const p = reduceMotion ? target : prog;
+    ctx.clearRect(0, 0, w, h);
+    const cx = w / 2, cy = h / 2, Rc = Math.min(w, h) * .36;
+    const a = smooth(.08, .3, p), b = smooth(.33, .55, p), heat = smooth(.58, .92, p);
+    const pts = [];
+    for (let i = 0; i < N; i++) {
+      const ang = -Math.PI / 2 + i * Math.PI * 2 / N;
+      const s = scatter[i];
+      const sx = cx + s.x * Rc * 1.15 + Math.sin(t * .0004 + s.p) * 6, sy = cy + s.y * Rc * 1.15 + Math.cos(t * .00035 + s.p) * 6;
+      let x = sx + (cx + Math.cos(ang) * Rc - sx) * a, y = sy + (cy + Math.sin(ang) * Rc - sy) * a;
+      if (i === 0) { x += (cx - x) * b; y += (cy - y) * b; }
+      pts.push({ x, y });
+    }
+    // the ring
+    ctx.strokeStyle = `rgba(${COL.bone},${.1 * a})`; ctx.lineWidth = .8;
+    ctx.beginPath(); ctx.arc(cx, cy, Rc, 0, Math.PI * 2); ctx.stroke();
+    // heat: rings rising from the center
+    if (heat > 0) {
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Rc * (.35 + heat * .55));
+      g.addColorStop(0, `rgba(${COL.corona},${.28 * heat})`);
+      g.addColorStop(.4, `rgba(${COL.ember},${.22 * heat})`);
+      g.addColorStop(1, `rgba(${COL.ember},0)`);
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, Rc, 0, Math.PI * 2); ctx.fill();
+      for (let k = 0; k < 4; k++) {
+        const ph = ((t / 2600) + k / 4) % 1;
+        const rr = 8 + ph * Rc * .9;
+        ctx.strokeStyle = `rgba(${COL.corona},${(1 - ph) * .32 * heat})`; ctx.lineWidth = .8;
+        ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.stroke();
+      }
+    }
+    // attention: dashed lines flowing inward
+    if (b > 0) {
+      ctx.save();
+      ctx.setLineDash([2, 7]); ctx.lineDashOffset = -(t * .02) % 9;
+      ctx.strokeStyle = `rgba(${COL.corona},${.18 * b + .3 * heat})`; ctx.lineWidth = .9;
+      for (let i = 1; i < N; i++) { ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[0].x, pts[0].y); ctx.stroke(); }
+      ctx.restore();
+    }
+    // people
+    pts.forEach((q, i) => {
+      const centre = i === 0;
+      const rad = centre ? 4 + b * 2 + heat * (1.5 + Math.sin(t * .004) * .8) : 3.2;
+      if (centre && b > 0) {
+        ctx.save(); ctx.shadowColor = `rgba(${COL.corona},1)`; ctx.shadowBlur = 12 + heat * 30;
+        ctx.fillStyle = `rgba(${COL.bone},1)`; ctx.beginPath(); ctx.arc(q.x, q.y, rad, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      } else {
+        ctx.fillStyle = `rgba(${COL.bone},${.55 + .35 * a})`;
+        ctx.beginPath(); ctx.arc(q.x, q.y, rad, 0, Math.PI * 2); ctx.fill();
+      }
+    });
+  });
+})();
+
+/* closing: a smaller, quieter eclipse */
+(function () {
+  const c = document.getElementById('closing-canvas');
+  const rays = makeRays(160, 99);
+  visibleLoop(c, t => {
+    const { ctx, w, h } = fit(c);
+    ctx.clearRect(0, 0, w, h);
+    const narrow = w < 860;
+    const R = Math.min(w, h) * (narrow ? .12 : .16);
+    const breath = .5 - .5 * Math.cos(t / 11000 * Math.PI * 2);
+    drawEclipse(ctx, narrow ? w * .78 : w * .78, narrow ? h * .18 : h * .5, R, t + 5000, breath, { rays });
+  });
+})();
+
+/* ---------- breath overlay ---------- */
+(function () {
+  const ov = document.getElementById('breath'), c = document.getElementById('breath-canvas');
+  const cue = document.getElementById('breath-cue'), count = document.getElementById('breath-count'), end = document.getElementById('breath-end');
+  const rays = makeRays(260, 3);
+  const IN = 4500, OUT = 6500, CYCLES = 3, TOTAL = (IN + OUT) * CYCLES;
+  let start = 0, raf = 0, lastPhase = '';
+  const words = { nl: { in: 'Adem in', out: 'En laat los', of: 'van' }, en: { in: 'Breathe in', out: 'And let go', of: 'of' } };
+  function frame(now) {
+    const { ctx, w, h } = fit(c);
+    const el = now - start;
+    ctx.clearRect(0, 0, w, h);
+    let breath, phase, cyc;
+    if (el < TOTAL) {
+      const inC = el % (IN + OUT); cyc = Math.floor(el / (IN + OUT)) + 1;
+      if (inC < IN) { phase = 'in'; breath = smooth(0, 1, inC / IN); } else { phase = 'out'; breath = 1 - smooth(0, 1, (inC - IN) / OUT); }
+    } else { phase = 'end'; breath = .5 - .5 * Math.cos((el - TOTAL) / 11000 * Math.PI * 2); }
+    const R = Math.min(w, h) * (.13 + breath * .06);
+    drawEclipse(ctx, w / 2, h / 2 - (phase === 'end' ? h * .12 : 0), R, now, breath, { rays });
+    const l = lang();
+    if (phase !== lastPhase || (phase !== 'end' && count.dataset.c != cyc)) {
+      if (phase === 'end') { cue.textContent = ''; count.textContent = ''; end.hidden = false; }
+      else { cue.textContent = words[l][phase]; count.textContent = `${cyc} ${words[l].of} ${CYCLES}`; count.dataset.c = cyc; }
+      lastPhase = phase;
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  function open() {
+    ov.hidden = false; end.hidden = true; lastPhase = ''; document.body.style.overflow = 'hidden';
+    if (reduceMotion) { const l = lang(); cue.textContent = l === 'en' ? 'Three slow breaths. In through the nose, out long and slow.' : 'Drie trage ademhalingen. In door je neus, lang en langzaam uit.'; cue.style.fontSize = '1.6rem'; setTimeout(() => { end.hidden = false; }, 12000); const { ctx, w, h } = fit(c); drawEclipse(ctx, w / 2, h / 3, Math.min(w, h) * .12, 0, .5, { rays }); }
+    else { start = performance.now(); raf = requestAnimationFrame(frame); }
+    document.getElementById('breath-close').focus();
+  }
+  function close() { ov.hidden = true; cancelAnimationFrame(raf); document.body.style.overflow = ''; }
+  document.getElementById('breath-open').addEventListener('click', open);
+  document.getElementById('breath-close').addEventListener('click', close);
+  document.getElementById('breath-apply').addEventListener('click', close);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden) close(); });
+})();
+</script>
+
+</body></html>

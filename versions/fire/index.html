@@ -1,0 +1,2090 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Inner Shadow Circle</title>
+<meta name="description" content="Inner Shadow Circle: schaduwwerk in een groep. Elke maandag een gratis cirkel in Groningen.">
+<meta name="theme-color" content="#efe5d2">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23efe5d2'/%3E%3Ccircle cx='16' cy='17' r='10' fill='%23251b15'/%3E%3Cpath d='M16 8c2 5 6 7 6 11a6 6 0 0 1-12 0c0-3 2-4 3-5 0 2 1 3 2 3 0-3 0-6 1-9z' fill='%23d0902f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400..900;1,400..900&family=Schibsted+Grotesk:wght@400..800&family=Reenie+Beanie&display=swap">
+<script>
+  (function () {
+    var l = 'nl';
+    try { var s = localStorage.getItem('isc-lang'); if (s === 'en' || s === 'nl') l = s; } catch (e) {}
+    var r = document.documentElement;
+    r.lang = l; if (l === 'en') r.classList.add('en');
+    r.classList.add('js');
+    // the cover is printed in front of you once per visit; coming back in the same session, it is simply there
+    try { if (sessionStorage.getItem('isc-printed')) r.classList.add('seen'); sessionStorage.setItem('isc-printed', '1'); } catch (e) {}
+  })();
+</script>
+<style>
+/* ------------------------------------------------------------------
+   FIRE. A riso-printed magazine, read by the fire at night.
+   Stock: newsprint paper, ochre, oxblood. Inks: charcoal, ochre, red.
+   Type: Besley (heavy Clarendon) + Schibsted Grotesk (newsroom sans).
+   ------------------------------------------------------------------ */
+:root {
+  --soot: #140f0c;
+  --char: #251b15;          /* = paper x charcoal ink, so printed night matches */
+  --paper: #efe5d2;
+  --paper-2: #e4d5bb;
+  --news: #d9d0be;          /* cooler, greyer newsprint */
+  --red-ink: #ad371a;
+  --ink: #1d1510;
+  --ink-soft: #5b4939;
+  --ochre: #c98b2c;
+  --ochre-hi: #e2a94f;
+  --red: #c4421f;
+  --blood: #6b2014;
+  --oxide: #7d2615;
+  --ash: #b5a48f;
+  --f-head: "Besley", "Clarendon", "Rockwell", Georgia, serif;
+  --f-text: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --gutter: clamp(16px, 4.6vw, 76px);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-io: cubic-bezier(.65, 0, .35, 1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--soot); -webkit-text-size-adjust: 100%; scroll-padding-top: 80px; scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--char); color: var(--paper);
+  font-family: var(--f-text); font-size: 1.0625rem; line-height: 1.6; font-weight: 400;
+  -webkit-font-smoothing: antialiased; overflow-x: clip;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; font-family: var(--f-head); font-weight: 800; letter-spacing: -.028em; text-wrap: balance; }
+button { font: inherit; color: inherit; }
+::selection { background: var(--ochre); color: var(--ink); }
+:focus-visible { outline: 2px solid var(--ochre-hi); outline-offset: 4px; border-radius: 2px; }
+[hidden] { display: none !important; }
+:root:not(.en) [data-l="en"], :root.en [data-l="nl"] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.wrap { width: 100%; max-width: 1480px; margin-inline: auto; padding-inline: var(--gutter); position: relative; z-index: 1; }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(12px, 2vw, 28px); }
+
+/* static film grain: texture, not flicker */
+.grain { position: fixed; inset: 0; z-index: 400; pointer-events: none; opacity: .07; background-size: 160px 160px; }
+
+/* ---------- stocks ---------- */
+.paper { background: var(--paper); color: var(--ink); position: relative; }
+.paper::before { content: ""; position: absolute; inset: 0; background-image: var(--fibre, none); background-size: 320px 320px; mix-blend-mode: multiply; pointer-events: none; z-index: 2; }
+.paper ::selection { background: var(--ink); color: var(--paper); }
+.news { background: var(--news); color: var(--ink); position: relative; }
+.news::before { content: ""; position: absolute; inset: 0; background-image: var(--fibre, none); background-size: 320px 320px; background-position: 97px 41px; mix-blend-mode: multiply; opacity: .8; pointer-events: none; z-index: 2; }
+.news ::selection { background: var(--ink); color: var(--paper); }
+.news :focus-visible { outline-color: var(--ink); }
+.night { background: var(--char); color: var(--paper); position: relative; }
+.blood { background: var(--blood); color: var(--paper); position: relative; }
+.ochre { background: var(--ochre); color: var(--ink); position: relative; }
+.ochre::before { content: ""; position: absolute; inset: 0; background-image: var(--fibre, none); background-size: 320px 320px; mix-blend-mode: multiply; opacity: .7; pointer-events: none; z-index: 2; }
+.paper :focus-visible, .ochre :focus-visible { outline-color: var(--ink); }
+
+/* torn paper edges between stocks (generated in JS) */
+.tear { position: absolute; left: 0; right: 0; top: -1px; height: clamp(14px, 1.9vw, 26px); z-index: 3; pointer-events: none; display: block; width: 100%; }
+
+/* ---------- buttons ---------- */
+.btn {
+  --bg: var(--paper); --fg: var(--ink); --hover: var(--ochre-hi);
+  position: relative; display: inline-flex; align-items: center; gap: .9rem;
+  background: var(--bg); color: var(--fg); text-decoration: none; cursor: pointer; border: 0;
+  font-family: var(--f-text); font-weight: 700; font-size: 1.02rem; letter-spacing: -.005em; line-height: 1.2;
+  padding: 1.05rem 1.35rem 1.05rem 1.45rem; border-radius: 2px;
+  transition: background-color .35s var(--ease-out), transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .28);
+}
+.btn .arr { display: inline-block; transition: transform .45s var(--ease-out); }
+.btn:hover { background: var(--hover); }
+.btn:hover .arr { transform: translateX(5px); }
+.btn:active { transform: translateY(2px); box-shadow: 0 0 0 rgba(0, 0, 0, .28); }
+.btn.ink { --bg: var(--ink); --fg: var(--paper); --hover: #46301f; }
+/* the main call: a red-ink block. On hover the ochre plate slips out of register, on press it snaps back in. */
+.btn.red { --bg: var(--red-ink); --fg: var(--paper); --hover: #9c2f15; box-shadow: 0 0 0 rgba(201, 139, 44, 0), 0 0 0 rgba(29, 21, 16, 0); transition: background-color .35s var(--ease-out), transform .2s var(--ease-out), box-shadow .3s cubic-bezier(.3, 1.4, .5, 1); }
+.btn.red:hover { box-shadow: 5px 4px 0 var(--ochre), -3px -2px 0 rgba(29, 21, 16, .85); }
+.btn.red:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ochre), 0 0 0 rgba(29, 21, 16, 0); transition-duration: .08s; }
+.btn.light { --bg: var(--paper); --fg: var(--ink); --hover: var(--ochre-hi); }
+.wa-ico { width: 1.25em; height: 1.25em; flex: none; }
+
+.ulink { text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; padding-bottom: 2px; transition: background-size .45s var(--ease-out); }
+.ulink:hover { background-size: 0% 1px; background-position: 100% 100%; }
+
+/* ---------- nav ---------- */
+/* a running head, printed on whatever stock is under it: no glass, no slab, a hairline rule */
+.nav { --nb: var(--paper); --nf: var(--ink); --acc: var(--red); position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding-top: env(safe-area-inset-top, 0px); color: var(--nf); background-color: transparent; transition: background-color .5s var(--ease-out), color .5s var(--ease-out); }
+/* on the cover the masthead is the brand, so the running head is just type on the page; it takes the stock once you move */
+.nav.filled { background-color: var(--nb); }
+.nav::after { content: ""; position: absolute; left: var(--gutter); right: var(--gutter); bottom: 0; height: 1px; background: currentColor; opacity: .5; transform: scaleX(0); transform-origin: left; transition: transform .8s var(--ease-out); }
+.nav.solid::after { transform: scaleX(1); }
+.nav[data-stock="news"] { --nb: var(--news); }
+.nav[data-stock="night"] { --nb: var(--char); --nf: var(--paper); --acc: #e2643c; }
+.nav[data-stock="blood"] { --nb: var(--blood); --nf: var(--paper); --acc: var(--paper); }
+.nav[data-stock="ochre"] { --nb: var(--ochre); --acc: var(--blood); }
+.nav[data-stock="soot"] { --nb: var(--soot); --nf: var(--paper); --acc: #e2643c; }
+.nav .wrap { height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; }
+.nav-brand { font-family: var(--f-head); font-weight: 900; font-size: 1.12rem; letter-spacing: -.03em; text-decoration: none; white-space: nowrap; opacity: 0; transform: translateY(-6px); transition: opacity .5s var(--ease-out), transform .5s var(--ease-out); pointer-events: none; }
+.nav.solid .nav-brand { opacity: 1; transform: none; pointer-events: auto; }
+.nav-right { display: flex; align-items: center; gap: clamp(.8rem, 2.2vw, 2rem); margin-left: auto; }
+.nav-links { display: flex; gap: 1.6rem; list-style: none; margin: 0; padding: 0; }
+.nav-links a { font-size: .94rem; font-weight: 500; text-decoration: none; opacity: .8; position: relative; padding-block: .3rem; transition: opacity .3s; }
+.nav-links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--acc); transform: scaleX(0); transform-origin: right; transition: transform .45s var(--ease-out); }
+.nav-links a:hover { opacity: 1; }
+.nav-links a:hover::after, .nav-links a.on::after { transform: scaleX(1); transform-origin: left; }
+.nav-links a.on { opacity: 1; }
+.lang-mini { display: none; background: none; border: 0; cursor: pointer; font-size: .84rem; font-weight: 700; padding: .4rem .3rem; position: relative; }
+.lang-mini::after { content: ""; position: absolute; left: .3rem; right: .3rem; bottom: .2rem; height: 2px; background: var(--acc, var(--red)); transform: scaleX(.35); transform-origin: left; transition: transform .4s var(--ease-out); }
+.lang-mini:hover::after { transform: scaleX(1); }
+.lang { display: inline-flex; align-items: center; gap: .1rem; font-size: .9rem; font-weight: 600; }
+.lang button { background: none; border: 0; cursor: pointer; padding: .35rem .35rem; opacity: .5; position: relative; transition: opacity .3s; }
+.lang button::after { content: ""; position: absolute; left: .35rem; right: .35rem; bottom: .15rem; height: 2px; background: var(--acc, var(--red)); transform: scaleX(0); transition: transform .4s var(--ease-out); }
+.lang button:hover { opacity: 1; }
+:root:not(.en) .lang [data-set="nl"], :root.en .lang [data-set="en"] { opacity: 1; }
+:root:not(.en) .lang [data-set="nl"]::after, :root.en .lang [data-set="en"]::after { transform: scaleX(1); }
+.lang .sl { opacity: .35; }
+.nav-cta { font-size: .9rem; padding: .62rem .9rem .62rem 1rem; --bg: var(--ink); --fg: var(--paper); --hover: #46301f; }
+.nav[data-stock="night"] .nav-cta, .nav[data-stock="blood"] .nav-cta, .nav[data-stock="soot"] .nav-cta { --bg: var(--paper); --fg: var(--ink); --hover: var(--ochre-hi); }
+.nav[data-stock="night"] :focus-visible, .nav[data-stock="blood"] :focus-visible { outline-color: var(--ochre-hi); }
+.nav :focus-visible { outline-color: currentColor; }
+@media (max-width: 1060px) { .nav-links { display: none; } }
+@media (max-width: 520px) {
+  .nav .wrap { gap: .6rem; }
+  .nav-brand { font-size: 1rem; }
+  .nav-right { gap: .55rem; }
+  .lang { font-size: .84rem; }
+  .lang button { padding: .35rem .25rem; }
+  .nav-cta { font-size: .84rem; padding: .55rem .7rem; white-space: nowrap; }
+}
+@media (max-width: 520px) { .nav:not(.solid) .nav-brand { display: none; } }
+@media (max-width: 400px) { .nav.solid .lang { display: none; } .nav.solid .lang-mini { display: inline-block; } }
+
+/* ---------- hero: the cover ---------- */
+.hero { min-height: 100vh; min-height: 100svh; overflow: hidden; isolation: isolate; }
+.hero-in { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; padding-top: calc(66px + env(safe-area-inset-top, 0px)); padding-bottom: clamp(24px, 3.4vh, 44px); }
+.mast { font-family: var(--f-head); font-weight: 900; font-size: clamp(2.9rem, 8.05vw, 9.4rem); line-height: .8; letter-spacing: -.055em; white-space: nowrap; margin-left: -.04em; }
+.mast > span { display: inline; }
+.dateline { margin-top: clamp(10px, 1.4vw, 18px); display: grid; grid-template-columns: auto auto 1fr; gap: 1rem clamp(1.6rem, 3vw, 3rem); border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink); padding: .42rem 0 .38rem; font-size: .84rem; font-weight: 500; letter-spacing: .005em; position: relative; z-index: 2; }
+.dateline .d1 { font-weight: 700; }
+.dateline .d3 { text-align: left; }
+.hero-grid { flex: 1; margin-top: clamp(26px, 4vh, 48px); display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: clamp(24px, 3vw, 48px); align-items: stretch; position: relative; }
+.hero-copy { display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: clamp(4px, 1vh, 16px); position: relative; z-index: 2; }
+.hero h1 { font-size: clamp(2.35rem, 4.9vw, 5.6rem); line-height: .95; letter-spacing: -.04em; font-weight: 800; }
+.hero h1 em { font-style: italic; font-weight: 600; color: var(--oxide); letter-spacing: -.03em; }
+.hero-sub { margin-top: clamp(1rem, 2.4vh, 1.6rem); max-width: 33rem; font-size: clamp(1.02rem, 1.2vw, 1.18rem); line-height: 1.55; color: #3d2f24; text-wrap: pretty; }
+.hero-actions { margin-top: clamp(1.4rem, 3.2vh, 2.2rem); }
+.hero-meta { font-size: .86rem; color: var(--ink-soft); margin-top: .6rem; }
+.hero-actions .btn.red { min-height: 4.2rem; }
+
+/* the printed fire plate: a round night printed in multiply on the paper. Its top edge sits on the dateline rule,
+   and the Feel first ticket is pinned to its bottom edge: the button sits right under the thing it lights. */
+.plate-fig { margin: calc(-1 * clamp(26px, 4vh, 48px) + 10px) calc(-1 * clamp(0px, 2vw, 30px)) 0 0; display: flex; flex-direction: column; align-items: center; min-height: 0; position: relative; }
+.plate { position: relative; flex: 1; min-height: 300px; width: 100%; padding: 0; border: 0; background: transparent; cursor: pointer; display: block; border-radius: 0; }
+.plate canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.plate:focus-visible { outline: 0; }
+.plate:focus-visible::after { content: ""; position: absolute; left: 50%; top: var(--disc-y, 50%); width: var(--disc-d, 90%); aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; outline: 2px solid var(--ink); outline-offset: 6px; }
+/* a small printed label follows the hand over the fire, so people find out the plate is a button */
+.plate-tip { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: nowrap; font-family: var(--f-head); font-style: italic; font-weight: 600; font-size: 1.12rem; letter-spacing: -.01em;
+  background: var(--paper); color: var(--ink); padding: .3rem .72rem .4rem; border-radius: 2px; box-shadow: 3px 3px 0 var(--red-ink); opacity: 0; transform: translate(var(--tx, 0px), var(--ty, 0px)) rotate(-3deg) scale(.9); transition: opacity .3s var(--ease-out), transform .3s var(--ease-out); }
+.plate.hov .plate-tip { opacity: 1; transform: translate(var(--tx, 0px), var(--ty, 0px)) rotate(-3deg) scale(1); transition: opacity .3s var(--ease-out), transform .14s var(--ease-out); }
+@media (hover: none) { .plate-tip { display: none; } }
+
+/* Feel first: a ticket pinned to the bottom of the plate, with a live ember that breathes with the big fire */
+.tk-wrap { display: block; position: relative; z-index: 3; margin-top: calc(-1 * clamp(30px, 3.6vw, 52px)); }
+.ticket {
+  --tk: var(--ochre); --nx: 7.05rem;
+  position: relative; display: inline-flex; align-items: center; gap: 1.3rem; cursor: pointer; text-align: left; border: 0;
+  padding: 1rem 2.3rem 1rem 1rem; background: var(--tk); color: var(--ink); border-radius: 2px;
+  transform: rotate(-2.4deg); box-shadow: 0 2px 0 rgba(29, 21, 16, .35), 0 18px 30px -14px rgba(20, 15, 12, .65);
+  -webkit-mask: radial-gradient(circle at var(--nx) 0, transparent 7px, #000 7.5px) top / 100% 51% no-repeat, radial-gradient(circle at var(--nx) 100%, transparent 7px, #000 7.5px) bottom / 100% 51% no-repeat;
+          mask: radial-gradient(circle at var(--nx) 0, transparent 7px, #000 7.5px) top / 100% 51% no-repeat, radial-gradient(circle at var(--nx) 100%, transparent 7px, #000 7.5px) bottom / 100% 51% no-repeat;
+  transition: transform .5s var(--ease-out), background-color .35s var(--ease-out);
+}
+.ticket::after { content: ""; position: absolute; left: var(--nx); top: 10px; bottom: 10px; border-left: 2px dotted rgba(29, 21, 16, .45); }
+.ticket:hover { transform: rotate(0deg) translateY(-3px); --tk: var(--ochre-hi); }
+.ticket:active { transform: rotate(0deg) translateY(1px); transition-duration: .1s; }
+.tk-ember { width: 5.1rem; height: 5.1rem; flex: none; display: block; border-radius: 50%; margin-right: .35rem; }
+.tk-t { display: block; font-family: var(--f-head); font-weight: 800; font-size: 2.35rem; line-height: 1; letter-spacing: -.035em; }
+.tk-s { display: block; margin-top: .4rem; font-size: 1rem; font-weight: 500; color: #3a2a1d; white-space: nowrap; }
+
+/* entrance, first visit only: three passes through the press. The ochre plate lands, then the red one, then the black. */
+.js:not(.seen) .hero .print { animation: reg 1.1s steps(1, end) both; animation-delay: var(--pd, .1s); }
+@keyframes reg {
+  0% { opacity: 0; }
+  12% { opacity: 1; -webkit-text-fill-color: transparent; text-shadow: .07em -.05em 0 rgba(201, 139, 44, .95); }
+  40% { -webkit-text-fill-color: transparent; text-shadow: .07em -.05em 0 rgba(201, 139, 44, .95), -.05em .035em 0 rgba(196, 66, 31, .85); }
+  68% { text-shadow: .025em -.02em 0 rgba(201, 139, 44, .9), -.02em .015em 0 rgba(196, 66, 31, .8); }
+  100% { opacity: 1; text-shadow: none; }
+}
+.js:not(.seen) .hero h1.print { animation-name: reg-s; }
+@keyframes reg-s {
+  0% { opacity: 0; }
+  12% { opacity: 1; -webkit-text-fill-color: transparent; text-shadow: 7px -5px 0 rgba(201, 139, 44, .9); }
+  40% { -webkit-text-fill-color: transparent; text-shadow: 7px -5px 0 rgba(201, 139, 44, .9), -5px 4px 0 rgba(196, 66, 31, .8); }
+  68% { text-shadow: 2px -2px 0 rgba(201, 139, 44, .85), -2px 1px 0 rgba(196, 66, 31, .7); }
+  100% { opacity: 1; text-shadow: none; }
+}
+/* the ticket is laid down after the headline; on that frame the fire flares once */
+.js:not(.seen) .hero .tk-wrap { animation: lay .8s cubic-bezier(.2, 1.3, .4, 1) 1.55s both; }
+@keyframes lay { from { opacity: 0; transform: translateY(-26px) rotate(-7deg) scale(1.04); } 60% { opacity: 1; } to { opacity: 1; transform: none; } }
+
+@media (max-width: 900px) {
+  .hero-in { padding-top: calc(58px + env(safe-area-inset-top, 0px)); padding-bottom: 28px; }
+  /* phones: a small line, then the one big word, the way a magazine stacks its name */
+  .mast { white-space: normal; margin-left: 0; }
+  .mast > span { display: block; }
+  .mast .m1 { font-size: calc((100vw - 2 * var(--gutter)) * .118); line-height: .9; letter-spacing: -.045em; }
+  .mast .m2 { font-size: calc((100vw - 2 * var(--gutter)) * .262); line-height: .8; margin-left: -.04em; }
+  .dateline { display: flex; justify-content: space-between; gap: .8rem; margin-top: 8px; font-size: .74rem; white-space: nowrap; border-top-width: 2px; }
+  .dateline .d1 { display: none; }
+  .hero-grid { grid-template-columns: 1fr; margin-top: 0; gap: 0; flex: none; }
+  .plate-fig { order: -1; margin: 0 calc(var(--gutter) * -1) 20px; }
+  .plate { min-height: 0; aspect-ratio: 1 / .7; flex: none; }
+  .hero h1 { font-size: clamp(1.95rem, 8.6vw, 3.6rem); }
+  .hero-sub { order: 3; margin-top: 1.4rem; font-size: 1rem; }
+  .hero-actions { margin-top: 1.1rem; }
+  .hero-actions .btn.red { min-height: 3.6rem; }
+  .tk-wrap { margin-top: -24px; }
+  .ticket { --nx: 4.45rem; gap: .85rem; padding: .6rem 1.25rem .6rem .6rem; }
+  .tk-ember { width: 3.2rem; height: 3.2rem; margin-right: .3rem; }
+  .tk-t { font-size: 1.6rem; }
+  .tk-s { font-size: .86rem; margin-top: .25rem; }
+}
+@media (max-width: 900px) and (min-width: 600px) { .plate { aspect-ratio: 16 / 9; } .mast .m1 { font-size: calc((100vw - 2 * var(--gutter)) * .09); } .mast .m2 { font-size: calc((100vw - 2 * var(--gutter)) * .2); } }
+
+/* ---------- the unsaid: six voices on newsprint ---------- */
+.unsaid { padding-block: clamp(84px, 9vw, 132px) clamp(84px, 9vw, 132px); }
+/* the section opens straight into the voices: one plain line, then sentence one */
+.unsaid h2 { font-family: var(--f-head); font-weight: 400; font-size: clamp(1.2rem, 1.5vw, 1.45rem); line-height: 1.3; letter-spacing: -.012em; color: var(--ink-soft); max-width: 34ch; }
+.said { list-style: none; margin: clamp(14px, 1.6vw, 22px) 0 0; padding: 0; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(12px, 2vw, 28px); row-gap: clamp(30px, 4.2vw, 64px); align-items: end; }
+.said li { position: relative; }
+.said q { quotes: none; display: block; text-wrap: balance; }
+.said q > span { display: block; }
+.said .br { display: block; }
+/* jealousy: plain, big, upright */
+.said .v1 { grid-column: 1 / span 8; }
+.said .v1 q { font-family: var(--f-head); font-weight: 700; font-size: clamp(2.1rem, 4.1vw, 4.1rem); line-height: 1.02; letter-spacing: -.032em; }
+/* competition: a harder, flatter voice, pushed right */
+.said .v2 { grid-column: 6 / span 7; text-align: right; }
+.said .v2 q { font-family: var(--f-text); font-weight: 800; font-size: clamp(1.6rem, 2.75vw, 2.7rem); line-height: 1.08; letter-spacing: -.03em; }
+/* grief: italic, quieter, in softer ink */
+.said .v3 { grid-column: 1 / span 7; padding-left: clamp(0px, 4vw, 60px); }
+.said .v3 q { font-family: var(--f-head); font-style: italic; font-weight: 400; font-size: clamp(1.9rem, 3.3vw, 3.3rem); line-height: 1.08; letter-spacing: -.025em; color: #3d2f24; }
+/* fear: not printed at all. Someone wrote it in the margin, in pencil. */
+.said .v4 { grid-column: 8 / span 4; align-self: start; padding-top: clamp(28px, 3.4vw, 54px); margin-left: clamp(-30px, -1.5vw, 0px); }
+.said .v4 q { font-family: "Reenie Beanie", "Bradley Hand", cursive; font-weight: 400; font-size: clamp(2.3rem, 3.2vw, 3.2rem); line-height: .94; letter-spacing: .005em; color: #2b2622; transform: rotate(-4deg); transform-origin: left center; max-width: 14ch; }
+
+/* shame */
+.said .v5 { grid-column: 3 / span 9; }
+.said .v5 q { font-family: var(--f-head); font-weight: 800; font-size: clamp(2.3rem, 4.8vw, 4.9rem); line-height: .98; letter-spacing: -.04em; }
+/* anger: the whole width, in red ink */
+.said .v6 { grid-column: 1 / -1; margin-top: clamp(0px, 1vw, 16px); }
+.said .v6 q { font-family: var(--f-head); font-weight: 900; font-size: clamp(2.5rem, 6.9vw, 7.6rem); line-height: .92; letter-spacing: -.05em; color: var(--red-ink); }
+
+/* landing: each sentence is printed slightly out of register and settles */
+.js .said .appear { opacity: 0; }
+.said .appear.in { animation: land 1.25s cubic-bezier(.22, 1, .36, 1) both; }
+.said .v4.appear.in { animation: whisper 2.4s cubic-bezier(.4, 0, .2, 1) both; }
+@keyframes land {
+  0% { opacity: 0; text-shadow: 3px -2px 0 rgba(201, 139, 44, .85), -2px 1px 0 rgba(173, 55, 26, .6); }
+  35% { opacity: 1; }
+  100% { opacity: 1; text-shadow: 0 0 0 rgba(201, 139, 44, 0), 0 0 0 rgba(173, 55, 26, 0); }
+}
+@keyframes whisper { from { opacity: 0; } to { opacity: 1; } }
+
+.unsaid-after { margin-top: clamp(64px, 8vw, 120px); align-items: start; }
+.unsaid-after .drop { grid-column: 7 / span 5; font-size: clamp(1.06rem, 1.25vw, 1.2rem); line-height: 1.6; color: #2e231a; }
+.unsaid-after .strong { grid-column: 7 / span 5; margin-top: clamp(22px, 2.4vw, 34px); font-family: var(--f-text); font-weight: 800; font-size: clamp(1.3rem, 1.75vw, 1.7rem); line-height: 1.18; letter-spacing: -.022em; }
+
+/* burn-in: the anger lands hot and cools into red ink */
+.burn .w { display: inline-block; white-space: pre; }
+.js .burn .w { opacity: 0; }
+.burn.lit .w { animation: burn 2.1s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i) * 130ms); }
+/* the last word stays hot a moment longer before it cools */
+.burn.lit .w.last { animation-name: burn-last; animation-duration: 2.7s; }
+@keyframes burn-last {
+  0% { opacity: 0; color: #f2b450; transform: translateY(.08em); }
+  15% { opacity: 1; color: #e88a2a; transform: none; }
+  52% { color: #e88a2a; }
+  72% { color: #d2542a; }
+  100% { opacity: 1; color: var(--red-ink); }
+}
+@keyframes burn {
+  0% { opacity: 0; color: #f2b450; transform: translateY(.08em); }
+  20% { opacity: 1; color: #e88a2a; transform: none; }
+  55% { color: #d2542a; }
+  100% { opacity: 1; color: var(--red-ink); }
+}
+
+@media (max-width: 860px) {
+  .unsaid h2 { font-size: 1.12rem; }
+  .said { row-gap: 40px; }
+  .said .v1, .said .v3, .said .v5, .said .v6 { grid-column: 1 / -1; }
+  .said .v2 { grid-column: 2 / -1; }
+  .said .v3 { padding-left: 1.4rem; }
+  .said .v4 { grid-column: 3 / -1; align-self: auto; padding-top: 0; margin: -14px 0 0; }
+  .said .v4 q { font-size: 2.3rem; }
+  .said .v5 { padding-left: .6rem; }
+  .said .v1 q { font-size: 2.05rem; }
+  .said .v2 q { font-size: 1.55rem; }
+  .said .v3 q { font-size: 1.85rem; }
+  .said .v5 q { font-size: 2.3rem; }
+  .said .v6 q { font-size: clamp(2.3rem, 11.4vw, 3.4rem); }
+  .unsaid-after .drop, .unsaid-after .strong { grid-column: 1 / -1; }
+}
+
+/* ---------- the circle ---------- */
+.circle-sec { padding-top: clamp(100px, 11vw, 170px); }
+.circle-head { align-items: end; }
+.circle-head h2 { grid-column: 1 / span 8; font-weight: 400; font-size: clamp(2.2rem, 4.3vw, 4.6rem); line-height: 1.02; letter-spacing: -.035em; max-width: 17ch; }
+.circle-head h2 b { font-weight: 800; }
+.circle-head .intro { grid-column: 9 / span 4; color: rgba(239, 229, 210, .8); font-size: 1.06rem; line-height: 1.6; padding-bottom: .5rem; max-width: 22rem; }
+.scene { position: relative; height: 320vh; margin-top: clamp(10px, 2vw, 30px); }
+.stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.steps { position: absolute; left: var(--gutter); bottom: 13vh; width: min(30rem, 34vw); z-index: 2; }
+.step { position: absolute; left: 0; right: 0; bottom: 0; opacity: 0; transform: translateY(8px); transition: opacity .5s var(--ease-out), transform .7s var(--ease-out); }
+.step.on { opacity: 1; transform: none; transition-delay: .12s; }
+/* the step heading is printed in, like the cover: the ochre and red plates land a beat apart */
+.js .step.on h3 { animation: reg-s .62s steps(1, end) .12s both; }
+.step h3 { font-family: var(--f-text); font-weight: 800; font-size: clamp(1.6rem, 2.4vw, 2.4rem); line-height: 1.04; letter-spacing: -.03em; }
+.step p { margin-top: .9rem; color: rgba(239, 229, 210, .84); font-size: 1.08rem; }
+.step .allowed { margin-top: 1rem; font-family: var(--f-head); font-weight: 400; font-size: clamp(1.45rem, 2vw, 1.85rem); line-height: 1.22; letter-spacing: -.02em; color: var(--paper); }
+.allowed .aw { color: rgba(239, 229, 210, .38); transition: color .5s var(--ease-out); background: linear-gradient(var(--red), var(--red)) 0 92% / 0% 3px no-repeat; transition: color .5s var(--ease-out), background-size .6s var(--ease-out); }
+.allowed .aw.on { color: var(--paper); background-size: 100% 3px; }
+.allowed .aw.was, .allowed .aw.all { color: var(--paper); }
+:root:not(.js) .allowed .aw { color: var(--paper); }
+:root:not(.js) .scene { height: auto; }
+:root:not(.js) .stage { position: relative; height: auto; }
+:root:not(.js) .stage canvas { display: none; }
+:root:not(.js) .steps { position: static; width: auto; padding: 0 var(--gutter) 80px; }
+:root:not(.js) .step { position: static; opacity: 1; transform: none; margin-top: 40px; }
+@media (max-width: 860px) {
+  .circle-head h2, .circle-head .intro { grid-column: 1 / -1; }
+  .circle-head .intro { margin-top: 26px; }
+  .scene { height: 300vh; }
+  .stage::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 52%; background: linear-gradient(rgba(37, 27, 21, 0), var(--char) 34%); z-index: 1; pointer-events: none; }
+  .steps { left: var(--gutter); right: var(--gutter); width: auto; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
+  .step h3 { font-size: 1.55rem; }
+  .step .allowed { font-size: 1.35rem; margin-top: .7rem; }
+  .step p { font-size: 1rem; margin-top: .6rem; }
+}
+
+/* ---------- who: one column of text, run-in head, footnote in the margin ---------- */
+.who { padding-block: clamp(100px, 9vw, 136px) clamp(90px, 8vw, 120px); }
+.who-col { grid-column: 3 / span 7; position: relative; }
+.who .txt { font-family: var(--f-head); font-weight: 400; font-size: clamp(1.45rem, 2.15vw, 2.15rem); line-height: 1.38; letter-spacing: -.012em; text-align: left; hyphens: manual; -webkit-hyphens: manual; text-wrap: pretty; color: rgba(239, 229, 210, .92); }
+.who .txt h2 { display: inline; font: inherit; font-family: var(--f-text); font-weight: 800; letter-spacing: -.025em; color: var(--paper); }
+.who .txt sup, .who .fn .ast { font-family: var(--f-text); font-weight: 800; color: #f0a184; }
+.who .txt sup { font-size: .55em; vertical-align: top; position: relative; top: -.05em; margin-left: .04em; }
+.who .fn { grid-column: 10 / span 3; align-self: end; position: relative; font-size: .88rem; line-height: 1.5; color: rgba(239, 229, 210, .8); padding-bottom: .5rem; }
+.who .fn .ast { position: absolute; left: -.85em; top: -.05em; font-size: 1.1rem; }
+.who .fn strong { color: var(--paper); }
+@media (max-width: 860px) {
+  .who-col { grid-column: 1 / -1; }
+  .who .txt { font-size: 1.36rem; }
+  .who .fn { grid-column: 2 / -1; margin-top: 40px; padding-left: .1rem; }
+}
+
+/* ---------- section seams: each one chosen for the two stocks it joins ---------- */
+.fold { position: absolute; left: 0; right: 0; top: 0; height: 34px; z-index: 3; pointer-events: none; background: linear-gradient(rgba(29, 21, 16, .16), rgba(29, 21, 16, 0)); }
+.fold::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: rgba(29, 21, 16, .28); }
+.overprint { position: absolute; left: 0; right: 0; top: -1px; height: 56px; z-index: 3; pointer-events: none; background-repeat: repeat-x; background-size: auto 56px; }
+
+/* ---------- team: four duotone halftone prints on the paper ---------- */
+.team { padding-block: clamp(96px, 10vw, 150px) clamp(96px, 10vw, 150px); }
+.frames { display: flex; justify-content: space-between; gap: clamp(12px, 1.6vw, 24px); }
+.frame { flex: 1 1 0; min-width: 0; margin: 0; }
+.ph { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--paper); }
+.ph canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ph img { display: none; }
+:root:not(.js) .ph img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) sepia(.5); }
+.frame figcaption { padding: .7rem 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: .15rem .55rem; line-height: 1.1; border-top: 2px solid var(--ink); margin-top: .7rem; }
+.frame figcaption .nm { font-family: var(--f-head); font-weight: 800; font-size: clamp(1.35rem, 1.75vw, 1.65rem); letter-spacing: -.03em; }
+.frame figcaption .rl { font-family: var(--f-head); font-style: italic; font-size: 1.02rem; color: var(--ink-soft); }
+.team-rule { margin-top: clamp(22px, 2.4vw, 34px); display: flex; align-items: baseline; gap: 1rem; font-family: var(--f-text); font-weight: 700; font-size: clamp(1.02rem, 1.2vw, 1.16rem); letter-spacing: -.01em; }
+.team-rule::before { content: ""; flex: none; width: 2.4rem; height: 2px; background: var(--red-ink); transform: translateY(-.32em); }
+.team-words { margin-top: clamp(64px, 7vw, 110px); align-items: start; }
+.team h2 { grid-column: 1 / span 5; font-size: clamp(2.4rem, 4.6vw, 4.8rem); line-height: .94; letter-spacing: -.045em; }
+.team-txt { grid-column: 7 / span 5; padding-top: .5rem; }
+.team-txt .lede { font-family: var(--f-text); font-weight: 700; font-size: clamp(1.35rem, 1.8vw, 1.7rem); line-height: 1.2; letter-spacing: -.022em; color: var(--ink); }
+.team-txt .rest { margin-top: 1rem; font-size: 1.08rem; color: #3d2f24; max-width: 34rem; }
+@media (max-width: 860px) {
+  /* phones: the four of us together, two by two */
+  .frames { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 14px; }
+  .frame figcaption { padding-top: .5rem; margin-top: .5rem; }
+  .frame figcaption .nm { font-size: 1.3rem; }
+  .frame figcaption .rl { font-size: .92rem; }
+  .team h2, .team-txt { grid-column: 1 / -1; }
+  .team-txt { margin-top: 26px; padding-top: 0; }
+}
+
+/* ---------- join: the Monday, and a leaf torn off the calendar ---------- */
+.join { padding-block: clamp(110px, 11vw, 170px) clamp(110px, 11vw, 170px); }
+.join-row { align-items: center; }
+.join-l { grid-column: 1 / span 7; }
+.join h2 { font-size: clamp(3rem, 7.6vw, 8.4rem); line-height: .9; letter-spacing: -.05em; }
+.join h2 .c { position: relative; display: inline-block; }
+.join h2 .c svg { position: absolute; left: -9%; top: -16%; width: 118%; height: 138%; overflow: visible; pointer-events: none; }
+.join h2 .c path { fill: none; stroke: var(--blood); stroke-width: 4.2; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.join h2 .c.drawn path { transition: stroke-dashoffset 1.5s cubic-bezier(.55, .05, .25, 1) .25s; stroke-dashoffset: 0; }
+:root:not(.js) .join h2 .c path { stroke-dashoffset: 0; }
+.run { margin: clamp(30px, 3.6vw, 52px) 0 0; max-width: 34rem; font-size: clamp(1.08rem, 1.3vw, 1.22rem); line-height: 1.55; color: #2a1e15; }
+.join-go { margin-top: clamp(26px, 3vw, 40px); display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; }
+.join-go p { font-size: .95rem; max-width: 20rem; color: #3a2a1a; }
+.join :focus-visible { outline-color: var(--ink); }
+
+/* the leaf is pinned across the seam: half on the team page, half on the ochre */
+.join .wrap { z-index: 4; }
+.leaf-w { grid-column: 9 / span 4; display: flex; justify-content: center; align-self: start; margin-top: calc(-1 * clamp(170px, 15vw, 240px)); }
+.leaf { position: relative; width: min(100%, 20rem); background: var(--paper); color: var(--ink); transform: rotate(2.2deg); box-shadow: 0 2px 0 rgba(29, 21, 16, .25), 0 26px 40px -24px rgba(29, 21, 16, .7); padding: 0 0 1.5rem; text-align: center; }
+.leaf::before { content: ""; position: absolute; inset: 0; background-image: var(--fibre, none); background-size: 320px 320px; mix-blend-mode: multiply; pointer-events: none; }
+.leaf .top { display: block; background: var(--red-ink); color: var(--paper); padding: 1.55rem 1rem .8rem; font-family: var(--f-text); font-weight: 800; font-size: 1.05rem; letter-spacing: .01em;
+  -webkit-mask: radial-gradient(circle 5px at 50% 10px, transparent 4.5px, #000 5px) 0 0 / 2.2rem 100% repeat-x; mask: radial-gradient(circle 5px at 50% 10px, transparent 4.5px, #000 5px) 0 0 / 2.2rem 100% repeat-x; }
+.leaf .day { display: block; font-family: var(--f-head); font-weight: 900; font-size: clamp(4.2rem, 6.4vw, 6rem); line-height: .9; letter-spacing: -.02em; margin-top: 1.1rem; }
+.leaf .to { display: block; font-family: var(--f-head); font-weight: 400; font-size: 1.45rem; letter-spacing: -.01em; margin-top: .35rem; }
+.leaf .free { display: block; margin: 1rem auto 0; width: max-content; font-family: var(--f-text); font-weight: 800; font-size: .98rem; color: var(--red-ink); border-top: 2px solid currentColor; padding-top: .45rem; }
+
+.events { margin-top: clamp(64px, 8vw, 110px); }
+.events h3 { font-family: var(--f-text); font-weight: 800; font-size: clamp(1.5rem, 2.2vw, 2rem); letter-spacing: -.03em; }
+.ev-list { list-style: none; margin: 1.2rem 0 0; padding: 0; border-top: 2px solid var(--ink); }
+.ev { border-bottom: 1px solid rgba(29, 21, 16, .35); }
+.ev a { display: grid; grid-template-columns: 11rem minmax(0, 1fr) auto; gap: 1.2rem; align-items: baseline; padding: 1.2rem 0; text-decoration: none; transition: padding-left .45s var(--ease-out), background-color .3s; }
+.ev a:hover { padding-left: .8rem; background: rgba(29, 21, 16, .06); }
+.ev .dt { font-family: var(--f-head); font-weight: 800; font-size: 1.3rem; letter-spacing: -.02em; }
+.ev .tt { font-family: var(--f-text); font-weight: 700; font-size: 1.2rem; letter-spacing: -.015em; }
+.ev .ln { display: block; font-size: 1rem; color: rgba(29, 21, 16, .78); margin-top: .2rem; font-family: var(--f-text); font-weight: 400; }
+.ev .go { font-weight: 700; white-space: nowrap; }
+@media (max-width: 700px) { .ev a { grid-template-columns: 1fr; gap: .3rem; } }
+@media (max-width: 860px) {
+  .join-l, .leaf-w { grid-column: 1 / -1; }
+  .join-row { position: relative; }
+  .leaf-w { position: absolute; right: -4px; top: -112px; margin: 0; width: 8.6rem; }
+  .leaf { width: 100%; padding-bottom: 1rem; }
+  .leaf .top { font-size: .86rem; padding: 1.25rem .6rem .55rem; }
+  .leaf .day { font-size: 2.9rem; margin-top: .7rem; }
+  .leaf .to { font-size: 1.05rem; }
+  .leaf .free { font-size: .84rem; margin-top: .6rem; }
+  .join h2 { padding-top: 40px; }
+}
+
+/* ---------- teams: a spread of its own, on the night stock ---------- */
+.teams { padding-block: clamp(120px, 12vw, 190px) clamp(80px, 8vw, 120px); }
+.teams h2 { font-family: var(--f-head); font-weight: 900; font-size: clamp(2.6rem, 7.2vw, 8.2rem); line-height: .9; letter-spacing: -.05em; max-width: 14ch; }
+.teams .sw { color: var(--red); }
+.js .teams .sw { color: var(--paper); }
+.js .teams h2.in .sw { animation: redpass 1.1s cubic-bezier(.3, 1.25, .5, 1) .5s forwards; }
+@keyframes redpass {
+  0% { color: var(--paper); text-shadow: .08em -.05em 0 rgba(196, 66, 31, .95); }
+  100% { color: var(--red); text-shadow: 0 0 0 rgba(196, 66, 31, 0); }
+}
+.teams-row { margin-top: clamp(40px, 5vw, 72px); align-items: end; }
+.teams .tx { grid-column: 4 / span 5; font-size: clamp(1.06rem, 1.25vw, 1.18rem); line-height: 1.6; color: rgba(239, 229, 210, .84); }
+.teams .tx b { color: var(--paper); font-weight: 800; }
+.teams .go { grid-column: 9 / span 4; display: flex; flex-direction: column; align-items: flex-start; gap: .9rem; }
+.teams .go p { font-size: .95rem; color: rgba(239, 229, 210, .8); }
+@media (max-width: 1100px) { .teams .tx { grid-column: 1 / span 7; } .teams .go { grid-column: 8 / span 5; } }
+.teams .go .btn { white-space: nowrap; }
+@media (max-width: 860px) {
+  .teams h2 { font-size: clamp(2.5rem, 12.4vw, 4rem); }
+  .teams .tx, .teams .go { grid-column: 1 / -1; }
+  .teams .go { margin-top: 30px; }
+}
+
+/* ---------- closing: back on the paper, the same round night as the cover. Hours later: only coals. ---------- */
+.closing { padding-block: clamp(120px, 13vw, 190px) clamp(90px, 9vw, 130px); text-align: center; }
+.closing h2 { font-family: var(--f-head); font-size: clamp(2.5rem, 5.4vw, 6.2rem); line-height: .98; letter-spacing: -.045em; max-width: 16ch; margin-inline: auto; }
+.closing h2 .l1 { display: block; font-weight: 400; color: var(--ink-soft); letter-spacing: -.035em; }
+.closing h2 .l2 { display: block; font-weight: 800; color: var(--ink); }
+.coal-fig { position: relative; margin: clamp(26px, 3vw, 44px) auto 0; width: min(100%, 30rem, 54vh); display: flex; flex-direction: column; align-items: center; }
+.coal-fig canvas { display: block; width: 100%; aspect-ratio: 1; }
+.coal-fig .btn { margin-top: calc(-1 * clamp(30px, 3vw, 40px)); position: relative; z-index: 2; transform: rotate(-1.6deg); }
+.coal-fig .btn:hover { transform: rotate(0deg) translateY(-2px); }
+.coal-fig .btn:active { transform: translate(2px, 2px); }
+.closing :focus-visible { outline-color: var(--ink); }
+@media (max-width: 700px) { .coal-fig { width: min(86vw, 22rem); } }
+
+/* ---------- footer ---------- */
+footer { background: var(--soot); color: rgba(239, 229, 210, .78); padding-block: 64px 40px; font-size: .96rem; position: relative; }
+.foot { row-gap: 40px; align-items: start; }
+.foot .fb { grid-column: 1 / span 4; }
+.foot .fb .nmk { font-family: var(--f-head); font-weight: 900; font-size: 1.7rem; letter-spacing: -.04em; color: var(--paper); line-height: 1; }
+.foot .fb p { margin-top: .8rem; max-width: 22rem; }
+.foot .fc { grid-column: 5 / span 3; display: flex; flex-direction: column; gap: .7rem; align-items: flex-start; }
+.foot .fc a { color: var(--paper); font-weight: 600; }
+.foot .lang { color: var(--paper); }
+/* the crisis line: a printed notice, red ink on soot */
+.foot .fx { grid-column: 9 / span 4; background: #4a1a10; color: rgba(239, 229, 210, .9); padding: 1.1rem 1.25rem 1.2rem; font-size: .92rem; line-height: 1.5; border-radius: 2px; }
+.foot .fx strong { color: var(--paper); display: block; font-size: 1.02rem; margin-bottom: .2rem; }
+.foot .fx .tel { color: var(--paper); font-weight: 800; text-decoration: underline; text-decoration-color: rgba(239, 229, 210, .45); text-decoration-thickness: 2px; text-underline-offset: 3px; white-space: nowrap; }
+.foot .fx .tel:hover { text-decoration-color: var(--paper); }
+.legal { margin-top: 56px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; font-size: .84rem; color: rgba(239, 229, 210, .74); border-top: 1px solid rgba(239, 229, 210, .16); padding-top: 22px; }
+.legal a { color: inherit; }
+@media (max-width: 860px) { .foot .fb, .foot .fc, .foot .fx { grid-column: 1 / -1; } }
+
+/* ---------- breath overlay: the room goes dark from the edges in, until only the fire is lit ---------- */
+@property --vr { syntax: '<percentage>'; inherits: false; initial-value: 130%; }
+.breath { position: fixed; inset: 0; z-index: 300; background: var(--char); color: var(--paper); --vr: 130%; opacity: 0;
+  -webkit-mask: radial-gradient(ellipse 150% 150% at var(--mx, 50%) var(--my, 46%), transparent calc(var(--vr) - 26%), #000 var(--vr));
+          mask: radial-gradient(ellipse 150% 150% at var(--mx, 50%) var(--my, 46%), transparent calc(var(--vr) - 26%), #000 var(--vr));
+  transition: --vr 2.6s cubic-bezier(.45, 0, .2, 1), opacity .4s linear; }
+.breath.show { --vr: 0%; opacity: 1; }
+.breath.lift { transition: --vr 2s cubic-bezier(.5, 0, .3, 1), opacity .5s linear 1.5s; }
+.breath canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.breath :focus-visible { outline-color: var(--ochre-hi); }
+.b-close { position: absolute; top: calc(14px + env(safe-area-inset-top, 0px)); right: var(--gutter); z-index: 2; display: inline-flex; align-items: center; gap: .45rem; background: none; border: 0; color: rgba(239, 229, 210, .78); cursor: pointer; font-size: .95rem; font-weight: 600; padding: .6rem .2rem; transition: color .3s; }
+.b-close:hover { color: var(--paper); }
+.b-close svg { width: 1.1rem; height: 1.1rem; }
+.b-cue { position: absolute; left: 0; right: 0; top: 72%; text-align: center; z-index: 2; pointer-events: none; transition: opacity .8s; }
+.b-word { font-family: var(--f-head); font-style: italic; font-weight: 400; font-size: clamp(2.1rem, 4.2vw, 3.3rem); letter-spacing: -.025em; line-height: 1; min-height: 1.1em; color: var(--paper); text-shadow: 0 0 18px rgba(20, 15, 12, .9), 0 0 4px rgba(20, 15, 12, .8); transition: opacity .8s var(--ease-out), transform .8s var(--ease-out); }
+.b-word.out { opacity: 0; transform: translateY(8px); }
+.b-dots { margin-top: 1.3rem; display: flex; justify-content: center; gap: .8rem; }
+.b-dots i { --f: 0; position: relative; width: 11px; height: 11px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(239, 229, 210, .35); transition: box-shadow .6s; }
+.b-dots i::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--ochre-hi); transform: scale(var(--f)); }
+.b-dots i.cur { box-shadow: inset 0 0 0 1.5px var(--ochre-hi); }
+/* the sound toggle sits right under the breath, where the eye already is */
+.b-sound { position: absolute; left: 50%; bottom: calc(4.5vh + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 2; display: inline-flex; align-items: center; gap: .6rem; cursor: pointer;
+  background: transparent; color: var(--paper); border: 1.5px solid rgba(239, 229, 210, .45); border-radius: 999px; padding: .7rem 1.2rem .7rem 1rem; font-size: 1rem; font-weight: 600; white-space: nowrap; transition: border-color .3s, background-color .3s, color .3s; }
+.b-sound:hover { border-color: var(--paper); }
+.b-sound svg { width: 1.25rem; height: 1.25rem; }
+.b-sound .st { font-weight: 400; opacity: .75; }
+.b-sound[aria-pressed="true"] { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+.b-sound .wave { opacity: 0; transition: opacity .3s; }
+.b-sound[aria-pressed="true"] .wave { opacity: 1; }
+.b-sound[aria-pressed="true"] .mute { opacity: 0; }
+.b-sound .on-l { display: none; }
+.b-sound[aria-pressed="true"] .on-l { display: inline; }
+.b-sound[aria-pressed="true"] .off-l { display: none; }
+.b-end { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.b-end .q { position: absolute; left: 0; right: 0; top: 20%; padding: 0 var(--gutter); text-align: center; font-family: var(--f-head); font-style: italic; font-weight: 400; font-size: clamp(1.9rem, 3.6vw, 3rem); line-height: 1.08; letter-spacing: -.025em; color: var(--paper); text-wrap: balance; }
+.b-end .rest { position: absolute; left: 0; right: 0; top: 68%; padding: 0 var(--gutter); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; pointer-events: auto; }
+.b-end p { color: rgba(239, 229, 210, .78); font-size: 1.08rem; }
+.b-end .acts { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1rem 1.6rem; }
+.b-end .again { background-color: transparent; border: 0; cursor: pointer; color: var(--paper); font-weight: 600; padding: .4rem 0 2px; }
+.b-end .q, .b-end .rest { opacity: 0; transition: opacity 1.6s var(--ease-out), transform 1.6s var(--ease-out); }
+.b-end .q { transform: translateY(10px); }
+.b-end.show .q { opacity: 1; transform: none; }
+.b-end.show .rest { opacity: 1; transition-delay: 2s; }
+.breath.ended .b-sound { opacity: 0; pointer-events: none; transition: opacity .8s; }
+/* leaving: every word clears first (400 ms), and only then does the dark lift, so nothing overprints the page */
+.breath.leaving .b-cue, .breath.leaving .b-end .q, .breath.leaving .b-end .rest, .breath.leaving .b-sound, .breath.leaving .b-close { opacity: 0 !important; transition: opacity .38s cubic-bezier(.4, 0, .6, 1) !important; pointer-events: none; }
+@media (max-width: 700px) { .b-end .q { top: 17%; } .b-end .rest { top: 64%; } .b-cue { top: 66%; } }
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .hero .print, .js .hero h1.print, .js .hero .tk-wrap { animation: none !important; }
+  .js .burn .w { opacity: 1; }
+  .burn.lit .w { animation: none; color: var(--red-ink); }
+  .js .said .appear { opacity: 1; }
+  .said .appear.in, .said .v4.appear.in { animation: none; }
+  .js .teams .sw { color: var(--red); }
+  .js .teams h2.in .sw { animation: none; }
+  .join h2 .c path { stroke-dashoffset: 0; transition: none !important; }
+  .step { transition: opacity .3s linear; transform: none !important; }
+  .js .step.on h3 { animation: none; }
+  .allowed .aw { color: var(--paper); background-size: 0 3px; }
+  .js .hero .tk-wrap { opacity: 1; }
+  .b-word, .b-end .q, .b-end .rest { transition: opacity .4s linear; transform: none !important; }
+  .b-end.show .rest { transition-delay: .8s; }
+  .breath, .breath.lift { transition: opacity .4s linear; --vr: 0%; }
+  .ticket, .ticket:hover { transition: none; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.2a9.7 9.7 0 0 0-8.4 14.6L2.3 21.7l5-1.3A9.7 9.7 0 1 0 12 2.2Zm0 17.7c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 19.9Zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.9 2c0 1.2.9 2.3 1 2.5.1.2 1.7 2.7 4.2 3.7 1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.4Z"/></symbol>
+</svg>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="nav-brand" href="#top">Inner Shadow Circle</a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#onuitgesproken"><span data-l="nl">Wat je niet zegt</span><span data-l="en">What you don't say</span></a></li>
+        <li><a href="#cirkel"><span data-l="nl">De cirkel</span><span data-l="en">The circle</span></a></li>
+        <li><a href="#wij"><span data-l="nl">Wij</span><span data-l="en">Us</span></a></li>
+        <li data-events><a href="#agenda"><span data-l="nl">Agenda</span><span data-l="en">Events</span></a></li>
+        <li><a href="#meedoen"><span data-l="nl">Meedoen</span><span data-l="en">Join</span></a></li>
+      </ul>
+      <div class="lang" role="group" aria-label="Taal / Language">
+        <button type="button" data-set="nl" lang="nl" aria-label="Nederlands">NL</button><span class="sl" aria-hidden="true">/</span><button type="button" data-set="en" lang="en" aria-label="English">EN</button>
+      </div>
+      <button class="lang-mini" type="button" id="lang-mini"><span data-l="nl" lang="en" aria-label="Switch to English">EN</span><span data-l="en" lang="nl" aria-label="Naar het Nederlands">NL</span></button>
+      <a class="btn nav-cta" data-signup href="#meedoen"><span data-l="nl">Meld je aan</span><span data-l="en">Sign up</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ============ HERO: the cover ============ -->
+<section class="paper hero" id="top" data-stock="paper" aria-labelledby="hero-title">
+  <div class="wrap hero-in">
+    <p class="mast"><span class="m1 print" style="--pd:.1s">Inner Shadow</span> <span class="m2 print" style="--pd:.1s">Circle</span></p>
+    <p class="dateline">
+      <span class="d1"><span data-l="nl">Maandagavond</span><span data-l="en">Monday night</span></span>
+      <span class="d2"><span data-l="nl">Schaduwwerk in een groep</span><span data-l="en">Shadow work in a group</span></span>
+      <span class="d3"><span data-l="nl">Groningen en onderweg</span><span data-l="en">Groningen and on the road</span></span>
+    </p>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1 id="hero-title" class="print" style="--pd:.5s">
+          <span data-l="nl">De meeste mensen denken, <em>zodat ze niet hoeven te voelen.</em></span>
+          <span data-l="en">Most people think, <em>so they don't have to feel.</em></span>
+        </h1>
+        <p class="hero-sub">
+          <span data-l="nl">Samen kijken we naar wat je normaal nooit hardop zegt, en we laten je lijf het werk doen.</span>
+          <span data-l="en">Together we look at what you normally never say out loud, and we let your body do the work.</span>
+        </p>
+        <div class="hero-actions">
+          <a class="btn red" data-signup href="#meedoen"><span data-l="nl">Kom maandag naar de cirkel</span><span data-l="en">Come to Monday's circle</span><span class="arr" aria-hidden="true">&rarr;</span></a>
+          <p class="hero-meta"><span data-l="nl">Gratis, elke maandag van 18.30 tot 22.00</span><span data-l="en">Free, every Monday from 18:30 to 22:00</span></p>
+        </div>
+      </div>
+      <figure class="plate-fig">
+        <button class="plate" type="button" data-feel id="plate" data-aria-nl="Voel eerst: adem drie keer mee met het vuur" data-aria-en="Feel first: breathe three times with the fire">
+          <canvas id="hero-gl" aria-hidden="true"></canvas>
+          <span class="plate-tip" aria-hidden="true"><span data-l="nl">Adem mee</span><span data-l="en">Breathe with it</span></span>
+        </button>
+        <span class="tk-wrap">
+          <button class="ticket" type="button" data-feel id="ticket">
+            <canvas class="tk-ember" aria-hidden="true"></canvas>
+            <span>
+              <span class="tk-t"><span data-l="nl">Voel eerst</span><span data-l="en">Feel first</span></span>
+              <span class="tk-s"><span data-l="nl">Adem drie keer mee met het vuur.</span><span data-l="en">Breathe three times with the fire.</span></span>
+            </span>
+          </button>
+        </span>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHAT YOU DON'T SAY ============ -->
+<section class="news unsaid" id="onuitgesproken" data-stock="news" aria-labelledby="unsaid-title">
+  <i class="fold" aria-hidden="true"></i>
+  <div class="wrap">
+    <h2 id="unsaid-title"><span data-l="nl">Iedereen heeft een zin die nog nooit hardop is gezegd.</span><span data-l="en">Everyone has a sentence they have never said out loud.</span></h2>
+    <ol class="said" id="said">
+      <li class="v1 appear"><q><span data-l="nl">Ik ben jaloers op het leven van mijn beste vriend.</span><span data-l="en">I'm jealous of my best friend's life.</span></q></li>
+      <li class="v2 appear"><q><span data-l="nl">Ik wil winnen, ook van de mensen van wie ik hou.</span><span data-l="en">I want to win, even against the people I love.</span></q></li>
+      <li class="v3 appear"><q><span data-l="nl">Ik heb nooit om mijn vader gerouwd. <span class="br">Ik ging gewoon harder werken.</span></span><span data-l="en">I never grieved my father. <span class="br">I just started working harder.</span></span></q></li>
+      <li class="v4 appear"><q><span data-l="nl">Ik ben doodsbang dat ik niet genoeg ben.</span><span data-l="en">I'm terrified that I'm not enough.</span></q></li>
+      <li class="v5 appear"><q><span data-l="nl">Ik schaam me voor hoe graag ik gezien wil worden.</span><span data-l="en">I'm ashamed of how badly I want to be seen.</span></q></li>
+      <li class="v6"><q class="burn" id="burn"><span data-l="nl">Soms ben ik zo kwaad dat ik er zelf van schrik.</span><span data-l="en">Sometimes I'm so angry it scares me.</span></q></li>
+    </ol>
+    <div class="grid unsaid-after">
+      <p class="drop">
+        <span data-l="nl">Zolang je zo'n zin alleen draagt, zit hij stiekem aan het stuur. Hij beslist mee waar je je kapot voor werkt, en wanneer je dichtklapt.</span>
+        <span data-l="en">As long as you carry a sentence like that alone, it's quietly at the wheel. It has a say in what you work yourself to the bone for, and when you shut down.</span>
+      </p>
+      <p class="strong"><span data-l="nl">In de cirkel zeg je hem hardop, en de groep blijft bij je.</span><span data-l="en">In the circle you say it out loud, and the group stays with you.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE BODY AND THE CIRCLE ============ -->
+<section class="night circle-sec" id="cirkel" data-stock="night" aria-labelledby="circle-title">
+  <svg class="tear" data-tear="news" aria-hidden="true"></svg>
+  <div class="wrap">
+    <div class="grid circle-head">
+      <h2 id="circle-title"><span data-l="nl">Je kunt alles uitleggen en het toch niet voelen. <b>Daarom praten we hier weinig.</b></span><span data-l="en">You can explain everything and still not feel it. <b>That's why we don't talk much here.</b></span></h2>
+      <p class="intro"><span data-l="nl">We vertragen, tot je merkt wat je keel doet, of je kaak, of je buik. Daar gebeurt het werk.</span><span data-l="en">We slow down until you notice what your throat is doing, or your jaw, or your belly. That's where the work happens.</span></p>
+    </div>
+  </div>
+  <div class="scene" id="scene">
+    <div class="stage">
+      <canvas id="circle-cv" aria-hidden="true"></canvas>
+      <div class="steps" id="steps">
+        <div class="step on">
+          <h3><span data-l="nl">Je komt binnen zoals je bent.</span><span data-l="en">You walk in as you are.</span></h3>
+          <p><span data-l="nl">Met je pantser en het verhaal dat altijd klopt. Dat mag allemaal mee naar binnen.</span><span data-l="en">With your armor and the story that always adds up. Bring all of it in.</span></p>
+        </div>
+        <div class="step">
+          <h3><span data-l="nl">We gaan in een cirkel zitten.</span><span data-l="en">We sit down in a circle.</span></h3>
+          <p><span data-l="nl">Je voelt de grond onder je, en je adem zakt een stukje. Je hoeft nog niks te zeggen.</span><span data-l="en">You feel the floor under you, and your breath drops a little. You don't have to say anything yet.</span></p>
+        </div>
+        <div class="step">
+          <h3><span data-l="nl">Iemand gaat naar het midden.</span><span data-l="en">Someone steps into the center.</span></h3>
+          <p><span data-l="nl">De hele groep blijft erbij en ademt mee. Met zoveel aandacht op je wordt het lastig om naar je hoofd te vluchten.</span><span data-l="en">The whole group stays with you and breathes with you. With that much attention on you, it gets hard to run off into your head.</span></p>
+        </div>
+        <div class="step">
+          <h3><span data-l="nl">Alles mag er zijn.</span><span data-l="en">Everything is allowed.</span></h3>
+          <p class="allowed" id="allowed"><span data-l="nl"><span class="aw">Stilte</span>, <span class="aw">diep rusten</span>, <span class="aw">tranen</span>, <span class="aw">trillen</span>, <span class="aw">schreeuwen</span>, <span class="aw">vechten</span>.</span><span data-l="en"><span class="aw">Silence</span>, <span class="aw">deep rest</span>, <span class="aw">tears</span>, <span class="aw">shaking</span>, <span class="aw">screaming</span>, <span class="aw">fighting</span>.</span></p>
+          <p><span data-l="nl">Dat kan allemaal gebeuren, maar niks hoeft. De groep voelt samen aan wat er nodig is.</span><span data-l="en">All of that can happen, but none of it has to. The group senses together what's needed.</span></p>
+        </div>
+        <div class="step">
+          <h3><span data-l="nl">En als je toekijkt, ben je ook aan het werk.</span><span data-l="en">And if you're watching, you're working too.</span></h3>
+          <p><span data-l="nl">In het verdriet van een ander kom je vaak je eigen verdriet tegen.</span><span data-l="en">In someone else's grief you often run into your own.</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHO ============ -->
+<section class="blood who" id="voor-wie" data-stock="blood" aria-labelledby="who-title">
+  <i class="overprint" id="overprint" aria-hidden="true"></i>
+  <div class="wrap">
+    <div class="grid">
+      <div class="who-col">
+        <div class="txt"><span data-l="nl"><h2 id="who-title">Voor iedereen die bereid is dieper te kijken dan prettig is.<sup aria-hidden="true">*</sup></h2> Jong en oud, Nederlands- en Engelstalig, alles door elkaar. We vragen maar één ding, en dat is dat je bereid bent. Nieuwsgierig zijn is mooi, maar je moet ook echt willen kijken.</span><span data-l="en"><h2>For anyone willing to look deeper than is comfortable.<sup aria-hidden="true">*</sup></h2> Young and old, Dutch and English speakers, all mixed together. We ask one thing, and that's that you're willing. Curiosity is great, but you have to actually want to look.</span></div>
+      </div>
+      <p class="fn"><span class="ast" aria-hidden="true">*</span><span data-l="nl"><strong>Dit is geen therapie</strong> en geen medische of psychologische behandeling. Zit je in een acute crisis, dan is dit nu niet de goede plek. Onderaan de pagina staat wie je dan wel kunt bellen.</span><span data-l="en"><strong>This is not therapy</strong>, and not a medical or psychological treatment. If you're in acute crisis, this isn't the right place right now. At the bottom of the page you'll find who you can call instead.</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE FOUR OF US ============ -->
+<section class="paper team" id="wij" data-stock="paper" aria-labelledby="team-title">
+  <svg class="tear" data-tear="blood" aria-hidden="true"></svg>
+  <div class="wrap">
+    <div class="frames" id="frames"></div>
+    <p class="team-rule"><span data-l="nl">Er zitten altijd minstens twee van ons bij, en nooit meer dan twaalf mensen.</span><span data-l="en">Always at least two of us, and never more than twelve people.</span></p>
+    <div class="grid team-words">
+      <h2 id="team-title"><span data-l="nl">Wij zijn met z'n vieren.</span><span data-l="en">There are four of us.</span></h2>
+      <div class="team-txt">
+        <p class="lede"><span data-l="nl">Al twee jaar zitten we zelf elke week in de cirkel.</span><span data-l="en">For two years we've sat in the circle ourselves, every week.</span></p>
+        <p class="rest"><span data-l="nl">Sinds kort mogen anderen erbij, en wij zitten er gewoon tussen. Samen nemen we zo'n tien jaar meditatie, retraites, ademwerk, Focusing, parts work en TRE mee.</span><span data-l="en">Recently we opened it to others, and we still sit right there among you. Between us we bring around ten years of meditation, retreats, breathwork, Focusing, parts work and TRE.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ JOIN ============ -->
+<section class="ochre join" id="meedoen" data-stock="ochre" aria-labelledby="join-title">
+  <svg class="tear" data-tear="paper" aria-hidden="true"></svg>
+  <div class="wrap">
+    <div class="grid join-row">
+      <div class="join-l">
+        <h2 id="join-title">
+          <span data-l="nl">Elke maandag een <span class="c">cirkel.<svg viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M226 14C170 4 70 6 30 28 2 44 6 72 44 86c52 18 170 16 220-6 34-15 32-46 4-60-30-14-96-16-150-8"/></svg></span></span>
+          <span data-l="en">A <span class="c">circle<svg viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M226 14C170 4 70 6 30 28 2 44 6 72 44 86c52 18 170 16 220-6 34-15 32-46 4-60-30-14-96-16-150-8"/></svg></span> every Monday.</span>
+        </h2>
+        <p class="run">
+          <span data-l="nl">Er is plek voor jou, en het kost niks. We zitten in Groningen, soms ergens anders. Het adres krijg je als je je hebt aangemeld.</span>
+          <span data-l="en">There's room for you, and it costs nothing. We're in Groningen, sometimes somewhere else. You get the address once you've signed up.</span>
+        </p>
+        <div class="join-go">
+          <a class="btn red" data-signup="direct" href="#meedoen"><span data-l="nl">Meld je aan voor maandag</span><span data-l="en">Sign up for Monday</span><span class="arr" aria-hidden="true">&rarr;</span></a>
+          <p><span data-l="nl">Je vult een kort formulier in, en daarna sturen we je alles wat je moet weten.</span><span data-l="en">You fill in a short form, and then we send you everything you need to know.</span></p>
+        </div>
+      </div>
+      <div class="leaf-w" aria-hidden="true">
+        <div class="leaf">
+          <span class="top"><span data-l="nl">Maandag</span><span data-l="en">Monday</span></span>
+          <span class="day"><span data-l="nl">18.30</span><span data-l="en">18:30</span></span>
+          <span class="to"><span data-l="nl">tot 22.00</span><span data-l="en">until 22:00</span></span>
+          <span class="free"><span data-l="nl">gratis</span><span data-l="en">free</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="events" id="agenda" data-events hidden>
+      <h3><span data-l="nl">Ook op de agenda</span><span data-l="en">Also coming up</span></h3>
+      <ul class="ev-list" id="ev-list"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TEAMS: its own spread, on the night stock ============ -->
+<section class="night teams" id="teams" data-stock="night" aria-labelledby="teams-title">
+  <svg class="tear" data-tear="ochre" aria-hidden="true"></svg>
+  <div class="wrap">
+    <h2 id="teams-title"><span data-l="nl">Wat je in de vergadering <span class="sw">inslikt</span>, sleep je de hele week mee.</span><span data-l="en">Whatever you <span class="sw">swallow</span> in the meeting, you drag around all week.</span></h2>
+    <div class="grid teams-row">
+      <p class="tx"><span data-l="nl"><b>Neem je team mee de schaduw in.</b> Iedereen voelt de rivaliteit of het oude zeer, en iedereen praat eromheen. In een cirkel zeg je het één keer hardop, met je collega's erbij. Wat eenmaal gezegd is, hoeft niet meer onder het tapijt.</span><span data-l="en"><b>Take your team into the shadow.</b> Everyone feels the rivalry or the old hurt, and everyone talks around it. In a circle you say it out loud once, with your colleagues in the room. Once it has been said, it no longer has to be swept under the rug.</span></p>
+      <div class="go">
+        <a class="btn light" id="wa-teams" href="https://wa.me/31630269017" target="_blank" rel="noopener"><svg class="wa-ico" aria-hidden="true"><use href="#wa"/></svg><span data-l="nl">App ons over je team</span><span data-l="en">Message us about your team</span><span class="arr" aria-hidden="true">&rarr;</span></a>
+        <p><span data-l="nl">Of</span><span data-l="en">Or</span> <a class="ulink" id="wa-other" href="https://wa.me/31630269017" target="_blank" rel="noopener"><span data-l="nl">app ons gewoon</span><span data-l="en">just message us</span></a><span data-l="nl"> als je iets anders in gedachten hebt.</span><span data-l="en"> if you have something else in mind.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLOSING: the cover again, hours later ============ -->
+<section class="paper closing" id="slot" data-stock="paper" aria-labelledby="closing-title">
+  <svg class="tear" data-tear="night" aria-hidden="true"></svg>
+  <div class="wrap">
+    <h2 id="closing-title"><span data-l="nl"><span class="l1">Het licht was er altijd al.</span> <span class="l2">Je moest alleen de schaduw in.</span></span><span data-l="en"><span class="l1">The light was always there.</span> <span class="l2">You just had to step into the shadow.</span></span></h2>
+    <div class="coal-fig">
+      <canvas id="closing-gl" aria-hidden="true"></canvas>
+      <a class="btn red" data-signup href="#meedoen"><span data-l="nl">Kom maandag naar de cirkel</span><span data-l="en">Come to Monday's circle</span><span class="arr" aria-hidden="true">&rarr;</span></a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer data-stock="soot">
+  <svg class="tear" data-tear="paper" aria-hidden="true"></svg>
+  <div class="wrap">
+    <div class="grid foot">
+      <div class="fb">
+        <p class="nmk">Inner Shadow Circle</p>
+        <p><span data-l="nl">Schaduwwerk in een groep, in Groningen en onderweg.</span><span data-l="en">Shadow work in a group, in Groningen and on the road.</span></p>
+      </div>
+      <div class="fc">
+        <a class="ulink" id="wa-foot" href="https://wa.me/31630269017" target="_blank" rel="noopener">WhatsApp +31 6 30269017</a>
+        <div class="lang" role="group" aria-label="Taal / Language">
+          <button type="button" data-set="nl" lang="nl" aria-label="Nederlands">NL</button><span class="sl" aria-hidden="true">/</span><button type="button" data-set="en" lang="en" aria-label="English">EN</button>
+        </div>
+      </div>
+      <div class="fx">
+        <p><span data-l="nl"><strong>Zit je nu in nood?</strong> Wacht dan niet op een cirkel. Bel 113 Zelfmoordpreventie: <a class="tel" href="tel:113">113</a>, of gratis <a class="tel" href="tel:08000113">0800-0113</a>. Dag en nacht.</span><span data-l="en"><strong>In crisis right now?</strong> Don't wait for a circle. Call 113 Suicide Prevention (NL): <a class="tel" href="tel:113">113</a>, or free on <a class="tel" href="tel:08000113">0800-0113</a>. Day and night.</span></p>
+      </div>
+    </div>
+    <div class="legal">
+      <span>&copy; 2026 Inner Shadow Circle</span>
+      <a class="ulink" href="#top"><span data-l="nl">Terug naar boven</span><span data-l="en">Back to the top</span></a>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ FEEL FIRST: breath overlay ============ -->
+<div class="breath" id="breath" role="dialog" aria-modal="true" aria-labelledby="b-label" hidden>
+  <canvas id="breath-gl" aria-hidden="true"></canvas>
+  <p class="sr" id="b-label"><span data-l="nl">Voel eerst: drie ademhalingen</span><span data-l="en">Feel first: three breaths</span></p>
+  <button class="b-close" type="button" id="b-close"><span data-l="nl">Stoppen</span><span data-l="en">Stop</span><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <div class="b-cue" id="b-cue">
+    <p class="b-word" id="b-word" aria-live="polite"></p>
+    <div class="b-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+  </div>
+  <button class="b-sound" type="button" id="b-sound" aria-pressed="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path class="wave" d="M15.5 9.2a4 4 0 0 1 0 5.6M18 7a7 7 0 0 1 0 10"/><path class="mute" d="M16 10l4 4M20 10l-4 4"/></svg>
+    <span><span data-l="nl">Geluid</span><span data-l="en">Sound</span></span>
+    <span class="st" aria-hidden="true"><span class="off-l"><span data-l="nl">uit</span><span data-l="en">off</span></span><span class="on-l"><span data-l="nl">aan</span><span data-l="en">on</span></span></span>
+  </button>
+  <div class="b-end" id="b-end" hidden>
+    <h2 class="q" id="b-q"><span data-l="nl">Wat merk je nu, in je lijf?</span><span data-l="en">What do you notice now, in your body?</span></h2>
+    <div class="rest">
+      <p><span data-l="nl">Blijf er nog even bij.</span><span data-l="en">Stay with it a moment.</span></p>
+      <div class="acts">
+        <button class="btn light" type="button" id="b-on"><span data-l="nl">Lees verder</span><span data-l="en">Read on</span><span class="arr" aria-hidden="true">&darr;</span></button>
+        <button class="again ulink" type="button" id="b-again"><span data-l="nl">Nog een keer</span><span data-l="en">Once more</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==================================================================
+   CONFIG: the things you will want to edit.
+   ================================================================== */
+const CONFIG = {
+  // >>> PLACEHOLDER <<< Intake / sign-up form for the free Monday circle.
+  // Replace 'SIGNUP_URL' with the real link. Once it is set, EVERY link marked data-signup
+  // (nav, hero, join, closing) opens this form in a new tab (see setLinks below).
+  // Until then: the join button opens WhatsApp with a sign-up message, and the other
+  // sign-up links scroll to the join section.
+  SIGNUP_URL: 'SIGNUP_URL',
+
+  // WhatsApp (international format, no + or spaces) and the prefilled messages.
+  whatsapp: '31630269017',
+  waText: {
+    nl: 'Hoi! Ik heb een vraag over Inner Shadow Circle.',
+    en: 'Hi! I have a question about Inner Shadow Circle.'
+  },
+  waTeams: {
+    nl: 'Hoi! We zijn benieuwd naar Inner Shadow Circle voor ons team.',
+    en: "Hi! We're curious about Inner Shadow Circle for our team."
+  },
+  waSignup: {
+    nl: 'Hoi! Ik wil me aanmelden voor de cirkel van maandag.',
+    en: "Hi! I'd like to sign up for Monday's circle."
+  },
+
+  // Paid events. Leave EMPTY and the whole events block plus its menu link disappear.
+  // Shape: { date: 'YYYY-MM-DD', url: 'https://...', nl: { title: '...', line: '...' }, en: { title: '...', line: '...' } }
+  events: [],
+
+  // The four of us. Crops were tuned by hand so the heads line up: keep pos / scale / origin.
+  team: [
+    { photo: '../../images/team/marko.jpg',           pos: '52% 28%', name: 'Marko' },
+    { photo: '../../images/team/max-field-clean.jpg', pos: '55% 30%', name: 'Max' },
+    { photo: '../../images/team/natan.jpg',           pos: '50% 22%', name: 'Natan' },
+    { photo: '../../images/team/thomas-white-shirt-face-original.png', pos: '50% 50%', scale: 1.25, origin: '50% 2%', name: 'Thomas' }
+  ]
+};
+/* Preview helper: add ?events=demo to the URL to see the events block with a sample. */
+if (/[?&]events=demo/.test(location.search) && !CONFIG.events.length) {
+  CONFIG.events = [{ date: '2026-11-21', url: 'https://wa.me/31630269017', nl: { title: 'Voorbeeld-event', line: 'Zo ziet een event eruit zodra er een in de lijst staat.' }, en: { title: 'Sample event', line: 'This is how an event looks once there is one in the list.' } }];
+}
+
+/* ================================================================== */
+const root = document.documentElement;
+const RM = window.matchMedia('(prefers-reduced-motion: reduce)');
+let reduce = RM.matches;
+const lang = () => (root.classList.contains('en') ? 'en' : 'nl');
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const easeIO = t => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const $ = s => document.querySelector(s);
+
+/* ---------- links ---------- */
+const signupReady = CONFIG.SIGNUP_URL && CONFIG.SIGNUP_URL !== 'SIGNUP_URL';
+const waLink = msg => 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(msg);
+function setLinks() {
+  const l = lang();
+  document.querySelectorAll('[data-signup]').forEach(a => {
+    if (signupReady) { a.href = CONFIG.SIGNUP_URL; a.target = '_blank'; a.rel = 'noopener'; }
+    else if (a.dataset.signup === 'direct') { a.href = waLink(CONFIG.waSignup[l]); a.target = '_blank'; a.rel = 'noopener'; }
+    else a.href = '#meedoen';
+  });
+  $('#wa-teams').href = waLink(CONFIG.waTeams[l]);
+  $('#wa-other').href = waLink(CONFIG.waText[l]);
+  $('#wa-foot').href = waLink(CONFIG.waText[l]);
+  document.querySelectorAll('[data-aria-nl]').forEach(el => el.setAttribute('aria-label', el.dataset['aria' + (l === 'en' ? 'En' : 'Nl')]));
+}
+
+/* ---------- language ---------- */
+function setLang(l) {
+  root.classList.toggle('en', l === 'en');
+  root.lang = l;
+  try { localStorage.setItem('isc-lang', l); } catch (e) {}
+  setLinks(); renderEvents();
+}
+document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.set)));
+$('#lang-mini').addEventListener('click', () => setLang(lang() === 'en' ? 'nl' : 'en'));
+
+/* ---------- textures (generated, no files) ---------- */
+(function () {
+  // grain
+  let c = document.createElement('canvas'); c.width = c.height = 160;
+  let x = c.getContext('2d'); const d = x.createImageData(160, 160);
+  for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() < .5 ? 0 : 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = Math.random() * 110; }
+  x.putImageData(d, 0, 0);
+  $('.grain').style.backgroundImage = `url(${c.toDataURL()})`;
+  // paper fibre: specks, soft blotches and short fibres, multiplied over paper stock
+  c = document.createElement('canvas'); c.width = c.height = 320; x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, 320, 320);
+  for (let i = 0; i < 40; i++) {
+    const gx = Math.random() * 320, gy = Math.random() * 320, r = 30 + Math.random() * 70;
+    const g = x.createRadialGradient(gx, gy, 0, gx, gy, r); g.addColorStop(0, 'rgba(150,120,80,.028)'); g.addColorStop(1, 'rgba(150,120,80,0)');
+    x.fillStyle = g;
+    for (let ox = -320; ox <= 320; ox += 320) for (let oy = -320; oy <= 320; oy += 320) { x.save(); x.translate(ox, oy); x.fillRect(gx - r, gy - r, r * 2, r * 2); x.restore(); }
+  }
+  for (let i = 0; i < 1600; i++) { x.fillStyle = `rgba(80,55,30,${.05 + Math.random() * .16})`; x.fillRect(Math.random() * 320, Math.random() * 320, Math.random() < .9 ? 1 : 1.6, Math.random() < .9 ? 1 : 1.6); }
+  x.lineWidth = .6;
+  for (let i = 0; i < 90; i++) {
+    const sx = Math.random() * 320, sy = Math.random() * 320, a = Math.random() * 6.28, l = 6 + Math.random() * 16;
+    x.strokeStyle = `rgba(110,80,45,${.08 + Math.random() * .12})`;
+    for (let ox = -320; ox <= 320; ox += 320) for (let oy = -320; oy <= 320; oy += 320) {
+      x.beginPath(); x.moveTo(sx + ox, sy + oy);
+      x.quadraticCurveTo(sx + ox + Math.cos(a + .5) * l * .6, sy + oy + Math.sin(a + .5) * l * .6, sx + ox + Math.cos(a) * l, sy + oy + Math.sin(a) * l); x.stroke();
+    }
+  }
+  root.style.setProperty('--fibre', `url(${c.toDataURL('image/png')})`);
+})();
+
+/* ---------- torn edges ---------- */
+(function () {
+  const COL = { paper: ['#efe5d2', '#f8f2e6'], news: ['#d9d0be', '#ebe4d6'], blood: ['#6b2014', '#8a3a2a'], ochre: ['#c98b2c', '#dcae63'], night: ['#251b15', '#3a2c22'] };
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647, (seed - 1) / 2147483646);
+  document.querySelectorAll('[data-tear]').forEach(svg => {
+    const [fill, fibre] = COL[svg.dataset.tear];
+    const edge = off => {
+      let p = 'M0 0H1000V' + (10 + off).toFixed(1); let x = 1000; const ph = rnd() * 6;
+      while (x > 0) {
+        x -= 3 + rnd() * 9;
+        const y = 9 + Math.sin(x * .011 + ph) * 5 + Math.sin(x * .047 + ph * 2) * 2.4 + (rnd() - .5) * 5 + off;
+        p += 'L' + Math.max(0, x).toFixed(1) + ' ' + clamp(y, 1, 29).toFixed(1);
+      }
+      return p + 'Z';
+    };
+    svg.setAttribute('viewBox', '0 0 1000 30'); svg.setAttribute('preserveAspectRatio', 'none');
+    svg.innerHTML = `<path d="${edge(3)}" fill="${fibre}"/><path d="${edge(0)}" fill="${fill}"/>`;
+  });
+})();
+
+/* ---------- night into oxblood: the red plate overprints the charcoal in a band of dots ---------- */
+(function () {
+  const c = document.createElement('canvas'), H = 56, Wt = 48; c.width = Wt * 2; c.height = H * 2;
+  const x = c.getContext('2d'); x.scale(2, 2);
+  x.fillStyle = '#251b15'; x.fillRect(0, 0, Wt, H);
+  x.fillStyle = '#6b2014';
+  const cell = 6;
+  for (let j = -1; j <= H / cell + 1; j++) for (let i = -1; i <= Wt / cell + 1; i++) {
+    const px = i * cell + (j & 1) * cell / 2, py = j * cell;
+    const k = clamp(py / H, 0, 1);
+    const r = cell * .74 * Math.sqrt(k * k * (3 - 2 * k));
+    if (r > .2) { x.beginPath(); x.arc(px, py, r, 0, 6.2832); x.fill(); }
+  }
+  $('#overprint').style.backgroundImage = `url(${c.toDataURL()})`;
+  $('#overprint').style.backgroundSize = `${Wt}px ${H}px`;
+})();
+
+/* ---------- nav: solid after the cover, and a red underline that follows the section you're in ---------- */
+const nav = $('#nav');
+const navMap = [...document.querySelectorAll('.nav-links a')].map(a => [a, document.querySelector(a.getAttribute('href'))]);
+let navOn = null;
+const stocks = [...document.querySelectorAll('[data-stock]')].filter(el => el !== nav);
+let navStock = '';
+const onNav = () => {
+  nav.classList.toggle('solid', scrollY > innerHeight * .7);
+  nav.classList.toggle('filled', scrollY > 6);
+  // the running head takes the stock of the page it sits on
+  const y = nav.offsetHeight - 1;
+  let st = 'paper';
+  for (const el of stocks) { const r = el.getBoundingClientRect(); if (r.top <= y && r.bottom > y) { st = el.dataset.stock; break; } }
+  if (st !== navStock) { nav.dataset.stock = st; navStock = st; }
+  let cur = null, best = -1e9;
+  // a section counts once its top is above 60% of the screen and its bottom below 30%.
+  // The events block sits inside Meedoen: of all that count, the one that starts last (the most specific) wins.
+  const hiL = innerHeight * .6, loL = innerHeight * .3;
+  navMap.forEach(([a, sec]) => { if (sec && !sec.hidden && sec.offsetParent !== null) { const r = sec.getBoundingClientRect(); if (r.top <= hiL && r.bottom >= loL && r.top > best) { cur = a; best = r.top; } } });
+  if (cur !== navOn) { navMap.forEach(([a]) => a.classList.toggle('on', a === cur)); navOn = cur; }
+};
+addEventListener('scroll', onNav, { passive: true }); onNav();
+
+/* ---------- team: each photo is screened into two inks on the paper (charcoal + ochre, off register).
+   Crops follow CONFIG.team exactly (object-position, then scale around origin, as in the root index.html). ---------- */
+const Team = (function () {
+  const DEV = 1100;
+  const wrap = $('#frames');
+  wrap.innerHTML = CONFIG.team.map((p, i) => `
+    <figure class="frame">
+      <div class="ph"><canvas aria-hidden="true"></canvas><img src="${p.photo}" alt="${esc(p.name)}" decoding="async"></div>
+      <figcaption><span class="nm">${esc(p.name)}</span><span class="rl"><span data-l="nl">begeleider</span><span data-l="en">facilitator</span></span></figcaption>
+    </figure>`).join('');
+  const frames = [...wrap.querySelectorAll('.frame')];
+  const items = frames.map((f, i) => ({ f, cv: f.querySelector('canvas'), img: f.querySelector('img'), cfg: CONFIG.team[i], lum: null, k: 0, start: 0, done: false }));
+  const pct = v => { const [a, b] = String(v || '50% 50%').split(/\s+/); return [parseFloat(a) / 100, parseFloat(b == null ? a : b) / 100]; };
+  // sample the cropped photo into a small luminance grid, auto-levelled so the four faces print at equal density
+  function sample(it, gw, gh) {
+    const c = document.createElement('canvas'); c.width = gw; c.height = gh;
+    const x = c.getContext('2d', { willReadFrequently: true });
+    const iw = it.img.naturalWidth, ih = it.img.naturalHeight;
+    const sc = Math.max(gw / iw, gh / ih), dw = iw * sc, dh = ih * sc;
+    const [px, py] = pct(it.cfg.pos), [ox, oy] = pct(it.cfg.origin), z = it.cfg.scale || 1;
+    x.translate(ox * gw, oy * gh); x.scale(z, z); x.translate(-ox * gw, -oy * gh);
+    x.drawImage(it.img, (gw - dw) * px, (gh - dh) * py, dw, dh);
+    const d = x.getImageData(0, 0, gw, gh).data, L = new Float32Array(gw * gh), hist = [];
+    for (let i = 0; i < L.length; i++) { const v = (d[i * 4] * .3 + d[i * 4 + 1] * .59 + d[i * 4 + 2] * .11) / 255; L[i] = v; hist.push(v); }
+    hist.sort((a, b) => a - b);
+    const lo = hist[Math.floor(hist.length * .03)], hi = hist[Math.floor(hist.length * .985)];
+    let mean = 0;
+    for (let i = 0; i < L.length; i++) { L[i] = clamp((L[i] - lo) / Math.max(.05, hi - lo), 0, 1); mean += L[i]; }
+    mean /= L.length;
+    const g = Math.log(.5) / Math.log(clamp(mean, .2, .8));   // pull every face to the same mid-grey
+    for (let i = 0; i < L.length; i++) L[i] = Math.pow(L[i], g);
+    return L;
+  }
+  function render(it, k) {
+    const cv = it.cv, W = cv.clientWidth, H = cv.clientHeight;
+    if (!W || !H || !it.img.complete || !it.img.naturalWidth) return;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); it.lum = null; }
+    const cell = W < 260 ? 3.4 : 4;
+    const gw = Math.ceil(W), gh = Math.ceil(H);
+    if (!it.lum) it.lum = sample(it, gw, gh);
+    const L = it.lum, x = cv.getContext('2d');
+    x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    x.fillStyle = '#efe5d2'; x.fillRect(0, 0, W, H);
+    const at = (px, py) => { const i = clamp(Math.floor(px / W * gw), 0, gw - 1), j = clamp(Math.floor(py / H * gh), 0, gh - 1); return L[j * gw + i]; };
+    // develop: the dots grow in from nothing, two passes, the ochre plate first and the charcoal 150 ms behind it
+    const inks = [
+      { col: 'rgba(201,139,44,.95)', ang: .26, off: [1.1, -.8], f: v => clamp((1 - v) * 1.15, 0, 1) * .8, lag: 0 },
+      { col: 'rgba(29,21,16,.93)', ang: .785, off: [0, 0], f: v => Math.pow(clamp(.86 - v, 0, 1) / .86, 1.25), lag: 150 }
+    ];
+    inks.forEach(ink => {
+      const kk = clamp((k - ink.lag) / DEV, 0, 1), e = 1 - Math.pow(1 - kk, 3);
+      if (e <= 0) return;
+      const ca = Math.cos(ink.ang), sa = Math.sin(ink.ang), n = Math.ceil(Math.hypot(W, H) / cell / 2) + 1;
+      x.fillStyle = ink.col; x.beginPath();
+      for (let i = -n; i <= n; i++) for (let j = -n; j <= n; j++) {
+        const px = W / 2 + (i * ca - j * sa) * cell, py = H / 2 + (i * sa + j * ca) * cell;
+        if (px < -cell || py < -cell || px > W + cell || py > H + cell) continue;
+        const v = at(px, py);
+        const r = cell * .62 * Math.sqrt(ink.f(v)) * e;
+        if (r > .22) { x.moveTo(px + ink.off[0] + r, py + ink.off[1]); x.arc(px + ink.off[0], py + ink.off[1], r, 0, 6.2832); }
+      }
+      x.fill();
+    });
+  }
+  let raf = 0;
+  function loop(now) {
+    raf = 0; let more = false;
+    items.forEach(it => {
+      if (!it.start || it.done) return;
+      const k = reduce ? DEV + 150 : Math.max(0, now - it.start);   // ms since this frame started developing
+      render(it, k); it.k = k;
+      if (k >= DEV + 150) it.done = true; else more = true;
+    });
+    if (more) raf = requestAnimationFrame(loop);
+  }
+  function develop(it, delay) {
+    if (it.start) return;
+    const go = () => { it.start = performance.now() + (reduce ? 0 : delay); if (!raf) raf = requestAnimationFrame(loop); };
+    if (it.img.complete && it.img.naturalWidth) go(); else it.img.addEventListener('load', go, { once: true });
+  }
+  // a frame develops when it is actually on screen: in the viewport and, on phones, inside the sideways strip
+  function check() {
+    let n = 0;
+    items.forEach(it => {
+      if (it.start) return;
+      const r = it.f.getBoundingClientRect();
+      if (r.top < innerHeight * .82 && r.bottom > innerHeight * .1) develop(it, (n++) * 180);
+    });
+  }
+  addEventListener('scroll', check, { passive: true });
+  wrap.addEventListener('scroll', check, { passive: true });
+  addEventListener('resize', () => items.forEach(it => { it.lum = null; if (it.start) render(it, it.done ? DEV + 150 : it.k); }));
+  check();
+  return { check };
+})();
+
+/* ---------- events ---------- */
+function renderEvents() {
+  const has = CONFIG.events.length > 0;
+  document.querySelectorAll('[data-events]').forEach(el => { el.hidden = !has; });
+  if (!has) return;
+  const l = lang();
+  $('#ev-list').innerHTML = CONFIG.events.map(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    const ds = d.toLocaleDateString(l === 'en' ? 'en-GB' : 'nl-NL', { day: 'numeric', month: 'long' });
+    const t = e[l] || e.nl;
+    return `<li class="ev"><a href="${esc(e.url || '#')}" target="_blank" rel="noopener">
+      <span class="dt">${esc(ds)}</span>
+      <span class="tt">${esc(t.title)}<span class="ln">${esc(t.line || '')}</span></span>
+      <span class="go">${l === 'en' ? 'More' : 'Meer'} &rarr;</span></a></li>`;
+  }).join('');
+}
+setLinks(); renderEvents();
+
+/* ---------- the six sentences: five appear quietly, the last one burns ---------- */
+const burnEl = $('#burn');
+burnEl.querySelectorAll('[data-l]').forEach(span => {
+  const words = span.textContent.split(/(\s+)/); let i = 0;
+  const n = words.filter(w => !/^\s*$/.test(w)).length;
+  span.innerHTML = words.map(w => (/^\s*$/.test(w) ? w : `<span class="w${i === n - 1 ? ' last' : ''}" style="--i:${i++}">${esc(w)}</span>`)).join('');
+});
+const appears = [...document.querySelectorAll('#said .appear')];
+const sentences = [...appears, burnEl];
+// each sentence waits a little longer than the one before, so the reader slows down
+appears.forEach((a, i) => { a.style.animationDuration = (1.1 + i * .14) + 's'; });
+// every sentence is triggered by its own position on screen, and never sooner than 600 ms after the one before,
+// so even a fast scroll lands them one at a time
+let sentHold = false, lastLand = 0, sentTimer = 0;
+const sentQueue = [];
+function landNext() {
+  if (sentTimer || sentHold || !sentQueue.length) return;
+  sentQueue.sort((x, y) => sentences.indexOf(x) - sentences.indexOf(y));
+  const wait = reduce ? 0 : Math.max(0, lastLand + 600 - performance.now());
+  sentTimer = setTimeout(() => {
+    sentTimer = 0;
+    if (sentHold) return;
+    const el = sentQueue.shift(); if (!el) return;
+    el.classList.add(el === burnEl ? 'lit' : 'in');
+    lastLand = performance.now();
+    landNext();
+  }, wait);
+}
+const sentIO = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting || sentHold) return;
+  sentIO.unobserve(e.target); sentQueue.push(e.target); landNext();
+}), { rootMargin: '0px 0px -18% 0px' });
+sentences.forEach(a => sentIO.observe(a));
+
+/* ---------- once-only reveals ---------- */
+const onceIO = (el, cls, margin) => {
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add(cls); io.unobserve(e.target); } }), { rootMargin: margin || '0px 0px -20% 0px' });
+  io.observe(el);
+};
+onceIO($('#teams-title'), 'in', '0px 0px -30% 0px');
+document.querySelectorAll('.join h2 .c').forEach(c => onceIO(c, 'drawn', '0px 0px -25% 0px'));
+
+/* ---------- render loops that sleep off screen and while the breath is open ---------- */
+const loops = []; let paused = false;
+function whileVisible(el, frame) {
+  const L = { on: false, raf: 0, drawn: false };
+  const tick = now => { frame(now / 1000); L.drawn = true; if (L.on && !reduce && !paused) L.raf = requestAnimationFrame(tick); };
+  L.kick = () => { cancelAnimationFrame(L.raf); if (L.on && (!paused || !L.drawn)) L.raf = requestAnimationFrame(tick); };
+  new IntersectionObserver(es => es.forEach(e => { L.on = e.isIntersecting; L.kick(); })).observe(el);
+  loops.push(L);
+  addEventListener('resize', () => { if (L.on && !paused) frame(performance.now() / 1000); });
+  return L;
+}
+const setPaused = v => { paused = v; loops.forEach(l => l.kick()); };
+
+/* ==================================================================
+   THE FIRE, RISO-PRINTED.
+   Pass 1 simulates the fire at low resolution (flame, light, coal bed).
+   Pass 2 prints it: three inks (charcoal, ochre, red) as halftone screens
+   at different angles, slightly out of register, multiplied onto paper.
+   ================================================================== */
+const PREC = '#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n';
+const NOISE = `
+float hash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float noise(vec2 p){ vec2 i = floor(p); vec2 f = fract(p); vec2 u = f * f * (3. - 2. * f);
+  return mix(mix(hash(i), hash(i + vec2(1., 0.)), u.x), mix(hash(i + vec2(0., 1.)), hash(i + vec2(1., 1.)), u.x), u.y); }`;
+const FIRE = PREC + `
+uniform vec2 uC; uniform float uR; uniform float uT;
+uniform float uHeat; uniform float uSpark; uniform float uWind; uniform float uRoom; uniform float uTongue; uniform float uSpread;
+uniform float uStrike; uniform float uBed; uniform float uCoal;
+${NOISE}
+float hs(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+const mat2 M = mat2(1.6, 1.2, -1.2, 1.6);
+float fbm(vec2 p){ float v = 0.; float a = .5; for (int i = 0; i < 4; i++){ v += a * noise(p); p = M * p; a *= .5; } return v; }
+void main(){
+  /* uv: 1 unit = uR, origin at the foot of the flames, on the coal bed */
+  vec2 uv = (gl_FragCoord.xy - uC) / uR;
+  float t = uT;
+  float flick = .9 + .07 * noise(vec2(t * 2.3, 1.7)) + .05 * noise(vec2(t * 7.1, 4.2));
+  float heat = uHeat * flick;
+  /* the light the fire throws: low, wide, centred a little above the coals (posterized when it is printed) */
+  float rr = length(vec2(uv.x * .5, (uv.y - .7) * .78));
+  float light = exp(-rr * uSpread) * uRoom * heat;
+  /* the coal bed: wide, lopsided, a heap of lumps. Charcoal crusts, glowing seams between them. */
+  vec2 bp = uv - vec2(.08, -.1);
+  float bw = mix(1.45, 1.15, smoothstep(-.3, .3, bp.x)) * uBed;
+  float top = (.48 + .16 * noise(vec2(bp.x * 2.2, 3.1)) - .14 * smoothstep(.4, 1.7, abs(bp.x))) * (1. + .55 * uCoal);
+  float be = length(vec2(bp.x / bw, bp.y / mix(.34, top, smoothstep(-.12, .12, bp.y))));
+  float ember = 0., chr = 0.;
+  if (be < 1.6) {
+    vec2 q = vec2(bp.x * 2.7, bp.y * 5.2);
+    float n = fbm(q + vec2(t * .02, 0.));
+    float lump = noise(q * 1.25 + 3.) * .6 + noise(q * 2.6 + 9.) * .4;
+    float cr = 1. - abs(2. * fbm(q * 1.2 + n * 1.5 + vec2(0., t * .04)) - 1.);
+    float edge = 1. - smoothstep(.45, 1.12, be + (n - .5) * .5);
+    float breathe = .5 + .5 * noise(vec2(bp.x * 1.6 + t * .22, t * .3));
+    float core = (1. - smoothstep(0., .9, be)) * (.55 + .45 * breathe);
+    ember = clamp((pow(cr, 2.2) * .9 + core * .75 + smoothstep(.55, .8, lump) * .25) * edge * (.45 + .55 * heat), 0., 1.);
+    chr = edge * smoothstep(.7, .38, cr) * smoothstep(.36, .6, lump) * (1. - smoothstep(.35, .7, ember)) * smoothstep(.3, .75, be) * .95;
+    ember *= 1. - .55 * chr;
+    /* burned down (uCoal): the heap is mostly black crust, lit only along its cracks and in a few hot lumps */
+    float seam = pow(cr, 3.2) * edge;
+    float hot = smoothstep(.62, .82, lump) * edge * (1. - smoothstep(.2, .9, be));
+    ember = mix(ember, clamp(seam * 1.25 + hot * .7, 0., 1.) * (.5 + .5 * heat), uCoal);
+    chr = mix(chr, edge * (1. - smoothstep(.25, .6, seam + hot)) * .92, uCoal);
+  }
+  /* the flames: one body of fire with two smaller ones leaning out of its sides.
+     Turbulence rises through it (domain-warped noise) and eats the top into separate licks. */
+  float tf = 0.;
+  float H = 2.25 * uTongue;
+  if (uTongue > .01 && uv.y > -.6 && uv.y < H * 1.3 + .4 && abs(uv.x) < 2.4) {
+    vec2 q = uv;
+    q.x += uWind * .28 * max(q.y, 0.);
+    float n1 = fbm(vec2(q.x * 1.2, q.y * .9 - t * 1.3));
+    float y = max(q.y, 0.) / max(H, .01);
+    float sway = ((n1 - .5) * 1.2 + .25 * sin(t * 1.1 + 1.3)) * y * y * H * .38;
+    float x = q.x - sway - .08;
+    /* the outline is an egg that the rising turbulence pulls apart: wide at the foot, torn into licks at the top */
+    float n = fbm(vec2(x * 2.3, q.y * 1.15 - t * 2.4) + vec2(n1 * 1.4, 0.));
+    float n3 = noise(vec2(x * 6.5, q.y * 2.6 - t * 4.));
+    vec2 k = vec2(x / H, y - .16);
+    float d = length(k * vec2(.95 + k.y * 2.5, .78)) - (n - .08) * max(0., k.y + .26) * 1.2 - (n3 - .5) * .08 * y - .24;
+    /* hottest low in the body, cooling to red toward the tips */
+    float f = (smoothstep(.1, -.3, d) * 1.12 + smoothstep(-.28, -.55, d) * .45) * (1. - .42 * smoothstep(.15, 1., y));
+    f *= smoothstep(-.4, .06, q.y);
+    tf = f * heat;
+    /* the lumps at the front of the heap sit in front of the flames' feet */
+    tf *= 1. - .85 * chr * smoothstep(.25, -.05, uv.y);
+  }
+  /* the match: one dot of light before anything burns */
+  vec2 sq = uv - vec2(-.1, .08);
+  tf = max(tf, uStrike * exp(-dot(sq, sq) * 40.) * 1.5);
+  /* sparks: lifted off the tips, climbing to the edge of the night */
+  float sp = 0.;
+  if (uSpark > 0.) {
+    for (int i = 0; i < 2; i++) {
+      float fi = float(i);
+      float sc = 2.2 + fi * 1.5;
+      vec2 p = uv * sc;
+      p.y -= t * (.55 + fi * .2) * sc * .5;
+      p.x += sin(p.y * .8 + fi * 2.1 + t * .4) * .35 - uWind * max(uv.y, 0.) * .5;
+      vec2 id = floor(p); vec2 fp = fract(p) - .5;
+      float h = hs(id + vec2(fi * 31.7, fi * 7.3));
+      if (h > .9) {
+        vec2 o = vec2(hs(id + 17.37), hs(id + 41.91)) - .5;
+        sp += smoothstep(.1, 0., length(fp - o * .6)) * (.5 + .5 * sin(t * (5. + h * 9.) + h * 40.));
+      }
+    }
+    float top0 = max(H * .55, .5);
+    sp *= exp(-pow(uv.x / (.9 + max(uv.y, 0.) * .3), 2.)) * smoothstep(top0, top0 + .8, uv.y) * (1. - smoothstep(top0 + 2.2, top0 + 4.2, uv.y)) * uSpark;
+  }
+  gl_FragColor = vec4(clamp(tf * .5 + sp, 0., 1.), clamp(light * .62, 0., 1.), ember, chr);
+}`;
+/* PRINT: three inks as halftone screens, off register.
+   The light is posterized into a few rough-edged tone steps, the way a riso separation would print it: no soft glows.
+   uMul = 1: printed in multiply over the page (the canvas blends onto the real paper).
+   Outside the round plate only the ochre plate shows, printed a little larger and out of register: a thin crescent. */
+const PRINT = PREC + `
+uniform sampler2D uTex; uniform vec2 uRes; uniform vec2 uTx; uniform float uPx; uniform vec3 uPlate; uniform vec3 uInk; uniform float uMul; uniform float uSpillDots;
+${NOISE}
+float screen(vec2 p, float ang, float cell, float d){
+  float c = cos(ang), s = sin(ang);
+  vec2 q = vec2(c * p.x - s * p.y, s * p.x + c * p.y) / cell;
+  float v = .5 - .25 * (cos(6.2831853 * q.x) + cos(6.2831853 * q.y));
+  float w = .9 / cell;
+  return smoothstep(v - w, v + w, d * (1. + 2. * w) - w);
+}
+vec4 soft(vec2 uv){
+  return texture2D(uTex, uv) * .4 + (texture2D(uTex, uv + vec2(uTx.x, 0.)) + texture2D(uTex, uv - vec2(uTx.x, 0.)) + texture2D(uTex, uv + vec2(0., uTx.y)) + texture2D(uTex, uv - vec2(0., uTx.y))) * .15;
+}
+float post(float v, vec2 p){
+  float n = noise(p * .02) * .7 + noise(p * .09) * .3;
+  return floor(v * 4. + n * .4 + .3) / 4.;
+}
+float plate(vec2 fc, float grow){
+  if (uPlate.z <= 0.) return 1.;
+  vec2 cssp = fc / uPx;
+  float se = length(fc - uPlate.xy) / (uPlate.z * grow);
+  float nn = noise(cssp * .045) * .6 + noise(cssp * .2) * .4;
+  return 1. - smoothstep(.985, 1.0, se + (nn - .5) * .035);
+}
+void main(){
+  vec2 fc = gl_FragCoord.xy;
+  vec2 uv = fc / uRes;
+  vec2 cssp = fc / uPx;
+  vec2 offR = vec2(2.4, -1.6) * uPx, offO = vec2(-1., .9) * uPx;
+  vec4 a = soft(uv), r = soft(uv + offR / uRes), o = soft(uv + offO / uRes);
+  float F = a.r * 2., L = post(a.g, cssp), E = a.b, G = a.a;
+  float m = plate(fc, 1.), mR = plate(fc + offR, 1.), mO = plate(fc + offO, 1.);
+  float patchy = .88 + .16 * noise(cssp * .018 + 7.);
+  float dC = m * (1. - smoothstep(.04, .82, L * .75 + F * .85 + E * .9));
+  dC = max(dC, G * m * (1. - smoothstep(.4, 1.1, F)));
+  dC *= .97 + .05 * noise(cssp * .05);
+  float Fo = o.r * 2., Lo = post(o.g, cssp + 3.1);
+  float dO = clamp(Lo * .95 + Fo * .8 + o.b * .85, 0., 1.) * (1. - .82 * smoothstep(.95, 1.4, Fo)) * patchy;
+  /* the ochre plate, cut a touch larger than the black one and laid down off register */
+  float crescent = plate(fc + vec2(-5., 4.) * uPx, 1.022) * (1. - m) * .5 * uSpillDots;
+  dO = dO * mO + crescent;
+  float Fr = r.r * 2.;
+  float dR = clamp(smoothstep(.06, .4, Fr) * (1. - smoothstep(.55, .98, Fr)) * .95 + r.b * smoothstep(.15, .6, r.b) * .62 + post(r.g, cssp + 7.7) * r.g * .3, 0., 1.) * patchy * mR;
+  dC *= uInk.x; dO *= uInk.y; dR *= uInk.z;
+  float cell = 4.6 * uPx;
+  vec3 P = vec3(.937, .898, .824);
+  vec3 f = vec3(1.);
+  f *= mix(vec3(1.), vec3(.16, .125, .1), screen(fc, .785, cell, dC));
+  f *= mix(vec3(1.), vec3(.9, .64, .24), screen(fc + 2.3, .26, cell * .93, dO));
+  f *= mix(vec3(1.), vec3(.86, .3, .16), screen(fc + 1.1, 1.31, cell * .97, dR));
+  if (uMul > .5) {
+    /* ink only: transparent where nothing is printed, so the real paper shows through.
+       premultiplied so that, over the paper, the result equals paper x inks */
+    float A = clamp(1. - min(f.r, min(f.g, f.b)), 0., 1.);
+    gl_FragColor = vec4(P * (f - 1. + A), A);
+  } else gl_FragColor = vec4(P * f, 1.);
+}`;
+const VERT = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }';
+
+/* S.px / S.py / S.pr: the round plate in CSS px (pr = 0: no plate, the whole canvas is night). S.mul: print in multiply over the page. */
+function createFire(canvas) {
+  const S = { cx: 0, cy: 0, r: 100, heat: 1, spark: 1, wind: 0, room: 1, tongue: 1, spread: .9, strike: 0, bed: 1, px: 0, py: 0, pr: 0, mul: 0, spill: 0, ink: [1, 1, 1] };
+  let w = 0, h = 0, s2 = 1, W1 = 0, H1 = 0;
+  let S1 = .62;
+  let gl = null, ok = false, p1, p2, tex, fbo, U1 = {}, U2 = {};
+  try { gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true, powerPreference: 'low-power' }); } catch (e) { gl = null; }
+  if (gl) {
+    try {
+      const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+      const mk = frag => { const p = gl.createProgram(); gl.attachShader(p, sh(gl.VERTEX_SHADER, VERT)); gl.attachShader(p, sh(gl.FRAGMENT_SHADER, frag)); gl.bindAttribLocation(p, 0, 'p'); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error('link'); return p; };
+      p1 = mk(FIRE); p2 = mk(PRINT);
+      ['uC', 'uR', 'uT', 'uHeat', 'uSpark', 'uWind', 'uRoom', 'uTongue', 'uSpread', 'uStrike', 'uBed', 'uCoal'].forEach(n => U1[n] = gl.getUniformLocation(p1, n));
+      ['uTex', 'uRes', 'uTx', 'uPx', 'uPlate', 'uInk', 'uMul', 'uSpillDots'].forEach(n => U2[n] = gl.getUniformLocation(p2, n));
+      const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+      tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      fbo = gl.createFramebuffer();
+      ok = true;
+    } catch (e) { ok = false; }
+  }
+  const resize = () => {
+    w = canvas.clientWidth; h = canvas.clientHeight;
+    s2 = Math.min(window.devicePixelRatio || 1, 1.5);
+    S1 = w < 560 ? .85 : .62;   // small canvases simulate a little finer, so the flame keeps its detail
+    const W = Math.max(1, Math.round(w * s2)), H = Math.max(1, Math.round(h * s2));
+    if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
+    if (ok) {
+      const w1 = Math.max(2, Math.round(w * S1)), h1 = Math.max(2, Math.round(h * S1));
+      if (w1 !== W1 || h1 !== H1) {
+        W1 = w1; H1 = h1;
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, W1, H1, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      }
+    }
+  };
+  if (!ok) {
+    // 2D fallback: a flat printed glow inside the round plate
+    const ctx = canvas.getContext('2d');
+    return { S, resize, draw() {
+      if (!ctx) return; resize(); ctx.setTransform(s2, 0, 0, s2, 0, 0);
+      ctx.clearRect(0, 0, w, h); if (!S.mul) { ctx.fillStyle = '#efe5d2'; ctx.fillRect(0, 0, w, h); }
+      ctx.save();
+      if (S.pr > 0) { ctx.beginPath(); ctx.arc(S.px, S.py, S.pr, 0, 6.2832); ctx.clip(); }
+      ctx.fillStyle = '#251b15'; ctx.fillRect(0, 0, w, h);
+      const g = ctx.createRadialGradient(S.cx, S.cy, 0, S.cx, S.cy, S.r * 1.6 * Math.max(.2, S.tongue));
+      g.addColorStop(0, 'rgba(240,200,120,1)'); g.addColorStop(.4, 'rgba(210,110,40,.9)'); g.addColorStop(1, 'rgba(120,40,15,0)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h); ctx.restore();
+    } };
+  }
+  return {
+    S, resize,
+    draw(t) {
+      resize();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.viewport(0, 0, W1, H1);
+      gl.useProgram(p1);
+      gl.uniform2f(U1.uC, S.cx * S1, (h - S.cy) * S1);
+      gl.uniform1f(U1.uR, S.r * S1);
+      gl.uniform1f(U1.uT, t % 2000);
+      gl.uniform1f(U1.uHeat, S.heat); gl.uniform1f(U1.uSpark, S.spark); gl.uniform1f(U1.uWind, S.wind);
+      gl.uniform1f(U1.uRoom, S.room); gl.uniform1f(U1.uTongue, S.tongue); gl.uniform1f(U1.uSpread, S.spread);
+      gl.uniform1f(U1.uStrike, S.strike); gl.uniform1f(U1.uBed, S.bed); gl.uniform1f(U1.uCoal, S.coal || 0);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.useProgram(p2);
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.uniform1i(U2.uTex, 0);
+      gl.uniform2f(U2.uRes, canvas.width, canvas.height);
+      gl.uniform2f(U2.uTx, 1 / W1, 1 / H1);
+      gl.uniform1f(U2.uPx, s2);
+      gl.uniform3f(U2.uPlate, S.px * s2, (h - S.py) * s2, S.pr * s2);
+      gl.uniform1f(U2.uMul, S.mul); gl.uniform1f(U2.uSpillDots, S.spill);
+      gl.uniform3f(U2.uInk, S.ink[0], S.ink[1], S.ink[2]);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+  };
+}
+
+/* ---------- hero plate: a round night is printed, a match is struck, the coals catch.
+   From then on the whole cover breathes on one slow 6 s cycle: the flames, and the ticket's ember with them. ---------- */
+const BREATH = 6;
+const pulse = t => .5 - .5 * Math.cos(t * 2 * Math.PI / BREATH);   // 0 = exhale, 1 = top of the inhale
+const heroCv = $('#hero-gl'), plateBtn = $('#plate'), plateTip = plateBtn.querySelector('.plate-tip');
+const heroFire = createFire(heroCv);
+// a return visit in the same session skips the printing and the match: the fire is simply burning
+const t0 = performance.now() / 1000 - (root.classList.contains('seen') ? 30 : 0);
+const LAND = 2.05;   // the moment the ticket lands (CSS: 1.55s delay + most of the .8s drop)
+let wind = 0, windT = 0, near = 0, nearT = 0, discKey = '';
+addEventListener('pointermove', e => { windT = (e.clientX / innerWidth - .5) * 2; }, { passive: true });
+// a hand near the fire makes it lean in and burn a little hotter
+[plateBtn, ...document.querySelectorAll('.ticket')].forEach(el => {
+  ['pointerenter', 'focus'].forEach(ev => el.addEventListener(ev, () => { nearT = 1; }));
+  ['pointerleave', 'blur'].forEach(ev => el.addEventListener(ev, () => { nearT = 0; }));
+});
+// over the plate, a small printed label rides along with the pointer: "Adem mee"
+plateBtn.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse') return;
+  const r = plateBtn.getBoundingClientRect(), S = heroFire.S;
+  const inDisc = Math.hypot(e.clientX - r.left - S.px, e.clientY - r.top - S.py) < S.pr;
+  plateBtn.classList.toggle('hov', inDisc);
+  nearT = inDisc ? 1 : 0;
+  plateTip.style.setProperty('--tx', Math.round(e.clientX - r.left + 16) + 'px');
+  plateTip.style.setProperty('--ty', Math.round(e.clientY - r.top + 18) + 'px');
+});
+plateBtn.addEventListener('pointerleave', () => plateBtn.classList.remove('hov'));
+const flareAt = age => smooth(LAND - .05, LAND + .1, age) * (1 - smooth(LAND + .2, LAND + .7, age));
+// the plate's geometry inside its canvas: the disc rests on the ticket and its top meets the dateline
+function heroGeom(w, h) {
+  const pr = Math.max(40, Math.min(w * .47, (h - 6) / 2));
+  const py = h - pr - 2;
+  return { px: w / 2, py, pr };
+}
+whileVisible(heroCv, t => {
+  const w = heroCv.clientWidth, h = heroCv.clientHeight;
+  const age = t - t0, b = pulse(t);
+  const S = heroFire.S;
+  near += (nearT - near) * .06;
+  const { px, py, pr } = heroGeom(w, h);
+  S.px = px; S.py = py; S.pr = pr; S.mul = 1; S.spill = 1; S.bed = 1;
+  S.cx = px; S.cy = py + pr * .42; S.r = pr * .36;
+  const key = Math.round(py) + '/' + Math.round(pr);
+  if (key !== discKey) { discKey = key; plateBtn.style.setProperty('--disc-y', Math.round(py) + 'px'); plateBtn.style.setProperty('--disc-d', Math.round(pr * 2) + 'px'); }
+  if (reduce) { S.ink = [1, 1, 1]; S.heat = 1; S.tongue = .9; S.spark = .3; S.strike = 0; }
+  else {
+    // the night goes down first (charcoal), one dot of light, the coals catch, then the flames climb
+    S.ink = [smooth(0, .4, age), smooth(.35, .7, age), smooth(.4, .8, age)];
+    S.strike = smooth(.35, .5, age) * (1 - smooth(.9, 1.3, age)) * (.8 + .2 * Math.sin(age * 40));
+    const ig = easeIO(smooth(.6, 1.9, age)), fl = flareAt(age);
+    S.heat = (.2 + .8 * smooth(.5, 1.3, age)) * (.86 + .2 * b) + .12 * near + .3 * fl;
+    S.tongue = ig * (.76 + .3 * b) + .1 * near + .3 * fl;
+    S.spark = smooth(1.4, 3, age) * (.35 + .6 * b + .4 * near) + 1.2 * fl;
+  }
+  S.room = .7; S.spread = 1.25 - .12 * near;
+  wind += (windT - wind) * .03; S.wind = wind;
+  heroFire.draw(reduce ? 12 : t);
+});
+
+/* ---------- the ticket's own ember: catches when the ticket lands, then breathes with the cover ---------- */
+document.querySelectorAll('.tk-ember').forEach(cv => {
+  const ctx = cv.getContext('2d');
+  const draw = t => {
+    const dpr = Math.min(devicePixelRatio || 1, 2), s = cv.clientWidth || 58;
+    if (cv.width !== Math.round(s * dpr)) { cv.width = cv.height = Math.round(s * dpr); }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, s, s);
+    const age = t - t0;
+    const lit = reduce ? 1 : smooth(LAND - .1, LAND + .3, age);
+    const b = reduce ? .6 : pulse(t) * lit + flareAt(age) * .9;
+    const c = s / 2, cell = s / 12;
+    for (let layer = 0; layer < 3; layer++) {
+      // 0: red ink, 1: ochre-hi hot core, 2: charcoal ring
+      ctx.fillStyle = layer === 0 ? '#a8301a' : layer === 1 ? '#f7d58e' : '#1d1510'; ctx.beginPath();
+      const off = layer === 0 ? 1 : layer === 1 ? -.6 : 0;
+      for (let i = -7; i <= 7; i++) for (let j = -7; j <= 7; j++) {
+        const x = c + (i + (j & 1) * .5) * cell + off, y = c + j * cell * .87 - off;
+        const d = Math.hypot(x - c, y - c) / c;
+        let I;
+        if (layer === 0) I = Math.exp(-d * d * (6.5 - 4 * b)) * (.45 + .55 * lit);
+        else if (layer === 1) I = Math.exp(-d * d * (16 - 10 * b)) * (b * 1.1 - .15);
+        else I = smooth(.42 + .3 * b, 1.05, d) * (1 - smooth(.95, 1.08, d));
+        const r = cell * .58 * Math.sqrt(clamp(I, 0, 1));
+        if (r > .25) { ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.2832); }
+      }
+      ctx.fill();
+    }
+  };
+  whileVisible(cv, draw);
+});
+
+/* ---------- closing: the cover's plate again, hours later. No flames to speak of: a bed of coals that breathes
+   on the same 6 s pulse as the cover, and now and then a spark. ---------- */
+const closeCv = $('#closing-gl');
+const closeFire = createFire(closeCv);
+whileVisible(closeCv, t => {
+  const w = closeCv.clientWidth, h = closeCv.clientHeight;
+  const S = closeFire.S, b = reduce ? .5 : pulse(t);
+  const pr = Math.min(w, h) * .475;
+  S.px = w / 2; S.py = h / 2 - 2; S.pr = pr; S.mul = 1; S.spill = 1; S.strike = 0; S.ink = [1, 1, 1];
+  S.r = pr * .6; S.cx = w / 2; S.cy = h / 2 + pr * .2; S.bed = .82; S.coal = 1;
+  S.tongue = reduce ? .16 : .12 + .1 * b;
+  S.heat = .45 + .5 * b;
+  S.room = .35 + .3 * b; S.spread = 1.6;
+  S.spark = reduce ? 0 : .2 + .25 * b; S.wind = wind * .3;
+  closeFire.draw(reduce ? 30 : t + 40);
+});
+
+/* ==================================================================
+   THE CIRCLE, AT NIGHT. A ring of people seen at an angle, a fire in
+   the middle. The scene is drawn as ink densities on a small canvas
+   (red, ochre, paper), then pulled as three halftone screens onto the
+   night stock in WebGL, a little off register, like the cover.
+   Light is printed in hard tone steps, never as a soft glow.
+   People walk in, sit down, the fire catches. One person stands and
+   walks to the fire; when they arrive, every head in the ring turns.
+   ================================================================== */
+const PRINT_DARK = PREC + `
+uniform sampler2D uTex; uniform vec2 uRes; uniform float uPx; uniform float uCell;
+float screen(vec2 p, float ang, float cell, float d){
+  float c = cos(ang), s = sin(ang);
+  vec2 q = vec2(c * p.x - s * p.y, s * p.x + c * p.y) / cell;
+  float v = .5 - .25 * (cos(6.2831853 * q.x) + cos(6.2831853 * q.y));
+  float w = .9 / cell;
+  return smoothstep(v - w, v + w, d * (1. + 2. * w) - w);
+}
+void main(){
+  vec2 fc = gl_FragCoord.xy;
+  vec2 uv = fc / uRes; uv.y = 1. - uv.y;
+  vec2 px = 1. / uRes;
+  float o = texture2D(uTex, uv + vec2(-1.2, -.9) * uPx * px).g;
+  float r = texture2D(uTex, uv + vec2(1.6, 1.1) * uPx * px).r;
+  float p = texture2D(uTex, uv).b;
+  float cell = uCell * uPx;
+  vec3 col = vec3(.145, .106, .082);
+  col = mix(col, vec3(.79, .545, .17), screen(fc + 2.3, .26, cell * .93, o));
+  col = mix(col, vec3(.77, .26, .12), screen(fc + 1.1, 1.31, cell * .97, r));
+  col = mix(col, vec3(.937, .898, .824), screen(fc, .785, cell, p));
+  gl_FragColor = vec4(col, 1.);
+}`;
+(function () {
+  const cv = $('#circle-cv'), scene = $('#scene');
+  const steps = [...document.querySelectorAll('#steps .step')];
+  const STEP_AT = [0, .14, .3, .55, .82];
+  const STEP_SHOW = [.05, .27, .52, .62, .97];
+  const A0 = .56, A1 = .8;                         // the six words of "everything is allowed"
+  const words = [...document.querySelectorAll('#allowed [data-l]')].map(sp => [...sp.querySelectorAll('.aw')]);
+  let wordK = -9;
+  const N = 12, HI = 1;                            // HI: the one who goes in (front row, right of centre)
+  let seed = 23; const rnd = () => (seed = (seed * 16807) % 2147483647, (seed - 1) / 2147483646);
+  // twelve seats, evenly spaced; everyone starts somewhere off to the side of the room
+  const people = Array.from({ length: N }, (_, i) => {
+    const a = Math.PI / 2 + i * Math.PI * 2 / N + Math.PI / N;
+    const side = i < N / 2 ? 1 : -1;
+    return { a, gx0: side * (.35 + rnd() * 1.05), gz0: (rnd() - .5) * 1.5, ph: rnd() * 6.28, h: .92 + rnd() * .16, lag: rnd() * .25 };
+  });
+  const sparks = [];
+  let target = 0, prog = 0, active = 0, last = 0, arrivedAt = -1, leftAt = -1;
+
+  // WebGL print stage
+  const src = document.createElement('canvas'), sx = src.getContext('2d');
+  let gl = null, prog2 = null, tex = null, U = {}, ok = false;
+  try { gl = cv.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' }); } catch (e) { gl = null; }
+  if (gl) {
+    try {
+      const sh = (type, code) => { const o = gl.createShader(type); gl.shaderSource(o, code); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; };
+      prog2 = gl.createProgram(); gl.attachShader(prog2, sh(gl.VERTEX_SHADER, VERT)); gl.attachShader(prog2, sh(gl.FRAGMENT_SHADER, PRINT_DARK));
+      gl.bindAttribLocation(prog2, 0, 'p'); gl.linkProgram(prog2);
+      if (!gl.getProgramParameter(prog2, gl.LINK_STATUS)) throw new Error('link');
+      ['uTex', 'uRes', 'uPx', 'uCell'].forEach(n => U[n] = gl.getUniformLocation(prog2, n));
+      const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+      tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      ok = true;
+    } catch (e) { ok = false; }
+  }
+  const out2d = ok ? null : cv.getContext('2d');
+
+  function setWord(k) {
+    if (k === wordK) return; wordK = k;
+    // k: -1 before, 0..5 the sweep, 6 after: the whole list stands, every word at full strength
+    words.forEach(list => list.forEach((w, i) => { w.classList.toggle('on', i === k); w.classList.toggle('was', k >= 0 && i < k); w.classList.toggle('all', k >= 6); }));
+  }
+  function measure() {
+    const r = scene.getBoundingClientRect();
+    target = clamp(-r.top / Math.max(1, r.height - innerHeight), 0, 1);
+    let a = 0; STEP_AT.forEach((s, i) => { if (target >= s) a = i; });
+    if (a !== active) { active = a; steps.forEach((s, i) => s.classList.toggle('on', i === a)); }
+  }
+  addEventListener('scroll', measure, { passive: true });
+  addEventListener('resize', measure);
+  measure();
+
+  const SS = .5;   // the density sketch is drawn at half resolution; the screen carries the detail
+  const ink = (r, g, b, a) => `rgba(${Math.round(clamp(r, 0, 1) * 255)},${Math.round(clamp(g, 0, 1) * 255)},${Math.round(clamp(b, 0, 1) * 255)},${a == null ? 1 : a})`;
+  function blob(x, y, rx, ry, col) { sx.beginPath(); sx.ellipse(x, y, Math.max(.1, rx), Math.max(.1, ry), 0, 0, 6.2832); sx.fillStyle = col; sx.fill(); }
+  // light printed as a separation: a few flat tone steps with torn, slightly wobbling edges
+  function pool(x, y, rx, ry, stepsCol, t) {
+    stepsCol.forEach(([k, col], si) => {
+      sx.beginPath();
+      for (let j = 0; j <= 56; j++) {
+        const a = j / 56 * 6.2832;
+        const wob = 1 + .035 * Math.sin(a * 5 + si * 1.7 + t * .4) + .025 * Math.sin(a * 11 + si * 3.1 - t * .3);
+        const px = x + Math.cos(a) * rx * k * wob, py = y + Math.sin(a) * ry * k * wob;
+        j ? sx.lineTo(px, py) : sx.moveTo(px, py);
+      }
+      sx.fillStyle = col; sx.fill();
+    });
+  }
+  // a person, seen from the side: seated (st = 0) or standing (st = 1). hx turns the head; trap > 0 cuts a thin
+  // dark line around the shape first, so two people who overlap stay two people (a printer's trap)
+  const L2 = (a, b, k) => a + (b - a) * k;
+  function figure(x, y, u, st, hx, col, trap) {
+    sx.save(); sx.translate(x, y);
+    sx.beginPath();
+    const hy = L2(-2.3, -3.62, st) * u, hr = .3 * u, hxx = hx * u;
+    const sh = L2(-1.86, -3.2, st) * u, shw = L2(.6, .5, st) * u;
+    const wa = L2(-1.05, -2.3, st) * u, waw = L2(.5, .36, st) * u;
+    const hp = L2(-.5, -1.68, st) * u, hpw = L2(.58, .38, st) * u;
+    sx.moveTo(hxx + hr, hy); sx.arc(hxx, hy, hr, 0, 6.2832);
+    sx.rect(hxx * .5 - .11 * u, hy + hr * .6, .22 * u, sh - hy - hr * .4);
+    sx.moveTo(-shw + .2 * u, sh);
+    sx.lineTo(shw - .2 * u, sh);
+    sx.quadraticCurveTo(shw, sh, shw + .02 * u, sh + .25 * u);
+    sx.lineTo(waw + .14 * u, wa);
+    sx.lineTo(hpw, hp);
+    sx.lineTo(-hpw, hp);
+    sx.lineTo(-waw - .14 * u, wa);
+    sx.lineTo(-shw - .02 * u, sh + .25 * u);
+    sx.quadraticCurveTo(-shw, sh, -shw + .2 * u, sh);
+    sx.closePath();
+    if (st < .98) { const k = 1 - st; sx.moveTo(1.28 * u * k, -.27 * u); sx.ellipse(0, -.27 * u, 1.28 * u * k + .01, .32 * u * k + .01, 0, 0, 6.2832); }
+    if (st > .02) {
+      const lh = (hp + .02 * u) * st;
+      sx.rect(-.36 * u, lh, .3 * u, -lh); sx.rect(.06 * u, lh, .3 * u, -lh);
+    }
+    if (trap) { sx.lineWidth = trap; sx.lineJoin = 'round'; sx.strokeStyle = '#000'; sx.stroke(); }
+    sx.fillStyle = col; sx.fill('nonzero'); sx.restore();
+  }
+
+  function draw(now) {
+    const t = now / 1000;
+    const dt = Math.min(.05, t - last || .016); last = t;
+    const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
+    const mob = W < 861;
+    const dpr = Math.min(devicePixelRatio || 1, 1.5);
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const sw = Math.max(2, Math.round(W * SS)), shh = Math.max(2, Math.round(H * SS));
+    if (src.width !== sw || src.height !== shh) { src.width = sw; src.height = shh; }
+    sx.setTransform(SS, 0, 0, SS, 0, 0);
+    sx.globalCompositeOperation = 'source-over';
+    sx.fillStyle = '#000'; sx.fillRect(0, 0, W, H);
+
+    prog = reduce ? STEP_SHOW[active] : prog + (target - prog) * Math.min(1, dt * 4);
+    const p = prog;
+    // geometry: a ring on the floor, seen at an angle. Big on desktop, set right of the step copy.
+    const cx = mob ? W * .5 : W * .6, cy = mob ? H * .39 : H * .47;
+    const R = mob ? Math.min(W * .44, H * .26) : Math.min(W * .31, H * .52);
+    const K = mob ? .46 : .42, u = R * (mob ? .1 : .085), uf = u * 1.35;
+    const proj = (gx, gz) => [cx + gx * R, cy + gz * R * K, 1 + .2 * gz];
+
+    // the timeline: every movement is bound to the scroll position
+    const gather = smooth(.04, .21, p);
+    const sit = smooth(.19, .25, p);
+    const fireOn = smooth(.22, .3, p);
+    const standUp = smooth(.31, .335, p), walkIn = easeIO(smooth(.335, .485, p));
+    const walkBack = easeIO(smooth(.84, .92, p)), sitBack = smooth(.92, .96, p);
+    const inMid = walkIn * (1 - walkBack);
+    const k = p >= A0 && p < A1 ? Math.min(5, Math.floor((p - A0) / ((A1 - A0) / 6))) : (p >= A1 ? 6 : -1);
+    setWord(reduce ? (p >= A0 ? 6 : -1) : k);
+    // the person arrives at the fire: a beat later, every head in the ring turns to them
+    const arrived = inMid > .985;
+    if (arrived && arrivedAt < 0) { arrivedAt = t; leftAt = -1; }
+    if (!arrived && arrivedAt >= 0 && leftAt < 0) leftAt = t;
+    if (!arrived && leftAt >= 0 && t - leftAt > .6) arrivedAt = -1;
+    const flick = reduce ? 1 : .9 + .06 * Math.sin(t * 7.3) + .04 * Math.sin(t * 12.9 + 1) + .03 * Math.sin(t * 3.1);
+    const flame = fireOn * flick;
+    const L = fireOn * (.85 + .15 * flick);
+
+    // where the one in the middle stands: just beside the fire, on the near side, lit from it
+    const spot = [.3, .14];
+    const figs = people.map((q, i) => {
+      const g = easeIO(clamp((gather - q.lag * .6) / (1 - q.lag * .6), 0, 1));
+      let gx = q.gx0 + (Math.cos(q.a) - q.gx0) * g, gz = q.gz0 + (Math.sin(q.a) - q.gz0) * g;
+      let st = 1 - sit;
+      if (i === HI) {
+        st = Math.max(st, standUp * (1 - sitBack));
+        gx += (spot[0] - gx) * inMid; gz += (spot[1] - gz) * inMid;
+      }
+      const [x, y, sc] = proj(gx, gz);
+      const moving = (g > .02 && g < .98) || (i === HI && ((walkIn > .02 && walkIn < .98) || (walkBack > .02 && walkBack < .98)));
+      const bob = moving && !reduce ? Math.abs(Math.sin(t * 6 + q.ph)) * .1 * u : 0;
+      return { i, q, gx, gz, x, y: y - bob, sc, st };
+    });
+    const hiF = figs[HI];
+
+    // the light on the floor, printed in three flat steps: red, then ochre, then a small hot centre
+    if (L > .01) {
+      const [fx, fy] = proj(0, 0);
+      pool(fx, fy, R * 1.18, R * 1.18 * K, [
+        [1, ink(.17 * L, .0, .0)],
+        [.6, ink(.24 * L, .14 * L, .0)],
+        [.3, ink(.22 * L, .42 * L, .06 * L)]
+      ], reduce ? 0 : t);
+    }
+    // the cushions: once the ring forms, the empty one stays visible
+    if (sit > .01) {
+      people.forEach((q, i) => {
+        const [x, y, sc] = proj(Math.cos(q.a), Math.sin(q.a));
+        const empty = i === HI ? clamp(standUp * (1 - sitBack), 0, 1) : 0;
+        blob(x, y - .1 * u, 1.3 * u * sc, .4 * u * sc, ink(.55 * L * (1 - empty) + .1, .12 + .2 * L + .45 * empty, .04 + .3 * empty, sit));
+      });
+    }
+    // draw in depth order: the back of the ring, then the fire, then the front
+    const items = figs.slice(); items.push({ fire: true, y: proj(0, 0)[1] - .5 });
+    items.sort((A, B) => A.y - B.y);
+    items.forEach(f => {
+      if (f.fire) { drawFire(cx, proj(0, 0)[1], uf, flame, t); return; }
+      const sc = f.sc, uu = u * sc * f.q.h;
+      const isHi = f.i === HI;
+      // head turn: a quick ripple around the ring, starting with the people nearest the one who arrived
+      let turn = 0;
+      if (!isHi && arrivedAt >= 0) {
+        const delay = Math.hypot(f.gx - hiF.gx, f.gz - hiF.gz) * .06;
+        const tin = reduce ? 1 : easeIO(clamp((t - arrivedAt - .12 - delay) / .36, 0, 1));
+        const tout = leftAt >= 0 ? (reduce ? 1 : clamp((t - leftAt) / .5, 0, 1)) : 0;
+        turn = tin * (1 - tout);
+      }
+      const hx = isHi ? 0 : clamp((hiF.x - f.x) / (R * .5), -1, 1) * .2 * turn;
+      // before the fire: people are pale shapes in the dark room, easy to read
+      const pre = 1 - fireOn;
+      const d = Math.hypot(f.gx, f.gz);
+      const lit = L * clamp(1.35 - d * .3, 0, 1);
+      const facing = clamp(-f.gz, 0, 1) * sit;            // the far side of the ring faces the fire, and us
+      const dir = Math.sign(cx - f.x) || 1;
+      // rim light on the side that faces the fire, brighter for a moment when the ring turns its attention
+      if (lit > .03) {
+        const rim = lit * (1 + .5 * turn + (isHi ? .4 * inMid : 0));
+        const off = (isHi ? .24 * inMid + .16 * (1 - inMid) : .16) * uu;
+        figure(f.x + dir * off, f.y - .08 * uu, uu, f.st, hx, ink(.8 * rim, .7 * rim, (.3 + .25 * turn + (isHi ? .45 * inMid : 0)) * rim), 0);
+      }
+      const base = ink(
+        .04 + .16 * facing * lit,
+        .06 + .36 * facing * lit,
+        .46 * pre + (.08 + .14 * turn) * facing * lit,
+        1);
+      figure(f.x - dir * .03 * uu, f.y, uu, f.st, hx, base, (mob ? .5 : .32) * uu);
+    });
+    // sparks: a few, all the time, rising from the fire
+    if (!reduce) {
+      const [fx, fy] = proj(0, 0);
+      const rate = 1.4 * flame * dt;
+      let n = Math.floor(rate) + (Math.random() < rate % 1 ? 1 : 0);
+      while (n-- > 0) sparks.push({ x: fx + (Math.random() - .5) * u * 1.4, y: fy - u * 1.2, vx: (Math.random() - .5) * 20, vy: -(30 + Math.random() * 46), life: 0, max: .9 + Math.random() * 1.5 });
+      for (let q = sparks.length - 1; q >= 0; q--) {
+        const s = sparks[q]; s.life += dt;
+        if (s.life > s.max) { sparks.splice(q, 1); continue; }
+        s.x += (s.vx + Math.sin(t * 3 + q) * 10) * dt; s.y += s.vy * dt;
+        const a = 1 - s.life / s.max;
+        blob(s.x, s.y, 2.2, 2.2, ink(.5 * a, .8 * a, .9 * a));
+      }
+    }
+    // pull the print
+    if (ok) {
+      gl.viewport(0, 0, cv.width, cv.height);
+      gl.useProgram(prog2);
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+      gl.uniform1i(U.uTex, 0); gl.uniform2f(U.uRes, cv.width, cv.height); gl.uniform1f(U.uPx, dpr); gl.uniform1f(U.uCell, mob ? 4 : 4.6);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    } else if (out2d) {
+      out2d.setTransform(1, 0, 0, 1, 0, 0); out2d.fillStyle = '#251b15'; out2d.fillRect(0, 0, cv.width, cv.height);
+      out2d.globalAlpha = .9; out2d.drawImage(src, 0, 0, cv.width, cv.height); out2d.globalAlpha = 1;
+    }
+  }
+  // the fire, from the side: a low heap of coals and a cluster of licks, each printed in three steps (red, ochre, paper)
+  const LICKS = [[-.8, .34, .24], [-.42, .7, .28], [-.05, 1, .32], [.32, .74, .27], [.7, .4, .22]];
+  function drawFire(x, y, u, k, t) {
+    if (k <= .01) return;
+    blob(x, y - .12 * u, 1.45 * u, .34 * u, ink(.6 * k, .35 * k, .05 * k));               // coal bed
+    LICKS.forEach(([o, hgt, wd], j) => {
+      const n = reduce ? .5 : .5 + .5 * Math.sin(t * (3.7 + j * 1.3) + j * 2) * Math.sin(t * (2.1 + j * .7) + j);
+      const leap = reduce ? 1 : 1 + .5 * Math.max(0, Math.sin(t * .9 + j * 2.3) - .7) * 3;
+      const h = (.9 + 2.6 * hgt) * u * k * (.65 + .5 * n) * leap;
+      const lx = x + o * u + (reduce ? 0 : Math.sin(t * 2.6 + j) * .1 * u), tip = reduce ? 0 : Math.sin(t * 3.1 + j * 1.7) * .36 * u;
+      const lick = (w, hh, col) => {
+        sx.beginPath(); sx.moveTo(lx - w * u, y - .1 * u);
+        sx.bezierCurveTo(lx - w * 1.15 * u, y - hh * .45, lx + tip * .3 - w * .3 * u, y - hh * .72, lx + tip, y - hh);
+        sx.bezierCurveTo(lx + tip * .4 + w * .2 * u, y - hh * .62, lx + w * 1.1 * u, y - hh * .38, lx + w * u, y - .1 * u); sx.closePath();
+        sx.fillStyle = col; sx.fill();
+      };
+      lick(wd, h, ink(.85 * k, .55 * k, 0));
+      lick(wd * .66, h * .7, ink(.2 * k, .85 * k, .15 * k));
+      lick(wd * .36, h * .42, ink(0, .25 * k, .85 * k));
+    });
+  }
+  whileVisible(cv, t => draw(t * 1000));
+  addEventListener('scroll', () => { if (reduce) draw(performance.now()); }, { passive: true });
+})();
+
+/* ==================================================================
+   FEEL FIRST: three breaths with the fire.
+   ================================================================== */
+const Sound = {
+  ctx: null, on: false, master: null, drone: null, crackleT: 0, noise: null,
+  init() {
+    if (this.ctx) return true;
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+    const c = this.ctx = new AC();
+    this.master = c.createGain(); this.master.gain.value = 0;
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200;
+    this.master.connect(lp); lp.connect(c.destination);
+    this.drone = c.createGain(); this.drone.gain.value = 0; this.drone.connect(this.master);
+    [[98, .5], [98.4, .5], [147, .2], [196.3, .1]].forEach(([f, g]) => {
+      const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+      const gg = c.createGain(); gg.gain.value = g; o.connect(gg); gg.connect(this.drone); o.start();
+    });
+    const b = c.createBuffer(1, c.sampleRate, c.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    this.noise = b;
+    return true;
+  },
+  set(v) {
+    if (v && !this.init()) return;
+    this.on = v; if (!this.ctx) return;
+    if (v && this.ctx.state === 'suspended') this.ctx.resume();
+    this.master.gain.setTargetAtTime(v ? .9 : 0, this.ctx.currentTime, .25);
+  },
+  bowl(f, g) {
+    if (!this.on || !this.ctx) return;
+    const c = this.ctx, t = c.currentTime;
+    [[1, 1], [2.71, .45], [5.15, .2], [8.4, .08]].forEach(([m, a], i) => {
+      [0, 1.6].forEach(det => {
+        const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f * m + det;
+        const e = c.createGain(); const peak = .11 * g * a;
+        e.gain.setValueAtTime(0, t); e.gain.linearRampToValueAtTime(peak, t + .06);
+        e.gain.exponentialRampToValueAtTime(.0001, t + 7.5 - i * 1.3);
+        o.connect(e); e.connect(this.master); o.start(t); o.stop(t + 8);
+      });
+    });
+  },
+  breathe(level) { if (this.ctx) this.drone.gain.setTargetAtTime(.012 + .05 * level, this.ctx.currentTime, .4); },
+  crackle(now, amount) {
+    if (!this.on || !this.ctx || now < this.crackleT) return;
+    this.crackleT = now + (.12 + Math.random() * .7) / Math.max(.15, amount);
+    if (amount < .2) return;
+    const c = this.ctx, t = c.currentTime;
+    const s = c.createBufferSource(); s.buffer = this.noise;
+    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1400 + Math.random() * 3200; bp.Q.value = 1.2;
+    const e = c.createGain(); const a = (.03 + Math.random() * .07) * amount;
+    e.gain.setValueAtTime(a, t); e.gain.exponentialRampToValueAtTime(.0001, t + .015 + Math.random() * .05);
+    s.connect(bp); bp.connect(e); e.connect(this.master);
+    s.start(t, Math.random() * .9, .1);
+  }
+};
+
+(function () {
+  const ov = $('#breath'), cv = $('#breath-gl');
+  const word = $('#b-word'), cue = $('#b-cue'), end = $('#b-end');
+  const dots = [...document.querySelectorAll('.b-dots i')];
+  const sBtn = $('#b-sound');
+  let fire = null, raf = 0, start = 0, lastKey = '', lastFocus = null, tAcc = 0, speed = 1, lastNow = 0, closing = false, from = null;
+  const INTRO = 3.2, IN = 4, HOLD = 3, OUT = 6, CYC = IN + HOLD + OUT, N = 3, TOTAL = INTRO + CYC * N;
+  const W = {
+    nl: { intro: 'Kom even zitten.', in: 'Adem in', hold: 'Vasthouden', out: 'Adem uit' },
+    en: { intro: 'Come and sit for a moment.', in: 'Breathe in', hold: 'Hold', out: 'Breathe out' }
+  };
+  function say(key) {
+    if (key === lastKey) return; lastKey = key;
+    word.classList.add('out');
+    setTimeout(() => { word.textContent = key ? W[lang()][key] : ''; word.classList.remove('out'); }, reduce ? 0 : 380);
+  }
+  function state(el) {
+    if (el < INTRO) return { phase: 'intro', b: 0, cyc: -1, x: 0 };
+    if (el >= TOTAL) return { phase: 'end', b: 0, cyc: N, x: 0 };
+    const k = el - INTRO, cyc = Math.floor(k / CYC), x = k % CYC;
+    if (x < IN) return { phase: 'in', b: easeIO(x / IN), cyc, x };
+    if (x < IN + HOLD) return { phase: 'hold', b: 1, cyc, x };
+    return { phase: 'out', b: 1 - easeIO((x - IN - HOLD) / OUT), cyc, x };
+  }
+  let prevPhase = '', ended = false, settle = 0;
+  function frame(now) {
+    const t = now / 1000, el = t - start;
+    const dt = Math.min(.05, t - lastNow || .016); lastNow = t;
+    const st = state(el);
+    // on the hold, time itself nearly stops: no flicker, no sparks, the light stays exactly where it is
+    const want = st.phase === 'hold' ? .03 : 1;
+    speed += (want - speed) * Math.min(1, dt * (st.phase === 'hold' ? 2.4 : 1.2));
+    tAcc += dt * speed;
+    const w = cv.clientWidth, h = cv.clientHeight, mob = w < 700;
+    const S = fire.S;
+    const grow = reduce ? st.b * .35 : st.b;
+    // the fire catches while the room goes dark
+    const catchK = from ? 1 : st.phase === 'intro' ? easeIO(clamp((el - .6) / (INTRO - .6), 0, 1)) : 1;
+    const base = mob ? Math.min(w * .2, h * .095) : Math.min(w * .085, h * .115);
+    let r = base * (1 + .28 * grow);
+    let fy = h * (mob ? .52 : .56);
+    let tongue = (.55 + .5 * st.b) * catchK, heat = (.5 + .55 * st.b) * (.35 + .65 * catchK);
+    // the breath is the light: it opens wide on the in-breath and draws back in on the out-breath
+    let spread = 2.1 - .95 * grow, room = (.55 + .4 * grow) * (.5 + .5 * catchK);
+    let fx = w / 2;
+    if (from && st.phase === 'intro') {
+      // the room went dark around the cover's fire; now that same fire is drawn to the middle of the screen
+      const mv = reduce ? 1 : easeIO(clamp((el - 1.35) / 1.2, 0, 1));
+      const L = (a, b2) => a + (b2 - a) * mv;
+      fx = L(from.x, fx); fy = L(from.y, fy); r = L(from.r, base);
+      tongue = L(from.tongue, .55); heat = L(from.heat, .5); spread = L(from.spread, 2.1); room = L(from.room, .55);
+    }
+    if (st.phase === 'end') {
+      settle += (1 - settle) * Math.min(1, dt * (reduce ? 10 : 1.1));
+      r += (base * .62 - r) * settle; fy += (h * (mob ? .5 : .52) - fy) * settle;
+      tongue += (.35 - tongue) * settle; heat += (.75 - heat) * settle; spread += (1.6 - spread) * settle; room += (.8 - room) * settle;
+      if (settle > .86 && !end.classList.contains('show')) end.classList.add('show');
+    }
+    S.pr = 0; S.mul = 0; S.spill = 0; S.bed = 1; S.strike = 0; S.ink = [1, 1, 1];
+    S.cx = fx; S.cy = fy; S.r = r; S.tongue = tongue; S.heat = heat; S.spread = spread; S.room = room; S.wind = 0;
+    S.spark = (st.phase === 'hold' ? 0 : .25 + .35 * st.b) * speed * catchK;
+    fire.draw(reduce ? 7 : tAcc + 20);
+    Sound.breathe(st.b); Sound.crackle(t, speed);
+    if (st.phase !== prevPhase) {
+      if (st.phase === 'in') Sound.bowl(st.cyc === 0 ? 174.6 : 196, 1);
+      if (st.phase === 'out') Sound.bowl(130.8, .55);
+      if (st.phase === 'end') Sound.bowl(174.6, .8);
+      prevPhase = st.phase;
+    }
+    if (st.phase === 'end') {
+      if (!ended) {
+        ended = true; say(''); cue.style.opacity = '0'; ov.classList.add('ended');
+        end.hidden = false;
+        setTimeout(() => { if (ended && !ov.hidden) $('#b-on').focus({ preventScroll: true }); }, reduce ? 900 : 4000);
+      }
+    } else {
+      say(st.phase);
+      // one ring per breath; the current one fills while you hold
+      const fill = st.phase === 'hold' ? (st.x - IN) / HOLD : st.phase === 'out' ? 1 : 0;
+      dots.forEach((d, i) => {
+        d.style.setProperty('--f', (i < st.cyc ? 1 : i === st.cyc ? fill : 0).toFixed(3));
+        d.classList.toggle('cur', i === st.cyc);
+      });
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  function begin() {
+    cancelAnimationFrame(raf);
+    ended = false; prevPhase = ''; lastKey = '-'; settle = 0; speed = 1; tAcc = 0; lastNow = 0;
+    end.classList.remove('show'); end.hidden = true; cue.style.opacity = ''; ov.classList.remove('ended');
+    dots.forEach(d => { d.style.setProperty('--f', 0); d.classList.remove('cur'); });
+    start = performance.now() / 1000;
+    raf = requestAnimationFrame(frame);
+  }
+  function open() {
+    if (!ov.hidden) return;
+    lastFocus = document.activeElement; closing = false;
+    if (!fire) fire = createFire(cv);
+    // where is the cover's fire right now? If it is on screen, the dark closes in on it and the breath starts from it
+    from = null;
+    const hr = heroCv.getBoundingClientRect(), H = heroFire.S;
+    const dx = hr.left + H.px, dy = hr.top + H.py;
+    if (H.pr > 0 && dy > -H.pr * .3 && dy < innerHeight + H.pr * .3) {
+      from = { x: hr.left + H.cx, y: hr.top + H.cy, r: H.r, tongue: Math.max(.5, H.tongue), heat: Math.max(.6, H.heat), spread: H.spread, room: H.room };
+      ov.style.setProperty('--mx', Math.round(dx) + 'px'); ov.style.setProperty('--my', Math.round(dy) + 'px');
+    } else { ov.style.removeProperty('--mx'); ov.style.removeProperty('--my'); }
+    setPaused(true);
+    ov.classList.remove('lift');
+    ov.hidden = false; document.body.style.overflow = 'hidden';
+    begin();
+    requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('show')));
+    $('#b-close').focus({ preventScroll: true });
+  }
+  // the light comes back up: the dark opens from the middle outward and the page is there again
+  function close(after) {
+    if (closing) return; closing = true;
+    Sound.set(false); sBtn.setAttribute('aria-pressed', 'false');
+    // first the words clear, then the light comes back up from the middle of the screen
+    ov.classList.add('leaving');
+    setTimeout(() => {
+      ov.style.removeProperty('--mx'); ov.style.removeProperty('--my');
+      ov.classList.add('lift'); ov.classList.remove('show');
+      setTimeout(() => {
+        cancelAnimationFrame(raf); ov.hidden = true; ov.classList.remove('lift', 'leaving'); document.body.style.overflow = '';
+        setPaused(false); closing = false;
+        if (!after && lastFocus) lastFocus.focus({ preventScroll: true });
+      }, reduce ? 450 : 2000);
+      if (after) after();
+    }, reduce ? 200 : 420);
+  }
+  document.querySelectorAll('[data-feel]').forEach(b => b.addEventListener('click', open));
+  $('#b-close').addEventListener('click', () => close());
+  $('#b-again').addEventListener('click', () => { from = null; begin(); });
+  sBtn.addEventListener('click', () => {
+    Sound.set(!Sound.on); sBtn.setAttribute('aria-pressed', String(Sound.on));
+    // switched on mid-breath: strike the bowl now instead of waiting for the next phase
+    if (Sound.on && !ov.hidden) setTimeout(() => Sound.bowl(prevPhase === 'out' ? 130.8 : 174.6, prevPhase === 'out' ? .6 : .85), 60);
+  });
+  addEventListener('keydown', e => {
+    if (ov.hidden) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'Tab') {
+      const f = [...ov.querySelectorAll('button')].filter(b => b.offsetParent !== null && getComputedStyle(b).pointerEvents !== 'none');
+      const i = f.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+  // Read on: behind the dark the page moves to the six sentences, the first one is already printed,
+  // and as the light comes back up the rest land one by one.
+  $('#b-on').addEventListener('click', () => {
+    const target = $('#onuitgesproken');
+    sentHold = true; sentQueue.length = 0;
+    appears.forEach(a => a.classList.remove('in')); burnEl.classList.remove('lit');
+    const y = target.getBoundingClientRect().top + scrollY + (innerWidth < 861 ? 20 : 40);
+    root.style.scrollBehavior = 'auto'; scrollTo(0, y); root.style.scrollBehavior = '';
+    appears[0].style.animationDelay = '0s'; appears[0].classList.add('in');
+    close(() => {
+      const h = $('#unsaid-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true });
+      const gap = reduce ? 0 : 1100, first = reduce ? 0 : 1700;
+      appears.slice(1).forEach((a, i) => setTimeout(() => a.classList.add('in'), first + i * gap));
+      setTimeout(() => { burnEl.classList.add('lit'); sentHold = false; }, first + (appears.length - 1) * gap + (reduce ? 0 : 300));
+    });
+  });
+})();
+
+RM.addEventListener && RM.addEventListener('change', e => { reduce = e.matches; });
+</script>
+</body>
+</html>

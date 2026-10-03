@@ -1,0 +1,1620 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Inner Shadow Circle</title>
+<meta name="description" content="Inner Shadow Circle: schaduwwerk in een groep, via het lijf. Elke maandag een gratis cirkel in Groningen.">
+<meta name="theme-color" content="#f3f2ee">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 fill=%27%23f3f2ee%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2710%27 fill=%27%230a0a0a%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,600..900&family=Schibsted+Grotesk:wght@400..800&display=swap">
+<script>
+  (function () {
+    var l = 'nl';
+    try { var s = localStorage.getItem('isc-lang'); if (s === 'en' || s === 'nl') l = s; } catch (e) {}
+    var r = document.documentElement;
+    if (l === 'en') r.classList.add('en');
+    r.lang = l;
+    r.classList.add('js');
+  })();
+</script>
+<style>
+/* ==========================================================
+   POSTER. Two inks, paper and black. Two voices only:
+   POSTER  = Archivo extra-condensed black, always caps, one size per block.
+   SPOKEN  = Schibsted Grotesk, sentence case, for everything people say.
+   ========================================================== */
+:root {
+  --ink: #0a0a0a;
+  --paper: #f3f2ee;
+  --fg: var(--ink);
+  --bg: var(--paper);
+  --pad: clamp(16px, 2.6vw, 40px);
+  --gap: clamp(12px, 1.6vw, 24px);
+  --navh: 60px;
+  --say: clamp(1.7rem, 3.3vw, 3.25rem);       /* a sentence said out loud */
+  --lead: clamp(1.18rem, 1.5vw, 1.55rem);
+  --f-d: "Archivo", Impact, Haettenschweiler, "Arial Narrow Bold", "Roboto Condensed", sans-serif-condensed, sans-serif;  /* fallback stays condensed and loud */
+  --f-t: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --e-out: cubic-bezier(.16, 1, .3, 1);
+  --e-slam: cubic-bezier(.2, 1.35, .35, 1);
+  --e-io: cubic-bezier(.7, 0, .2, 1);
+  --e-sine: cubic-bezier(.37, 0, .63, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--f-t); font-size: 1.0625rem; line-height: 1.5; font-weight: 430;
+  -webkit-font-smoothing: antialiased; overflow-x: clip;
+}
+[hidden] { display: none !important; }
+:root:not(.en) [data-l="en"], :root.en [data-l="nl"] { display: none !important; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+::selection { background: var(--ink); color: var(--paper); }
+.inv ::selection { background: var(--paper); color: var(--ink); }
+:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
+.nw { white-space: nowrap; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; font-weight: inherit; }
+
+section, header, footer { position: relative; }
+.inv { --fg: var(--paper); --bg: var(--ink); background: var(--ink); color: var(--paper); }
+.wrap { padding-inline: var(--pad); }
+
+/* the spoken voice, set big */
+.say { font-family: var(--f-t); font-size: var(--say); line-height: 1.08; font-weight: 640; letter-spacing: -.028em; text-wrap: balance; }
+.lead { font-size: var(--lead); line-height: 1.3; font-weight: 500; letter-spacing: -.012em; text-wrap: pretty; }
+.fine { font-size: .95rem; line-height: 1.45; font-weight: 500; }
+
+/* the poster voice: one size per block, ragged, the longest line fills the measure */
+.fit { font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase; line-height: .86; letter-spacing: -.012em; word-spacing: .08em; margin: 0; }
+.fit .ln { display: block; white-space: nowrap; inline-size: max-content; }
+.hp { display: inline-block; }
+html.js .fit[data-fit]:not(.ready) { visibility: hidden; }
+
+/* ---------- buttons ---------- */
+.btn {
+  --b: var(--fg); --t: var(--bg);
+  position: relative; isolation: isolate; overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 1.1em;
+  font-family: var(--f-d); font-stretch: 70%; font-weight: 850; text-transform: uppercase;
+  font-size: clamp(1.02rem, 1.2vw, 1.2rem); letter-spacing: .015em; word-spacing: .08em; line-height: 1;
+  padding: 1.05em 1.25em 1em; text-decoration: none; cursor: pointer;
+  background: var(--b); color: var(--t); border: 3px solid var(--b); border-radius: 0;
+  transition: color .45s var(--e-io), transform .15s var(--e-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--t); transform: scaleY(0); transform-origin: 50% 100%; transition: transform .45s var(--e-io); }
+.btn .ar { display: inline-block; transition: transform .45s var(--e-io); }
+@media (hover: hover) {
+  .btn:hover { color: var(--b); }
+  .btn:hover::before { transform: scaleY(1); }
+  .btn:hover .ar { transform: translateX(.35em); }
+}
+.btn:active { transform: translateY(2px) scale(.985); }
+.arr { display: inline-block; width: .62em; height: .62em; vertical-align: -.02em; overflow: visible; }
+
+/* the slab: a full-width bar that is unmistakably a button */
+.slab {
+  --b: var(--fg); --t: var(--bg);
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: center; gap: .45em; width: 100%;
+  padding: .5em .5em .44em; min-height: 1.9em;
+  background: var(--b); color: var(--t); border: 4px solid var(--b);
+  font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase;
+  font-size: clamp(1.9rem, 5.2vw, 5rem); line-height: .9; letter-spacing: -.01em; word-spacing: .08em;
+  text-decoration: none; cursor: pointer; transition: color .5s var(--e-io), transform .15s var(--e-out);
+  -webkit-tap-highlight-color: transparent;
+}
+.slab::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--t); transform: scaleY(0); transform-origin: 50% 100%; transition: transform .5s var(--e-io); }
+.slab .sl-t { flex: 1; min-width: 0; }
+.slab .arr { width: .7em; height: .7em; flex: none; transition: transform .5s var(--e-io); }
+.slab .wa { width: .82em; height: .82em; flex: none; margin-right: .1em; }
+@media (hover: hover) {
+  .slab:hover { color: var(--b); }
+  .slab:hover::before { transform: scaleY(1); }
+  .slab:hover .arr { transform: translateX(.18em); }
+}
+.slab:active { transform: translateY(3px); }
+.slab:focus-visible { outline-offset: 6px; }
+
+/* ---------- NAV ---------- */
+.nav {
+  --nf: var(--ink); --nb: var(--paper);
+  position: fixed; inset: 0 0 auto 0; z-index: 40; color: var(--nf); background: var(--nb);
+  height: calc(env(safe-area-inset-top, 0px) + var(--navh));
+  padding: env(safe-area-inset-top, 0px) var(--pad) 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  transition: transform .5s var(--e-out);
+}
+.nav.ink { --nf: var(--paper); --nb: var(--ink); }
+.nav.tuck { transform: translateY(-101%); }
+.mark { font-family: var(--f-d); font-stretch: 66%; font-weight: 900; text-transform: uppercase; font-size: 1.16rem; letter-spacing: .01em; word-spacing: .08em; text-decoration: none; white-space: nowrap; line-height: 1; }
+.nav-r { display: flex; align-items: center; gap: 1.1rem; }
+.nav-ev { font-family: var(--f-d); font-stretch: 70%; font-weight: 850; text-transform: uppercase; font-size: .98rem; text-decoration: none; background-image: linear-gradient(currentColor, currentColor); background-size: 0 3px; background-position: 0 100%; background-repeat: no-repeat; padding-bottom: 3px; transition: background-size .35s var(--e-io); }
+.nav-ev:hover, .nav-ev:focus-visible { background-size: 100% 3px; }
+.lang { display: flex; gap: .15rem; font-family: var(--f-d); font-stretch: 70%; font-weight: 850; font-size: .98rem; }
+.lang button { background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: .35em .4em; opacity: .45; position: relative; transition: opacity .25s; }
+.lang button::after { content: ""; position: absolute; left: .4em; right: .4em; bottom: .1em; height: 3px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform .35s var(--e-io); }
+.lang button:hover { opacity: .85; }
+.lang button[aria-pressed="true"] { opacity: 1; }
+.lang button[aria-pressed="true"]::after { transform: scaleX(1); }
+.nav .btn { --b: var(--nf); --t: var(--nb); font-size: .9rem; padding: .7em .9em .65em; border-width: 2px; }
+@media (max-width: 560px) { .nav-ev { display: none; } }
+@media (max-width: 420px) { :root { --navh: 56px; } .mark { font-size: 1.02rem; } .nav .btn { font-size: .8rem; padding: .65em .7em .6em; } .nav-r { gap: .45rem; } }
+
+/* ---------- 1. HERO ---------- */
+.hero { display: flex; flex-direction: column; justify-content: flex-end; min-height: 100vh; min-height: 100svh; padding-top: calc(var(--navh) + 14px); padding-bottom: clamp(18px, 3vw, 36px); overflow-x: clip; }
+.pblock { position: relative; }
+.poster .ln.up { line-height: .9; }
+.poster .ln.last { line-height: .86; }
+.poster .dot { display: inline-block; width: var(--dw, .76em); height: var(--dw, .76em); margin-left: .07em; vertical-align: baseline; margin-top: calc(.7em - var(--dw, .76em)); }
+.poster .ln.last .slam { display: inline-block; transform-origin: 0 100%; }
+html.js .hero:not(.set) .poster .ln, html.js .feel:not(.placed) { opacity: 0; }
+/* three beats: the thinking arrives quiet and fast, a pause, then the feeling lands */
+.hero.go .poster .ln:not(.last) { animation: lnIn .42s var(--e-out) both; animation-delay: calc(var(--li) * 70ms + 80ms); }
+.hero.go .poster .ln.last .slam { animation: slamBig .56s var(--e-slam) both; animation-delay: calc(var(--slam-at, 900ms) + var(--fi, 0) * 90ms); }
+@keyframes lnIn { from { opacity: 0; transform: translateY(.16em); } to { opacity: 1; transform: none; } }
+@keyframes slamBig { 0% { opacity: 0; transform: scale(1.42); } 22% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+
+.hero-foot { padding-top: clamp(22px, 2.6vw, 40px); display: flex; justify-content: space-between; align-items: flex-end; gap: 22px 40px; flex-wrap: wrap; }
+.hero-foot .lead { max-width: 23em; }
+html.js .hero:not(.idle) .hero-foot { opacity: 0; transform: translateY(12px); }
+.hero.idle .hero-foot { opacity: 1; transform: none; transition: opacity .7s var(--e-out), transform .7s var(--e-out); }
+
+/* the Feel first disc: the full stop of the opening sentence */
+.feel {
+  --s: 160px;
+  width: var(--s); height: var(--s); border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  background: var(--ink); color: var(--paper); position: absolute; left: 0; top: 0; z-index: 3;
+  display: grid; place-items: center; text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.feel .core { display: grid; place-items: center; pointer-events: none; transition: transform .2s var(--e-out); }
+.feel .fw { font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase; font-size: calc(var(--s) * .2); line-height: .86; word-spacing: .1em; }
+.feel .fs { position: relative; display: block; height: 1.25em; width: calc(var(--s) * .8); margin-top: .5em; font-weight: 650; font-size: clamp(.72rem, calc(var(--s) * .06), .95rem); line-height: 1.25; }
+.feel .fs > span { position: absolute; inset: 0; transition: opacity .5s var(--e-out); }
+.feel .fs .tk { opacity: 0; font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase; font-size: 1.25em; line-height: 1; letter-spacing: .06em; }
+.hero.go .feel { animation: dotIn .44s var(--e-slam) var(--dot-at, 1300ms) both; }
+@keyframes dotIn { 0% { opacity: 0; transform: scale(2.6); } 30% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+/* one slow, obvious breath when you linger: never a constant loop */
+.feel.inhale { animation: inhale 8s var(--e-sine) both !important; }
+@keyframes inhale { 0% { transform: scale(1); } 40% { transform: scale(1.14); } 58% { transform: scale(1.14); } 100% { transform: scale(1); } }
+.feel.inhale { transform-origin: 18% 82%; }
+.feel.inhale .fs .cap { opacity: 0; }
+.feel.inhale .fs .tk { animation: 8s linear both; }
+.feel.inhale .fs .k1 { animation-name: k1; }
+.feel.inhale .fs .k2 { animation-name: k2; }
+.feel.inhale .fs .k3 { animation-name: k3; }
+@keyframes k1 { 0%, 38% { opacity: 1; } 41%, 100% { opacity: 0; } }
+@keyframes k2 { 0%, 39% { opacity: 0; } 42%, 56% { opacity: 1; } 59%, 100% { opacity: 0; } }
+@keyframes k3 { 0%, 57% { opacity: 0; } 60%, 94% { opacity: 1; } 100% { opacity: 0; } }
+.feel:active .core { transform: scale(.94); }
+.feel:focus-visible { outline: 3px solid var(--ink); outline-offset: 6px; }
+@media (hover: hover) { .feel:hover .core { transform: scale(1.04); } }
+/* a small full stop (phones) only carries the two words */
+.feel.small .fs { display: none; }
+.feel.small .fw { font-size: calc(var(--s) * .235); }
+
+/* ---------- 2. THE UNSAID: one sentence per screen, set as a poster ---------- */
+.unsaid { background: var(--ink); color: var(--paper); }
+.un-title { color: var(--paper); max-width: 17em; }
+.sentences { list-style: none; margin: 0; padding: 0; }
+.sentences li { font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase; line-height: .88; letter-spacing: -.012em; word-spacing: .08em; }
+/* the release after six shouts: said, in the spoken voice, in normal flow */
+.after-wrap { padding: clamp(64px, 11vh, 130px) var(--pad) clamp(90px, 15vh, 170px); }
+.after { max-width: 19em; }
+/* calm fallback (no JS, reduced motion): a plain poster series in flow */
+.un-flow { padding: calc(var(--navh) + clamp(60px, 9vw, 140px)) var(--pad) 0; display: flex; flex-direction: column; gap: clamp(64px, 9vw, 130px); }
+.un-flow .sentences { display: flex; flex-direction: column; gap: clamp(56px, 8vw, 110px); }
+.un-flow .sentences li { font-size: clamp(3rem, 11vw, 11rem); max-width: 11ch; text-wrap: balance; }
+.un-flow .sentences li:nth-child(4) { font-size: clamp(3.6rem, 14vw, 15rem); }
+/* pinned: the stage holds still, the posters change */
+.run { display: none; }
+.unsaid.pin .un-flow { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); padding: 0; }
+.unsaid.pin .run { display: block; height: var(--runh, 300vh); }
+.un-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: var(--ink); color: var(--paper); }
+.un-stage.flip { background: var(--paper); color: var(--ink); }
+.un-box { position: absolute; inset: calc(var(--navh) + clamp(12px, 2.2vh, 26px)) var(--pad) clamp(18px, 3.4vh, 40px); }
+.st { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; visibility: hidden; }
+.st.on { visibility: visible; }
+.st.say-st { justify-content: center; }
+.st.say-st .un-title { opacity: 0; font-size: clamp(2.3rem, 6vw, 6.4rem); line-height: 1; letter-spacing: -.04em; max-width: 12.5em; }
+.st.on.say-st .un-title { animation: fadeUp .9s var(--e-out) both; animation-delay: var(--d0, 0ms); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.sent { margin: 0; font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase; letter-spacing: -.012em; word-spacing: .08em; }
+.sent .sl { display: block; width: fit-content; white-space: nowrap; line-height: .88; letter-spacing: -.012em; word-spacing: .08em; }
+.sent .sl.key { line-height: .84; transform-origin: 0 92%; }
+.sent .sl.key + .sl, .sent .sl + .sl.key { margin-top: .03em; }
+/* everything that is said is uncovered line by line; the key word always comes last */
+.st.on .sl { animation: wipe .5s var(--e-io) both; animation-delay: calc(var(--k) * 110ms + var(--d0, 0ms)); }
+.st.on[data-m="quiet"] .sl.key { animation-duration: .95s; animation-delay: calc(var(--kd) + var(--d0, 0ms)); }
+/* the loud ones are not said, they hit */
+.st.on[data-m="loud"] .sl.key, .st.on[data-m="hit"] .sl.key, .st.on[data-m="bleed"] .sl.key { animation: slamBig .5s var(--e-slam) both; animation-delay: calc(var(--kd) + var(--d0, 0ms)); }
+/* the fourth turns the page white: no build-up, it is just there */
+.st.on[data-m="hit"] .sl:not(.key) { animation: none; }
+.st.on[data-m="hit"] .sl.key { animation-delay: 60ms; }
+/* the last one is too big for the frame */
+.st.on[data-m="bleed"] .sl:not(.key) { animation-duration: .3s; animation-delay: calc(var(--k) * 55ms); }
+.st.on[data-m="bleed"] .sl.key { animation-name: slamHuge; }
+@keyframes slamHuge { 0% { opacity: 0; transform: scale(1.7); } 18% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+.st.on.again .sl, .st.on.again .sl.key { animation-duration: .3s; animation-delay: calc(var(--k) * 40ms); }
+.st.out { visibility: visible; animation: outUp .26s var(--e-io) both; }
+.st.out.down { animation-name: outDown; }
+@keyframes wipe { from { clip-path: inset(-.3em 100% -.35em -.1em); } to { clip-path: inset(-.3em -.3em -.35em -.1em); } }
+@keyframes outUp { to { opacity: 0; transform: translateY(-.5em); } }
+@keyframes outDown { to { opacity: 0; transform: translateY(.5em); } }
+
+/* ---------- 3. THE BODY AND THE CIRCLE ----------
+   A poster that changes: the words in the corner, the ring in its own
+   field, one headline across the full measure at the foot. No dot ever
+   touches the type; only the final black, which takes the whole page,
+   passes over it, and the type knocks out of it cleanly. */
+.scene { height: 210vh; }
+.stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: var(--paper); color: var(--ink); }
+.stage svg { position: absolute; width: var(--cs, 50vh); height: var(--cs, 50vh); left: var(--cx, 50%); top: var(--cy, 80px); overflow: visible; }
+.steps { position: absolute; inset: calc(var(--navh) + clamp(14px, 2.4vh, 28px)) var(--pad) clamp(18px, 3.2vh, 36px); pointer-events: none; }
+.step { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: flex-start; visibility: hidden; color: var(--paper); mix-blend-mode: difference; }
+.step.on { visibility: visible; }
+.step-h { order: 3; margin-top: auto; align-self: stretch; font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase; font-size: var(--hs, clamp(2.6rem, 8.4vw, 10rem)); line-height: .86; letter-spacing: -.012em; word-spacing: .08em; }
+.step-h .sl { display: block; width: fit-content; white-space: nowrap; overflow: hidden; padding: .1em .06em .12em 0; margin: -.1em 0 -.12em; }
+.step-h .si { display: block; }
+.step .lead { order: 2; max-width: var(--lw, 26rem); font-size: clamp(1.25rem, 1.75vw, 1.85rem); line-height: 1.24; letter-spacing: -.016em; }
+.allowed { order: 1; margin-bottom: clamp(.8rem, 1.6vw, 1.4rem); max-width: var(--lw, 26rem); font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase; font-size: clamp(1.7rem, 3vw, 3.3rem); line-height: .9; word-spacing: .08em; }
+.allowed .aw { display: inline-block; }
+.step.on .step-h .si { animation: lineUp .7s var(--e-out) both; animation-delay: calc(var(--k) * 90ms); }
+.step.on .lead { animation: fadeUp .6s var(--e-out) .25s both; }
+.step.on .allowed .aw { animation: awIn .42s var(--e-slam) both; animation-delay: calc(var(--w) * 150ms + 300ms); transform-origin: 0 100%; }
+@keyframes lineUp { from { transform: translateY(105%); } to { transform: none; } }
+@keyframes awIn { 0% { opacity: 0; transform: scale(1.5); } 30% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+/* calm fallback */
+.scene.static { height: auto; }
+.scene.static .stage { position: relative; height: auto; overflow: visible; display: flex; flex-direction: column; gap: 60px; padding: clamp(110px, 13vw, 200px) var(--pad) clamp(90px, 10vw, 150px); }
+.scene.static .stage svg { position: static; width: min(100%, 560px); height: auto; aspect-ratio: 1; }
+.scene.static .steps { position: static; display: flex; flex-direction: column; gap: 64px; }
+.scene.static .step { position: static; visibility: visible; mix-blend-mode: normal; color: inherit; }
+.scene.static .step-h { order: 0; margin: 0 0 1rem; font-size: clamp(2.6rem, 8vw, 8rem); }
+
+/* ---------- 4. WHO: one word, too big for the page ---------- */
+.who { padding-block: clamp(80px, 9vw, 130px) clamp(70px, 8vw, 120px); overflow-x: clip; }
+.who-lead { max-width: 15.5em; }
+.who-big { margin-top: clamp(8px, 1.4vw, 20px); margin-right: calc(-1 * var(--pad)); }
+/* the word runs off the page; scrolling drifts it left until you can read the end of it */
+.who-big .ln { will-change: transform; }
+.who-txt { margin-top: clamp(36px, 4.4vw, 70px); max-width: 31rem; display: flex; flex-direction: column; gap: 1.3rem; }
+.who-txt .care { opacity: .78; }
+
+/* ---------- 5. THE FOUR OF US ---------- */
+.team { padding-block: clamp(80px, 9vw, 130px) clamp(90px, 11vw, 160px); overflow-x: clip; }
+.team-q { max-width: 17em; }
+.team-intro { margin-top: clamp(20px, 2.4vw, 34px); max-width: 31em; }
+.strip { margin: clamp(40px, 5vw, 76px) calc(-1 * var(--pad)) 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.person { margin: 0; min-width: 0; }
+.person .ph { aspect-ratio: 4 / 5; overflow: hidden; background: #cfcdc7; position: relative; z-index: 1; }
+.person .ph img { width: 100%; height: 100%; object-fit: cover; filter: brightness(var(--ex, 1)) contrast(var(--co, 1)) url(#print); }
+.person .ph::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .32; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -1.6 1.15'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+/* film credit: each name sits under its own face */
+.credit { padding: clamp(10px, 1.1vw, 16px) var(--pad) 0 clamp(10px, 1vw, 16px); overflow: hidden; }
+.person:first-child .credit { padding-left: var(--pad); }
+.nm { font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase; line-height: .86; letter-spacing: -.012em; display: block; inline-size: max-content; white-space: nowrap; font-size: var(--nmf, 6rem); }
+.role { display: block; margin-top: .55em; font-size: .95rem; font-weight: 600; }
+html.js .strip:not(.in) .ph { clip-path: inset(100% 0 0 0); }
+html.js .strip:not(.in) .credit > * { transform: translateY(-110%); }
+.strip.in .ph { animation: phUp .9s var(--e-io) both; animation-delay: calc(var(--i) * 110ms); }
+.strip.in .credit > * { animation: fromUnder .8s var(--e-io) both; animation-delay: calc(var(--i) * 110ms + 420ms); }
+.strip.in .credit .role { animation-delay: calc(var(--i) * 110ms + 520ms); }
+@keyframes phUp { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes fromUnder { from { transform: translateY(-110%); } to { transform: none; } }
+/* the one rule, said big across the page */
+.rule { margin-top: clamp(64px, 8vw, 130px); font-size: clamp(2.2rem, 5.4vw, 5.9rem); line-height: 1; font-weight: 660; letter-spacing: -.035em; max-width: 13.5em; text-wrap: balance; }
+
+/* ---------- 6. JOIN ---------- */
+.join { padding-block: clamp(100px, 11vw, 160px) clamp(80px, 9vw, 130px); overflow-x: clip; }
+.when { margin-top: clamp(26px, 3.2vw, 48px); }
+.when .say { display: block; }
+.when .next { display: block; margin-top: .35em; opacity: .62; }
+.cd { display: inline-block; min-width: .62em; text-align: center; font-variant-numeric: tabular-nums; }
+.join .slab { margin-top: clamp(40px, 5vw, 72px); }
+.join .intake { margin-top: 18px; max-width: 34em; font-size: 1rem; opacity: .75; }
+.events { margin-top: clamp(100px, 12vw, 170px); }
+.ev-h { font-size: var(--lead); font-weight: 650; }
+.ev-list { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: clamp(40px, 5vw, 70px); }
+.ev { display: block; text-decoration: none; border-top: 4px solid currentColor; padding-top: 14px; }
+.ev-dt { display: block; font-size: var(--say); font-weight: 650; letter-spacing: -.02em; line-height: 1.1; }
+.ev-ti { display: block; margin-top: .1em; font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase; font-size: clamp(3rem, 9vw, 9rem); line-height: .86; }
+.ev-ti .arr { width: .5em; height: .5em; margin-left: .12em; transition: transform .45s var(--e-io); }
+.ev-ln { display: block; margin-top: 14px; max-width: 34em; }
+@media (hover: hover) { a.ev:hover .arr { transform: translateX(.12em); } }
+
+/* ---------- TEAMS: one more poster, then straight to the point ---------- */
+.teams { padding-block: clamp(90px, 10vw, 150px) clamp(70px, 8vw, 120px); overflow-x: clip; }
+.teams-body { margin-top: clamp(30px, 3.6vw, 56px); }
+.teams-body .say { max-width: 16em; }
+.teams-body .lead { max-width: 31em; margin-top: clamp(18px, 2vw, 28px); }
+.teams-body .slab { margin-top: clamp(40px, 5vw, 72px); }
+
+/* ---------- 7. CLOSING: light, then shadow ---------- */
+.closing { padding-block: clamp(120px, 15vw, 230px) clamp(70px, 9vw, 130px); overflow: hidden; transition: none; }
+.closing .say { max-width: 14em; }
+.closing .fit { margin-top: clamp(14px, 2vw, 30px); }
+.closing .ln.last { clip-path: inset(-.4em -.5em 0 -.5em); }
+.closing .rise { display: inline-block; will-change: transform; }
+.closing .btn { margin-top: clamp(56px, 7vw, 110px); font-size: clamp(1.25rem, 2vw, 1.9rem); padding: .95em 1.1em .9em; gap: 1.6em; border-width: 4px; }
+
+/* ---------- 8. FOOTER ---------- */
+footer { padding-block: clamp(50px, 6vw, 80px) calc(env(safe-area-inset-bottom, 0px) + 26px); }
+.wa-big { display: block; text-decoration: none; }
+.wa-big .fit { display: block; transition: opacity .3s; }
+@media (hover: hover) { .wa-big:hover .fit { opacity: .75; } }
+.wa-big:focus-visible { outline-offset: 8px; }
+.wa-lbl { display: flex; align-items: center; gap: .5em; font-weight: 650; margin-bottom: 10px; }
+.wa-lbl svg { width: 1.15em; height: 1.15em; }
+.fineprint { margin-top: clamp(30px, 4vw, 56px); padding-top: 16px; border-top: 6px solid var(--ink); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); row-gap: 18px; align-items: start; }
+.fineprint .crisis { grid-column: 1 / span 6; }
+.fineprint .crisis strong { font-weight: 750; }
+.fineprint .lang { grid-column: 8 / span 2; font-size: 1.05rem; margin-top: -.3em; }
+.fineprint .cr { grid-column: 10 / span 3; text-align: right; }
+
+/* ---------- FEEL FIRST ---------- */
+.breath { position: fixed; inset: 0; z-index: 100; color: var(--paper); --fg: var(--paper); --bg: var(--ink); overflow: hidden; isolation: isolate; transition: opacity .5s var(--e-io); --D: min(84vmin, 820px); }
+.breath.solid { background: var(--paper); }
+.breath.lite { color: var(--ink); --fg: var(--ink); --bg: var(--paper); }
+.breath.fading { opacity: 0; }
+.bdisc { position: absolute; left: 50%; top: 50%; width: var(--D); height: var(--D); margin: calc(var(--D) / -2) 0 0 calc(var(--D) / -2); border-radius: 50%; background: var(--ink); transform: scale(0); will-change: transform; overflow: hidden; }
+/* the word lives inside the disc and breathes with it: always paper on black, never a broken inversion */
+.bword { position: absolute; inset: 0; font-family: var(--f-d); font-stretch: 62%; font-weight: 900; text-transform: uppercase; font-size: calc(var(--D) * .34); line-height: 1; letter-spacing: -.01em; color: var(--paper); pointer-events: none; }
+.bword span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; line-height: .8; padding-top: .06em; }
+.bword span.in { animation: wIn .6s var(--e-out) both; animation-delay: var(--wd, 0ms); }
+.bword span.gone { animation: wOut .22s var(--e-io) both; }
+@keyframes wIn { from { transform: translateY(70%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes wOut { to { transform: translateY(-40%); opacity: 0; } }
+.btop { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 14px); left: var(--pad); right: var(--pad); display: flex; justify-content: space-between; align-items: center; z-index: 5; gap: 12px; opacity: 0; transition: opacity .4s; }
+.breath.solid .btop { opacity: 1; }
+.bbot { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); left: var(--pad); right: var(--pad); display: flex; justify-content: space-between; align-items: flex-end; z-index: 5; gap: 18px; }
+.bhint { font-size: .98rem; font-weight: 600; max-width: 24em; line-height: 1.35; }
+.bbtn { background: none; border: 2px solid currentColor; color: inherit; font-family: var(--f-d); font-stretch: 70%; font-weight: 850; text-transform: uppercase; font-size: .95rem; word-spacing: .08em; padding: .6em .85em .55em; cursor: pointer; display: inline-flex; align-items: center; gap: .55em; transition: background-color .25s, color .25s; }
+.bbtn:hover { background: var(--fg); color: var(--bg); }
+.bbtn svg { width: 1.1em; height: 1.1em; }
+.bbtn .sst { display: inline-block; min-width: 2.2em; text-align: left; }
+.bcount { display: flex; gap: 10px; flex: none; }
+.bcount i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; transition: background-color .6s var(--e-out); }
+.bcount i.on { background: currentColor; }
+.bpanel { position: absolute; inset: 0; z-index: 3; padding: calc(env(safe-area-inset-top, 0px) + 76px) var(--pad) calc(env(safe-area-inset-bottom, 0px) + 22px); display: flex; flex-direction: column; }
+/* the payoff: the question across the full measure, in the spoken voice */
+.bq:focus { outline: none; }
+.bq { margin-block: auto; font-weight: 680; letter-spacing: -.04em; line-height: .98; }
+.bq .sl { display: block; width: fit-content; white-space: nowrap; clip-path: inset(-.3em 100% -.35em -.1em); }
+#b-end.show .bq .sl { animation: wipe .8s var(--e-io) both; animation-delay: calc(var(--k) * 700ms + 150ms); }
+#b-end .later { opacity: 0; transform: translateY(10px); transition: opacity 1.1s var(--e-out), transform 1.1s var(--e-out); display: flex; justify-content: space-between; align-items: end; gap: 16px 40px; flex-wrap: wrap; }
+#b-end .later p { font-size: .98rem; font-weight: 550; max-width: 30em; opacity: .8; }
+#b-end .later .btn { font-size: .95rem; padding: .85em 1em .8em; border-width: 2px; }
+#b-end.late .later { opacity: 1; transform: none; }
+#b-end.late .later { opacity: 1; }
+.bhint, .bcount { transition: opacity .6s var(--e-out); }
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 900px) {
+  /* phones: the ring on top, the headline under it, then the words */
+  .step-h { order: 0; margin-top: 0; }
+  .allowed { order: 1; margin: .7rem 0 0; font-size: clamp(1.45rem, 7.2vw, 2.2rem); }
+  .step .lead { order: 2; margin-top: .7rem; font-size: 1.02rem; line-height: 1.38; max-width: 30rem; }
+  .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 26px; }
+  .person:nth-child(odd) .credit { padding-left: var(--pad); }
+  .fineprint .crisis { grid-column: 1 / -1; }
+  .fineprint .lang { grid-column: 1 / span 6; }
+  .fineprint .cr { grid-column: 7 / span 6; }
+}
+@media (max-width: 560px) {
+  .hero-foot .btn { width: 100%; }
+  .slab { font-size: clamp(1.7rem, 8.6vw, 2.4rem); border-width: 3px; }
+  .bbtn { font-size: .85rem; }
+  .bhint { font-size: .9rem; }
+  .fineprint .lang { grid-column: 1 / -1; }
+  .fineprint .cr { grid-column: 1 / -1; text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .001ms !important; transition-delay: 0s !important; }
+  html.js .strip:not(.in) .ph { clip-path: none; }
+  html.js .strip:not(.in) .credit > * { transform: none; }
+  .closing .rise { transform: none !important; }
+  .bq .sl { clip-path: none; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <!-- one shared print for the four photos: greyscale, real blacks that still keep the face, highlights just off the paper -->
+  <filter id="print" color-interpolation-filters="sRGB" x="0" y="0" width="100%" height="100%">
+    <feColorMatrix type="matrix" values=".3 .59 .11 0 0  .3 .59 .11 0 0  .3 .59 .11 0 0  0 0 0 1 0"/>
+    <feComponentTransfer>
+      <feFuncR type="table" tableValues="0.04 0.08 0.19 0.34 0.5 0.67 0.83 0.93 0.953"/>
+      <feFuncG type="table" tableValues="0.04 0.08 0.19 0.34 0.5 0.67 0.83 0.929 0.949"/>
+      <feFuncB type="table" tableValues="0.04 0.08 0.185 0.335 0.495 0.66 0.82 0.915 0.933"/>
+    </feComponentTransfer>
+  </filter>
+  <symbol id="wa" viewBox="0 0 24 24"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></symbol>
+</svg>
+
+<nav class="nav" id="nav" aria-label="Hoofdmenu">
+  <a class="mark" href="#top">Inner Shadow Circle</a>
+  <div class="nav-r">
+    <a class="nav-ev" id="nav-events" href="#events" hidden>Events</a>
+    <div class="lang" role="group" aria-label="Taal / Language">
+      <button type="button" data-set="nl" aria-pressed="true">NL</button>
+      <button type="button" data-set="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="btn" data-signup href="#meedoen"><span data-l="nl">Aanmelden</span><span data-l="en">Sign up</span></a>
+  </div>
+</nav>
+
+<main>
+<!-- ============ 1. OPENING ============ -->
+<header class="hero wrap" id="top" data-tone="paper">
+  <div class="pblock" id="pblock">
+    <h1 class="poster fit" id="poster" data-fit="hero">
+      <span data-l="nl">De meeste mensen denken, zodat ze niet hoeven te voelen.</span>
+      <span data-l="en">Most people think, so they don’t have to feel.</span>
+    </h1>
+    <button class="feel" id="feel-btn" type="button" aria-haspopup="dialog">
+      <span class="core">
+        <span class="fw"><span data-l="nl">Voel<br>eerst</span><span data-l="en">Feel<br>first</span></span>
+        <span class="fs"><span class="cap"><span data-l="nl">adem even mee</span><span data-l="en">breathe with us</span></span><span class="tk k1" aria-hidden="true">in</span><span class="tk k2" aria-hidden="true"><span data-l="nl">vast</span><span data-l="en">hold</span></span><span class="tk k3" aria-hidden="true"><span data-l="nl">uit</span><span data-l="en">out</span></span></span>
+      </span>
+    </button>
+  </div>
+  <div class="hero-foot">
+    <p class="lead">
+      <span data-l="nl">Inner Shadow Circle is schaduwwerk in een groep. We kijken samen naar wat je liever verborgen houdt, en we laten je lijf het werk doen.</span>
+      <span data-l="en">Inner Shadow Circle is shadow work in a group. Together we look at what you’d rather keep hidden, and we let your body do the work.</span>
+    </p>
+    <a class="btn" data-signup href="#meedoen"><span><span data-l="nl">Kom maandag naar de cirkel</span><span data-l="en">Come to the Monday circle</span></span><span class="ar" aria-hidden="true">&rarr;</span></a>
+  </div>
+</header>
+
+<!-- ============ 2. WHAT YOU DON'T SAY ============ -->
+<section class="unsaid" id="onuitgesproken" data-tone="ink" aria-labelledby="unsaid-title">
+  <h2 class="sr" id="unsaid-title" tabindex="-1"><span data-l="nl">Wat je niet zegt</span><span data-l="en">What you don’t say</span></h2>
+  <!-- the calm version: the same words in plain flow -->
+  <div class="un-flow">
+    <p class="say un-title"><span data-l="nl">Iedereen draagt een zin mee die nog nooit hardop is gezegd.</span><span data-l="en">Everyone carries a sentence they have never said out loud.</span></p>
+    <ol class="sentences" id="sentences">
+      <li><span data-l="nl">Ik ben jaloers op het leven van mijn beste vriend.</span><span data-l="en">I’m jealous of my best friend’s life.</span></li>
+      <li><span data-l="nl">Ik moet winnen. Ook van de mensen van wie ik hou.</span><span data-l="en">I need to win. Even against the people I love.</span></li>
+      <li><span data-l="nl">Ik heb nooit om mijn vader gerouwd. Ik ging gewoon door.</span><span data-l="en">I never grieved my father. I just kept going.</span></li>
+      <li><span data-l="nl">Ik ben doodsbang dat ik niet genoeg ben.</span><span data-l="en">I’m terrified that I’m not enough.</span></li>
+      <li><span data-l="nl">Ik schaam me voor hoe graag ik gezien wil worden.</span><span data-l="en">I’m ashamed of how badly I want to be seen.</span></li>
+      <li><span data-l="nl">Soms ben ik zo kwaad dat ik er zelf van schrik.</span><span data-l="en">Sometimes I’m so angry it scares me.</span></li>
+    </ol>
+  </div>
+  <!-- the pinned version: built from the same words by the script -->
+  <div class="run" id="run" aria-hidden="true">
+    <div class="un-stage" id="un-stage"><div class="un-box" id="un-box"></div></div>
+  </div>
+  <div class="after-wrap">
+    <p class="say after"><span data-l="nl">Zo’n zin stuurt je leven zolang je hem alleen draagt. Zeg je hem hardop in een cirkel, en blijft iedereen je gewoon aankijken, dan gaat er iets schuiven.</span><span data-l="en">As long as you carry it alone, a sentence like that runs your life. Say it out loud in a circle, with everyone still looking at you, and something starts to shift.</span></p>
+  </div>
+</section>
+
+<!-- ============ 3. THE BODY AND THE CIRCLE ============ -->
+<section class="scene" id="cirkel" data-tone="paper" aria-labelledby="body-title">
+  <div class="stage" id="stage">
+    <svg id="circle-svg" viewBox="-50 -50 100 100" role="img" aria-labelledby="circle-desc">
+      <desc id="circle-desc">Twaalf stippen lopen binnen en vormen een cirkel. Twee open stippen zijn de begeleiders. Eén stip gaat naar het midden en de rest leunt ernaartoe.</desc>
+      <g id="dots"></g>
+    </svg>
+    <div class="steps" id="steps">
+      <div class="step">
+        <h2 class="step-h" id="body-title"><span data-l="nl">Hier wordt weinig gepraat.</span><span data-l="en">There’s not much talking here.</span></h2>
+        <p class="lead"><span data-l="nl">Het werk gebeurt in je lijf. De meesten van ons kunnen hun pijn haarfijn uitleggen en hem toch niet voelen, want praten is vaak juist hoe we het op afstand houden. Dus vertragen we, tot je merkt wat er onder je verhaal gebeurt: in je keel, in je buik.</span><span data-l="en">The work happens in your body. Most of us can explain our pain in fine detail and still not feel it, because talking is often exactly how we keep it at arm’s length. So we slow down, until you notice what is happening under your story: in your throat, in your belly.</span></p>
+      </div>
+      <div class="step">
+        <p class="step-h"><span data-l="nl">We gaan in een cirkel zitten.</span><span data-l="en">We sit down in a circle.</span></p>
+        <p class="lead"><span data-l="nl">Je komt binnen zoals je bent, met je pantser en je grappen. Die twee open stippen, dat zijn wij.</span><span data-l="en">You walk in as you are, armour and jokes included. Those two open dots, that’s us.</span></p>
+      </div>
+      <div class="step">
+        <p class="step-h"><span data-l="nl">Iemand gaat het midden in.</span><span data-l="en">One person steps into the center.</span></p>
+        <p class="lead"><span data-l="nl">Jij kiest of en wanneer dat jij bent. In het midden hoef je niks uit te leggen, je mag voelen wat er is.</span><span data-l="en">You choose if and when that’s you. In the middle you don’t have to explain anything, you get to feel what’s there.</span></p>
+      </div>
+      <div class="step">
+        <p class="step-h"><span data-l="nl">De hele groep blijft erbij.</span><span data-l="en">The whole group stays with you.</span></p>
+        <p class="lead"><span data-l="nl">Iedereen blijft je aankijken en niemand probeert je te fixen. Met zoveel aandacht op je wordt het lastig om naar je hoofd te vluchten.</span><span data-l="en">Everyone keeps looking at you and nobody tries to fix you. With that much attention on you, it gets hard to escape into your head.</span></p>
+      </div>
+      <div class="step">
+        <p class="step-h"><span data-l="nl">Alles mag er zijn.</span><span data-l="en">Everything is allowed.</span></p>
+        <p class="allowed"><span data-l="nl">Stilte, diep rusten, tranen, trillen, schreeuwen, vechten.</span><span data-l="en">Silence, deep rest, tears, shaking, screaming, fighting.</span></p>
+        <p class="lead"><span data-l="nl">Wat er echt gebeurt, voelt de groep samen aan, op het moment zelf.</span><span data-l="en">What actually happens, the group feels out together, in the moment.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. WHO IT IS FOR ============ -->
+<section class="who inv wrap" id="voor-wie" data-tone="ink" aria-labelledby="who-title">
+  <h2 class="say who-lead" id="who-title"><span data-l="nl">Je hoeft maar één ding mee te nemen: dat je echt wilt <span class="sr">kijken.</span></span><span data-l="en">You only need to bring one thing: the willingness to really <span class="sr">look.</span></span></h2>
+  <p class="who-big fit" data-fit="who" aria-hidden="true"><span data-l="nl">kijken.</span><span data-l="en">look.</span></p>
+  <div class="who-txt">
+    <p class="lead"><span data-l="nl">Jong of oud, Nederlands- of Engelstalig: maakt niet uit. Wat wel uitmaakt, is dat je bereid bent diep te gaan, ook als het ongemakkelijk wordt. Alleen nieuwsgierig zijn is te weinig.</span><span data-l="en">Young or old, Dutch or English speaking: doesn’t matter. What does matter is that you’re willing to go deep, also when it gets uncomfortable. Just being curious isn’t enough.</span></p>
+    <p class="care fine"><span data-l="nl">Inner Shadow Circle is geen therapie, en geen medische of psychologische behandeling. Zit je in een acute crisis, dan is dit nu niet de goede plek.</span><span data-l="en">Inner Shadow Circle is not therapy, and not a medical or psychological treatment. If you are in acute crisis, this isn’t the right place for you right now.</span></p>
+  </div>
+</section>
+
+<!-- ============ 5. THE FOUR OF US ============ -->
+<section class="team wrap" id="wij" data-tone="paper" aria-labelledby="team-title">
+  <h2 class="say team-q" id="team-title">
+    <span data-l="nl">Al twee jaar zitten we elke week zelf in de cirkel.</span>
+    <span data-l="en">For two years we have sat in the circle ourselves, every week.</span>
+  </h2>
+  <p class="lead team-intro"><span data-l="nl">We zijn geen coaches aan de zijlijn. Sinds kort staat de deur open voor anderen. Samen hebben we zo’n tien jaar ervaring met meditatie, retraites, ademwerk, Focusing, parts work en TRE.</span><span data-l="en">We are not coaches on the sidelines. Recently we opened it to others. Between us we bring around ten years of meditation, retreats, breathwork, Focusing, parts work and TRE.</span></p>
+  <div class="strip" id="strip"></div>
+  <p class="rule"><span data-l="nl">Altijd minstens twee van ons. Nooit meer dan twaalf mensen, want het werk is intens.</span><span data-l="en">Always at least two of us. Never more than twelve people, because the work is intense.</span></p>
+</section>
+
+<!-- ============ 6. JOIN ============ -->
+<section class="join inv wrap" id="meedoen" data-tone="ink" aria-labelledby="join-title">
+  <h2 class="fit" id="join-title" data-fit="join"><span data-l="nl">Elke maandag een cirkel.</span><span data-l="en">A circle every Monday.</span></h2>
+  <p class="when">
+    <span class="say"><span data-l="nl">Van 18:30 tot 22:00. Gratis.</span><span data-l="en">From 18:30 to 22:00. Free.</span></span>
+    <span class="say next" id="next"></span>
+  </p>
+  <a class="slab" data-signup href="#meedoen"><span class="sl-t"><span data-l="nl">Meld je aan voor maandag</span><span data-l="en">Sign up for Monday</span></span><svg class="arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h17M12 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="square"/></svg></a>
+  <p class="intake"><span data-l="nl">Je meldt je aan via een kort intakeformulier. Daarna krijg je alle details, ook de locatie. We zitten in Groningen, maar we trekken ook rond.</span><span data-l="en">You sign up through a short intake form. After that you get all the details, including the location. We’re based in Groningen, but we move around.</span></p>
+
+  <div class="events" id="events" hidden>
+    <h3 class="ev-h"><span data-l="nl">Binnenkort</span><span data-l="en">Coming up</span></h3>
+    <ul class="ev-list" id="ev-list"></ul>
+  </div>
+</section>
+
+<section class="teams wrap" id="teams" data-tone="paper" aria-labelledby="teams-title">
+  <h2 class="fit" id="teams-title" data-fit="teams"><span data-l="nl">Elk team heeft dingen die niemand zegt.</span><span data-l="en">Every team has things nobody says.</span></h2>
+  <div class="teams-body">
+    <div>
+      <p class="say"><span data-l="nl">Iemand voelt zich gepasseerd, of over dat ene conflict is daarna nooit meer iets gezegd.</span><span data-l="en">Someone feels passed over, or nothing was ever said again after that one conflict.</span></p>
+      <p class="lead"><span data-l="nl">Het zit in elke vergadering en het kost meer dan je denkt, soms zelfs je beste mensen. Neem je team mee de cirkel in. Daar komt het eindelijk op tafel, en niet alleen in woorden. Liever iets op maat, voor je team of voor jezelf? Stuur ons een appje.</span><span data-l="en">It sits in every meeting and it costs more than you think, sometimes even your best people. Bring your team into the circle. That’s where it finally comes out, and not only in words. Rather have something custom, for your team or for yourself? Send us a message.</span></p>
+    </div>
+    <a class="slab" data-wa href="https://wa.me/31630269017" target="_blank" rel="noopener"><svg class="wa" aria-hidden="true"><use href="#wa"/></svg><span class="sl-t"><span data-l="nl">App ons over je team</span><span data-l="en">Message us about your team</span></span><svg class="arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h17M12 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="square"/></svg></a>
+  </div>
+</section>
+
+<!-- ============ 7. CLOSING ============ -->
+<section class="closing wrap" id="slot" data-tone="paper" aria-label="Slot">
+  <p class="say"><span data-l="nl">Het licht was er altijd al.</span><span data-l="en">The light was always there.</span></p>
+  <p class="fit" id="closing-line" data-fit="closing"><span data-l="nl">Je moest alleen de schaduw in.</span><span data-l="en">You just had to step into the shadow.</span></p>
+  <a class="btn" data-signup href="#meedoen"><span><span data-l="nl">Meld je aan voor maandag</span><span data-l="en">Sign up for Monday</span></span><span class="ar" aria-hidden="true">&rarr;</span></a>
+</section>
+</main>
+
+<!-- ============ 8. FOOTER ============ -->
+<footer class="wrap" data-tone="paper">
+  <a class="wa-big" data-wa href="https://wa.me/31630269017" target="_blank" rel="noopener" aria-label="WhatsApp +31 6 30269017">
+    <span class="wa-lbl" aria-hidden="true"><svg><use href="#wa"/></svg><span data-l="nl">Alleen via WhatsApp. Je krijgt antwoord van een van ons.</span><span data-l="en">WhatsApp only. One of us will answer.</span></span>
+    <span class="fit" data-fit="foot" aria-hidden="true"><span data-l="nl">+31 6 30269017</span><span data-l="en">+31 6 30269017</span></span>
+  </a>
+  <div class="fineprint">
+    <p class="crisis fine"><span data-l="nl">Gaat het nu niet goed met je? Praat erover. <strong>113 Zelfmoordpreventie</strong>: bel 113 of gratis <span class="nw">0800-0113</span>.</span><span data-l="en">Not doing well right now? Talk to someone. <strong>113 Suicide Prevention</strong> (NL): call 113 or free <span class="nw">0800-0113</span>.</span></p>
+    <div class="lang" role="group" aria-label="Taal / Language">
+      <button type="button" data-set="nl" aria-pressed="true">NL</button>
+      <button type="button" data-set="en" aria-pressed="false">EN</button>
+    </div>
+    <p class="cr fine">&copy; 2026 Inner Shadow Circle<br><span data-l="nl">Groningen, en onderweg.</span><span data-l="en">Groningen, and on the road.</span></p>
+  </div>
+</footer>
+
+<!-- ============ FEEL FIRST: breath guide ============ -->
+<div class="breath" id="breath" role="dialog" aria-modal="true" aria-labelledby="b-title" hidden>
+  <h2 class="sr" id="b-title"><span data-l="nl">Voel eerst: drie keer samen ademen</span><span data-l="en">Feel first: three breaths together</span></h2>
+  <div class="bdisc" id="bdisc" aria-hidden="true"><div class="bword" id="bword"></div></div>
+  <p class="sr" id="b-live" aria-live="polite"></p>
+
+  <div class="btop">
+    <button class="bbtn" type="button" id="b-sound" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 9h4l5-4v14l-5-4H4z"/><path id="b-sound-wave" fill="none" stroke="currentColor" stroke-width="2" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/><path id="b-sound-x" stroke="currentColor" stroke-width="2" d="M16 9l5 6M21 9l-5 6"/></svg>
+      <span><span data-l="nl">Geluid:</span><span data-l="en">Sound:</span> <span class="sst" id="b-sound-st"></span></span>
+    </button>
+    <button class="bbtn" type="button" id="b-close"><span data-l="nl">Stop</span><span data-l="en">Stop</span><span aria-hidden="true">&times;</span></button>
+  </div>
+
+  <div class="bpanel" id="b-end" hidden>
+    <p class="bq" id="b-q"><span data-l="nl">Wat merk je nu, in je lijf?</span><span data-l="en">What do you notice now, in your body?</span></p>
+    <div class="later">
+      <p><span data-l="nl">Een spanning, een zucht, misschien niks. Het is allemaal goed, je hoeft er nog niks mee.</span><span data-l="en">A tension, a sigh, maybe nothing. All of it is fine, you don’t have to do anything with it yet.</span></p>
+      <button class="btn" type="button" id="b-on"><span><span data-l="nl">Lees verder</span><span data-l="en">Read on</span></span><span class="ar" aria-hidden="true">&darr;</span></button>
+    </div>
+  </div>
+
+  <div class="bbot" id="b-bot" hidden>
+    <span class="bhint"><span data-l="nl">Voeten op de grond, schouders laten zakken. Met geluid aan kun je je ogen dichtdoen.</span><span data-l="en">Feet on the floor, let your shoulders drop. With sound on, you can close your eyes.</span></span>
+    <span class="bcount" id="b-count" aria-hidden="true"><i></i><i></i><i></i></span>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG: edit these.
+   ============================================================ */
+const CONFIG = {
+  SIGNUP_URL: 'SIGNUP_URL',   // <-- PLACEHOLDER: paste the intake form link here (e.g. https://tally.so/r/...)
+  whatsapp: '31630269017',
+  whatsappText: {
+    nl: 'Hoi! Ik kom via de website van Inner Shadow Circle. Ik wil graag iets vragen over ',
+    en: 'Hi! I found you through the Inner Shadow Circle website. I have a question about '
+  },
+  // Paid events. Leave empty [] to hide the whole Events block and its nav link.
+  // Example: { date: '2026-11-21', title: { nl: 'Dagcirkel', en: 'Day circle' }, line: { nl: 'Een hele dag in de cirkel.', en: 'A full day in the circle.' }, url: 'https://...' }
+  events: [],
+  // Photo crops are tuned by hand so the four heads line up. Keep pos / scale / origin as they are.
+  // `ex` (exposure) and `co` (contrast) only even out the four shoots so they print as one series.
+  team: [
+    { photo: '../../images/team/marko.jpg',           pos: '52% 28%', ex: 1.04, co: 1,    nl: { name: 'Marko',  role: 'Begeleider' }, en: { name: 'Marko',  role: 'Facilitator' } },
+    { photo: '../../images/team/max-field-clean.jpg', pos: '55% 30%', ex: 1.3,  co: .92,  nl: { name: 'Max',    role: 'Begeleider' }, en: { name: 'Max',    role: 'Facilitator' } },
+    { photo: '../../images/team/natan.jpg',           pos: '50% 22%', ex: .94,  co: 1,    nl: { name: 'Natan',  role: 'Begeleider' }, en: { name: 'Natan',  role: 'Facilitator' } },
+    { photo: '../../images/team/thomas-white-shirt-face-original.png', pos: '50% 50%', scale: 1.25, origin: '50% 2%', ex: .9, co: 1, nl: { name: 'Thomas', role: 'Begeleider' }, en: { name: 'Thomas', role: 'Facilitator' } }
+  ],
+  breath: { inMs: 4500, holdMs: 2500, outMs: 6000, rounds: 3 }
+};
+
+/* ============================================================ */
+const root = document.documentElement;
+const RM = window.matchMedia('(prefers-reduced-motion: reduce)');
+const reduce = () => RM.matches;
+const lang = () => root.classList.contains('en') ? 'en' : 'nl';
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const tr = v => (v && typeof v === 'object') ? (v[lang()] || v.nl || '') : (v || '');
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const navH = () => document.getElementById('nav').offsetHeight;
+const ARROW = '<svg class="arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h17M12 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="square"/></svg>';
+const vw = () => window.innerWidth, vh = () => window.innerHeight;
+
+/* ---------- links ---------- */
+const signupReady = () => CONFIG.SIGNUP_URL && CONFIG.SIGNUP_URL !== 'SIGNUP_URL';
+function setLinks() {
+  document.querySelectorAll('[data-signup]').forEach(a => {
+    if (signupReady()) { a.href = CONFIG.SIGNUP_URL; a.target = '_blank'; a.rel = 'noopener'; }
+    else { a.href = '#meedoen'; a.title = 'SIGNUP_URL: nog in te vullen in CONFIG'; }
+  });
+  const wa = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(CONFIG.whatsappText[lang()])}`;
+  document.querySelectorAll('[data-wa]').forEach(a => a.href = wa);
+}
+if (!signupReady() && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+  console.info('[Inner Shadow Circle] SIGNUP_URL is still the placeholder. Every signup button points to #meedoen until it is filled in at the top of the script.');
+}
+
+/* ---------- team: a film credit under every face ---------- */
+document.getElementById('strip').innerHTML = CONFIG.team.map((p, i) => `
+  <figure class="person" style="--i:${i}">
+    <div class="ph" style="--ex:${p.ex || 1};--co:${p.co || 1}"><img src="${esc(p.photo)}" alt="" loading="lazy" decoding="async" style="object-position:${p.pos};transform:scale(${p.scale || 1});transform-origin:${p.origin || '50% 50%'}"></div>
+    <figcaption class="credit"><span class="nm">${esc(p.nl.name)}</span><span class="role"><span data-l="nl">${esc(p.nl.role)}</span><span data-l="en">${esc(p.en.role)}</span></span></figcaption>
+  </figure>`).join('');
+function fitNames() {
+  const names = [...document.querySelectorAll('.strip .nm')];
+  if (!names.length) return;
+  names.forEach(n => n.style.fontSize = '100px');
+  let k = Infinity;
+  names.forEach(n => { const box = n.parentElement; const cs = getComputedStyle(box); const w = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); k = Math.min(k, w / Math.max(1, n.offsetWidth)); });
+  const size = Math.min(100 * k * .98, vh() * .17);
+  names.forEach(n => n.style.fontSize = size.toFixed(1) + 'px');
+}
+
+/* ---------- the next circle: a real date, counted from today ---------- */
+function nextCircle(now) {
+  const day = now.getDay(), mins = now.getHours() * 60 + now.getMinutes();
+  let add = (8 - day) % 7;                  // days until Monday
+  const live = add === 0 && mins >= 18 * 60 + 30 && mins < 22 * 60;
+  if (add === 0 && mins >= 18 * 60 + 30) add = 7;
+  return { date: new Date(now.getFullYear(), now.getMonth(), now.getDate() + add), add, live };
+}
+let cdShown = false;
+function renderNext(count) {
+  const el = document.getElementById('next');
+  const n = nextCircle(new Date()), l = lang();
+  const ds = n.date.toLocaleDateString(l === 'en' ? 'en-GB' : 'nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+  const D = l === 'en' ? ds.replace(/^\w/, c => c.toUpperCase()) : ds;
+  let html;
+  if (l === 'nl') {
+    if (n.live) html = `De cirkel van vanavond is al bezig. De volgende is ${D}.`;
+    else if (n.add === 0) html = `De volgende is vanavond.`;
+    else if (n.add === 1) html = `De volgende is morgen, ${D}.`;
+    else html = `De volgende is ${D}, over <span class="cd">${n.add}</span> dagen.`;
+  } else {
+    if (n.live) html = `Tonight’s circle has already started. The next one is ${D}.`;
+    else if (n.add === 0) html = `The next one is tonight.`;
+    else if (n.add === 1) html = `The next one is tomorrow, ${D}.`;
+    else html = `The next one is ${D}, in <span class="cd">${n.add}</span> days.`;
+  }
+  el.innerHTML = html;
+  // the week runs down to the real number once, the first time you see it
+  const cd = el.querySelector('.cd');
+  if (cd && count && !reduce()) {
+    let v = 7; cd.textContent = v;
+    const tick = () => { v--; cd.textContent = v; if (v > n.add) setTimeout(tick, 70 + (7 - v) * 18); };
+    if (v > n.add) setTimeout(tick, 220);
+  }
+}
+(function () {
+  const sec = document.getElementById('meedoen');
+  if (!('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !cdShown) { cdShown = true; renderNext(true); io.disconnect(); } }), { rootMargin: '0px 0px -30% 0px' });
+  io.observe(document.getElementById('next'));
+})();
+
+/* ---------- events ---------- */
+function renderEvents() {
+  const list = (CONFIG.events || []).filter(Boolean);
+  const has = list.length > 0;
+  document.getElementById('events').hidden = !has;
+  document.getElementById('nav-events').hidden = !has;
+  if (!has) return;
+  const l = lang();
+  document.getElementById('ev-list').innerHTML = list.map(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    const ds = isNaN(d) ? esc(e.date) : esc(d.toLocaleDateString(l === 'en' ? 'en-GB' : 'nl-NL', { weekday: 'long', day: 'numeric', month: 'long' }));
+    const inner = `<span class="ev-dt">${ds}</span><span class="ev-ti">${esc(tr(e.title))}${e.url ? ARROW : ''}</span><span class="ev-ln lead">${esc(tr(e.line))}</span>`;
+    return `<li>${e.url ? `<a class="ev" href="${esc(e.url)}" target="_blank" rel="noopener">${inner}</a>` : `<div class="ev">${inner}</div>`}</li>`;
+  }).join('');
+}
+
+/* ============================================================
+   POSTER BLOCKS: hand-set breaks, ONE size per block (the longest
+   line fills the measure), ragged like real setting. Left side
+   bearings compensated, end punctuation hangs outside the measure.
+   ============================================================ */
+const FITS = {
+  hero: {
+    // the last full stop is not a character: it is the Feel first button.
+    // * marks the feeling. On a phone the Dutch word breaks, so the full stop can still be big enough to press.
+    nl: { wide: ['De meeste mensen denken,', 'zodat ze niet hoeven te', '*voelen'], narrow: ['De meeste mensen', 'denken, zodat ze', 'niet hoeven te', '*voe-', '*len'] },
+    en: { wide: ['Most people think,', 'so they don’t have to', '*feel'], narrow: ['Most people', 'think, so they', 'don’t have to', '*feel'] }
+  },
+  who: { nl: { wide: ['kijken.'], narrow: ['kijken.'] }, en: { wide: ['look.'], narrow: ['look.'] } },
+  join: {
+    nl: { wide: ['Elke maandag', 'een cirkel.'], narrow: ['Elke', 'maandag', 'een cirkel.'] },
+    en: { wide: ['A circle', 'every Monday.'], narrow: ['A circle', 'every', 'Monday.'] }
+  },
+  teams: {
+    nl: { wide: ['Elk team heeft dingen', 'die niemand zegt.'], narrow: ['Elk team', 'heeft dingen', 'die niemand', 'zegt.'] },
+    en: { wide: ['Every team has', 'things nobody says.'], narrow: ['Every team', 'has things', 'nobody says.'] }
+  },
+  closing: {
+    nl: { wide: ['Je moest alleen', 'de schaduw in.'], narrow: ['Je moest', 'alleen de', 'schaduw in.'] },
+    en: { wide: ['You just had to step', 'into the shadow.'], narrow: ['You just had', 'to step into', 'the shadow.'] }
+  },
+  foot: { nl: { wide: ['+31 6 30269017'], narrow: ['+31 6 30269017'] }, en: { wide: ['+31 6 30269017'], narrow: ['+31 6 30269017'] } }
+};
+/* the tallest a line may be, as a share of the screen height */
+const CAP = { join: .3, teams: .3, closing: .26, foot: .22, who: .6 };
+
+const hero = document.getElementById('top');
+const pblock = document.getElementById('pblock');
+const posterEl = document.getElementById('poster');
+const feelBtn = document.getElementById('feel-btn');
+const fitEls = [...document.querySelectorAll('.fit[data-fit]')];
+
+/* side bearings, measured once per glyph from the real font */
+const BEAR = {};
+let bctx = null;
+function bearing(ch) {
+  if (ch in BEAR) return BEAR[ch];
+  let v = { l: 0, r: 0 };
+  try {
+    if (!bctx) bctx = document.createElement('canvas').getContext('2d');
+    bctx.font = '900 100px Archivo';
+    if ('fontStretch' in bctx) bctx.fontStretch = 'extra-condensed';
+    const m = bctx.measureText(ch);
+    if (m && 'actualBoundingBoxLeft' in m) v = { l: clamp(-m.actualBoundingBoxLeft / 100, 0, .12), r: clamp((m.width - m.actualBoundingBoxRight) / 100, 0, .12) };
+  } catch (e) {}
+  BEAR[ch] = v; return v;
+}
+const isVert = el => getComputedStyle(el).writingMode.startsWith('vertical');
+function fitMode(el) { return vw() >= 760 && (el !== posterEl || vw() / vh() > 1.05) ? 'wide' : 'narrow'; }
+/* wrap a trailing . , : so it can hang */
+function lineHTML(txt) {
+  const m = txt.match(/^(.*?)([.,:])$/);
+  return m ? `${esc(m[1])}<span class="hp">${m[2]}</span>` : esc(txt);
+}
+function buildFit(el) {
+  const mode = fitMode(el);
+  if (el.dataset.built === mode) return false;
+  const set = FITS[el.dataset.fit];
+  const isHero = el === posterEl;
+  el.innerHTML = ['nl', 'en'].map(l => `<span data-l="${l}" class="pb">` +
+    set[l][mode].map((line, i, arr) => {
+      const feel = isHero && line.charAt(0) === '*';
+      if (feel) line = line.slice(1);
+      const fi = feel ? arr.slice(0, i).filter(x => x.charAt(0) === '*').length : 0;
+      const end = i === arr.length - 1;
+      const last = isHero ? feel : end;
+      let inner = isHero ? line.split(' ').map(w => `<span class="w">${lineHTML(w)}</span>`).join(' ') : lineHTML(line);
+      if (el.dataset.fit === 'closing' && last) inner = `<span class="rise">${inner}</span>`;
+      if (isHero && last) inner = `<span class="slam">${inner}</span>` + (end ? `<span class="dot" aria-hidden="true"></span><span class="sr">.</span>` : '');
+      return `<span class="ln${last ? ' last' : ' up'}" style="--li:${i};--fi:${fi}">${inner}</span>`;
+    }).join('') + '</span>').join('');
+  el.dataset.built = mode;
+  if (isHero) hero.classList.toggle('narrow', mode === 'narrow');
+  return true;
+}
+/* measure one line at 100px: its ink width without the hanging punctuation */
+function measure(l, vert) {
+  l.style.fontSize = '100px'; l.style.marginLeft = '0';
+  const txt = l.textContent.trim().toUpperCase().replace(/[.,:]$/, '');
+  const b0 = vert ? { l: 0 } : bearing(txt.charAt(0));
+  const hp = l.querySelector(':scope > .hp, :scope > .rise > .hp');
+  const hang = hp ? (vert ? hp.offsetHeight : hp.offsetWidth) : 0;
+  const w = vert ? l.offsetHeight : l.offsetWidth;
+  l._bl = b0.l;
+  return { ink: w - b0.l * 100 - hang, hang };
+}
+function sizeFit(el) {
+  const block = el.querySelector(`.pb[data-l="${lang()}"]`);
+  if (!block) return;
+  if (el === posterEl) return sizeHero(el, block);
+  const vert = isVert(el);
+  const W = vert ? el.clientHeight : el.clientWidth;
+  if (!W) return;
+  const lines = [...block.querySelectorAll('.ln')];
+  const ms = lines.map(l => measure(l, vert));
+  const k = el.dataset.fit;
+  const pad = parseFloat(getComputedStyle(document.body).getPropertyValue('--pad')) || 16;
+  let size;
+  if (k === 'who') {
+    // too big for the page: the end of the word runs off the right edge (scrolling brings it back)
+    size = 100 * (W + pad) * (reduce() ? .98 : 1.14) / Math.max(1, ms[0].ink + ms[0].hang);
+    size = Math.min(size, vh() * CAP.who / .86);
+  } else {
+    size = Math.min(...ms.map(m => 100 * W / Math.max(1, m.ink)));
+    // punctuation may hang into the margin, never past the screen edge
+    ms.forEach(m => { if (m.hang) size = Math.min(size, 100 * (W + pad * .85) / (m.ink + m.hang)); });
+    if (!vert) size = Math.min(size, vh() * (CAP[k] || .4) / .86);
+  }
+  size *= .996;
+  lines.forEach(l => { l.style.fontSize = size.toFixed(2) + 'px'; l.style.marginLeft = vert ? '0' : (-l._bl).toFixed(4) + 'em'; });
+  if (vert) el.parentElement.style.setProperty('--spw', Math.ceil(el.offsetWidth) + 'px');
+  el.classList.add('ready');
+}
+/* the opening: the thinking in one quiet size, the feeling as big as the page allows */
+function sizeHero(el, block) {
+  const W = el.clientWidth; if (!W) return;
+  const lines = [...block.querySelectorAll('.ln')];
+  const up = lines.filter(l => !l.classList.contains('last')), feel = lines.filter(l => l.classList.contains('last'));
+  const narrow = fitMode(el) === 'narrow';
+  // on a phone the full stop sits a touch above cap height, so it stays big enough to press
+  feel.forEach(l => l.style.setProperty('--dw', narrow ? '.84em' : '.76em'));
+  const mu = up.map(l => measure(l, false)), mf = feel.map(l => measure(l, false));
+  let U0 = Math.min(...mu.map(m => 100 * W / Math.max(1, m.ink)));
+  mu.forEach(m => { if (m.hang) U0 = Math.min(U0, 100 * (W + 14) / (m.ink + m.hang)); });
+  const L0 = Math.min(...mf.map(m => 100 * W / Math.max(1, m.ink)));
+  const foot = hero.querySelector('.hero-foot');
+  const top = navH() + 14, bottomPad = parseFloat(getComputedStyle(hero).paddingBottom);
+  const H = vh() - top - bottomPad - foot.offsetHeight - 6;
+  const n = up.length, LU = .9, LL = .86, nf = feel.length;
+  // the feeling wins: if it can't reach the full measure, the thinking gets quieter
+  let L = L0, U = U0;
+  for (let R = narrow ? .46 : .45; R >= .2; R -= .01) {
+    U = Math.min(U0, R * L0);
+    L = Math.min(L0, (H - n * U * LU) / (LL * nf));
+    if (narrow || L >= L0 * .985) break;
+  }
+  up.forEach(l => { l.style.fontSize = (U * .996).toFixed(2) + 'px'; l.style.marginLeft = (-l._bl).toFixed(4) + 'em'; });
+  feel.forEach(l => { l.style.fontSize = (L * .996).toFixed(2) + 'px'; l.style.marginLeft = (-l._bl).toFixed(4) + 'em'; });
+  el.classList.add('ready');
+}
+/* the disc sits exactly on the full stop */
+function placeDisc() {
+  const dot = posterEl.querySelector(`.pb[data-l="${lang()}"] .dot`);
+  if (!dot || !dot.offsetWidth) return;
+  let x = 0, y = 0, n = dot;
+  while (n && n !== pblock) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+  if (n !== pblock) return;
+  const size = dot.offsetWidth;
+  feelBtn.style.setProperty('--s', size.toFixed(1) + 'px');
+  feelBtn.classList.toggle('small', size < 128);
+  feelBtn.style.left = x.toFixed(1) + 'px';
+  feelBtn.style.top = (y + dot.offsetHeight - size).toFixed(1) + 'px';
+  feelBtn.classList.add('placed');
+}
+function fitAll() {
+  fitEls.forEach(el => { buildFit(el); sizeFit(el); });
+  placeDisc(); fitNames();
+}
+let slamT = [];
+function slam() {
+  slamT.forEach(clearTimeout); slamT = [];
+  hero.classList.remove('go', 'idle');
+  void hero.offsetWidth;
+  hero.classList.add('set');
+  if (reduce()) { hero.classList.add('idle'); return; }
+  const n = posterEl.querySelectorAll(`.pb[data-l="${lang()}"] .ln`).length;
+  const slamAt = 80 + (n - 2) * 70 + 420 + 380;   // quiet lines, a pause, then the slam
+  const dotAt = slamAt + 400;
+  hero.style.setProperty('--slam-at', slamAt + 'ms');
+  hero.style.setProperty('--dot-at', dotAt + 'ms');
+  hero.classList.add('go');
+  // once landed, drop the entrance classes: a language switch must not restart it
+  slamT.push(setTimeout(() => { hero.classList.remove('go'); hero.classList.add('idle'); armIdle(); }, dotAt + 520));
+}
+let heroDone = false;
+function heroInit() {
+  if (heroDone) return; heroDone = true;
+  fitAll(); slam(); buildRun(); splitAllSteps();
+  const again = () => { fitAll(); buildRun(); splitAllSteps(); };
+  if (document.fonts) { document.fonts.addEventListener('loadingdone', again); document.fonts.ready.then(again); }
+  setTimeout(again, 700); window.addEventListener('load', again);
+}
+if (document.fonts && document.fonts.load) {
+  Promise.all([document.fonts.load('900 100px "Archivo"'), document.fonts.load('600 20px "Schibsted Grotesk"')]).then(() => document.fonts.ready).then(heroInit, heroInit);
+} else heroInit();
+setTimeout(heroInit, 2000);
+let rz = 0, lastW = window.innerWidth;
+window.addEventListener('resize', () => {
+  cancelAnimationFrame(rz);
+  rz = requestAnimationFrame(() => {
+    // ignore pure height changes on phones (URL bar), they would make the type jump
+    if (window.innerWidth === lastW && 'ontouchstart' in window) { measureScene(); return; }
+    lastW = window.innerWidth;
+    fitAll(); buildRun(); splitAllSteps(); measureScene();
+  });
+});
+
+/* ---------- Feel first: the disc sits still, and breathes once when you linger ---------- */
+let idleT = 0, idleCount = 0;
+function breatheOnce() {
+  if (reduce() || !hero.classList.contains('idle') || feelBtn.classList.contains('inhale')) return;
+  if (!document.getElementById('breath').hidden) return;
+  const r = feelBtn.getBoundingClientRect(); if (r.bottom < 0 || r.top > vh()) return;
+  feelBtn.classList.add('inhale'); idleCount++;
+}
+feelBtn.addEventListener('animationend', e => { if (e.animationName === 'inhale') { feelBtn.classList.remove('inhale'); armIdle(); } });
+function armIdle() { clearTimeout(idleT); if (idleCount < 4) idleT = setTimeout(breatheOnce, 5000); }
+window.addEventListener('scroll', armIdle, { passive: true });
+window.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse') return;
+  const r = feelBtn.getBoundingClientRect();
+  const d = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+  if (d < r.width * 1.1) breatheOnce();
+}, { passive: true });
+
+/* ---------- nav: a solid strip in the colour of what is under it ---------- */
+const navTone = (function () {
+  const nav = document.getElementById('nav'); let lastY = window.scrollY;
+  const zones = [...document.querySelectorAll('[data-tone]')];
+  function tone() {
+    const y = nav.offsetHeight / 2;
+    for (const z of zones) {
+      const r = z.getBoundingClientRect();
+      if (r.top <= y && r.bottom > y) { nav.classList.toggle('ink', z.dataset.tone === 'ink'); return; }
+    }
+  }
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (y < window.innerHeight * .5 || y < lastY - 6) nav.classList.remove('tuck');
+    else if (y > lastY + 6) nav.classList.add('tuck');
+    lastY = y;
+    tone();
+  }, { passive: true });
+  nav.addEventListener('focusin', () => nav.classList.remove('tuck'));
+  tone();
+  return tone;
+})();
+
+/* ---------- language ---------- */
+function setLang(l) {
+  root.classList.toggle('en', l === 'en');
+  root.lang = l;
+  try { localStorage.setItem('isc-lang', l); } catch (e) {}
+  document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.set === l)));
+  document.getElementById('nav').setAttribute('aria-label', l === 'en' ? 'Main menu' : 'Hoofdmenu');
+  document.getElementById('slot').setAttribute('aria-label', l === 'en' ? 'Closing' : 'Slot');
+  document.getElementById('circle-desc').textContent = l === 'en'
+    ? 'Twelve dots walk in and form a circle. Two open dots are the facilitators. One dot moves to the center and the others lean toward it.'
+    : 'Twaalf stippen lopen binnen en vormen een cirkel. Twee open stippen zijn de begeleiders. Eén stip gaat naar het midden en de rest leunt ernaartoe.';
+  setLinks(); renderEvents(); renderNext(false);
+  // switching language swaps the words in place; the entrance is never replayed
+  if (heroDone) { fitAll(); buildRun(); splitAllSteps(); }
+  measureScene();
+}
+document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.set)));
+
+/* ---------- split a text block into its rendered lines ---------- */
+function splitLines(box) {
+  const span = box.querySelector(`[data-l="${lang()}"]`) || box;
+  if (!span.dataset.src) span.dataset.src = span.textContent.trim();
+  span.innerHTML = span.dataset.src.split(' ').map(w => `<span class="wd">${esc(w)}</span>`).join(' ');
+  const rows = [];
+  span.querySelectorAll('.wd').forEach(w => { const t = w.offsetTop; const r = rows.find(r => Math.abs(r.t - t) < 4); if (r) r.w.push(w.textContent); else rows.push({ t, w: [w.textContent] }); });
+  span.innerHTML = rows.map((r, k) => `<span class="sl" style="--k:${k}"><span class="si">${esc(r.w.join(' '))}</span></span>`).join('');
+}
+
+/* ============================================================
+   THE UNSAID: one pinned stage. A quiet sentence, then six posters.
+   Every poster fills the stage: one size for the sentence, the
+   widest line at full measure, and one key word (marked *) set as
+   big as the page allows. The voice alternates with intent: said,
+   hit, said, hit (and the page turns white), said, and the last
+   one is too big for the frame.
+   ============================================================ */
+const BREAKS = {
+  nl: {
+    wide: [
+      ['Ik ben', '*jaloers', 'op het leven van', 'mijn beste vriend.'],
+      ['Ik moet', '*winnen.', 'Ook van de mensen', 'van wie ik hou.'],
+      ['Ik heb nooit om', 'mijn vader', '*gerouwd.', 'Ik ging gewoon door.'],
+      ['Ik ben', '*doodsbang', 'dat ik niet', 'genoeg ben.'],
+      ['Ik schaam me voor', 'hoe graag ik', '*gezien', 'wil worden.'],
+      ['Soms ben ik zo', '*kwaad', 'dat ik er zelf', 'van schrik.']
+    ],
+    narrow: [
+      ['Ik ben', '*jaloers', 'op het leven', 'van mijn', 'beste vriend.'],
+      ['Ik moet', '*winnen.', 'Ook van', 'de mensen', 'van wie', 'ik hou.'],
+      ['Ik heb nooit', 'om mijn', 'vader', '*gerouwd.', 'Ik ging', 'gewoon door.'],
+      ['Ik ben', '*doods-', '*bang', 'dat ik niet', 'genoeg ben.'],
+      ['Ik schaam me', 'voor hoe', 'graag ik', '*gezien', 'wil worden.'],
+      ['Soms ben', 'ik zo', '*kwaad', 'dat ik er', 'zelf van', 'schrik.']
+    ]
+  },
+  en: {
+    wide: [
+      ['I’m', '*jealous', 'of my best', 'friend’s life.'],
+      ['I need to', '*win.', 'Even against', 'the people I love.'],
+      ['I never', '*grieved', 'my father.', 'I just kept going.'],
+      ['I’m', '*terrified', 'that I’m', 'not enough.'],
+      ['I’m ashamed of', 'how badly I want', 'to be', '*seen.'],
+      ['Sometimes', 'I’m so', '*angry', 'it scares me.']
+    ],
+    narrow: [
+      ['I’m', '*jealous', 'of my best', 'friend’s', 'life.'],
+      ['I need to', '*win.', 'Even', 'against', 'the people', 'I love.'],
+      ['I never', '*grieved', 'my father.', 'I just', 'kept going.'],
+      ['I’m', '*terri-', '*fied', 'that I’m', 'not enough.'],
+      ['I’m ashamed', 'of how badly', 'I want', 'to be', '*seen.'],
+      ['Sometimes', 'I’m so', '*angry', 'it scares', 'me.']
+    ]
+  }
+};
+/* per state: its voice, and how long it holds (in screen heights) */
+const STATES = [
+  { kind: 'say', len: .18 },
+  { m: 'quiet', len: .24 },
+  { m: 'loud', len: .24 },
+  { m: 'quiet', len: .24 },
+  { m: 'hit', flip: 1, len: .3 },
+  { m: 'quiet', len: .23 },
+  { m: 'bleed', len: .28 }
+];
+const unsaid = document.getElementById('onuitgesproken');
+const run = document.getElementById('run');
+const unStage = document.getElementById('un-stage');
+const unBox = document.getElementById('un-box');
+let stEls = [], curSt = -2;
+const said = new Set(), outT = new Map();
+function buildRun() {
+  if (reduce() || !heroDone) return;
+  unsaid.classList.add('pin');
+  const total = STATES.reduce((a, s) => a + s.len, 0);
+  run.style.setProperty('--runh', `calc(100vh + ${(total * 100).toFixed(1)}vh)`);
+  const W = unBox.clientWidth, H = unBox.clientHeight;
+  if (!W || !H) return;
+  const mode = W / H > .9 ? 'wide' : 'narrow';
+  const l = lang();
+  const title = document.querySelector(`.un-flow .un-title [data-l="${l}"]`).textContent;
+  const pad = parseFloat(getComputedStyle(document.body).getPropertyValue('--pad')) || 16;
+  let i = 0;
+  unBox.innerHTML = STATES.map(s => {
+    if (s.kind === 'say') return `<div class="st say-st"><p class="say un-title">${esc(title)}</p></div>`;
+    const rows = BREAKS[l][mode][i++];
+    let k = 0;
+    const html = rows.map(r => r.charAt(0) === '*'
+      ? `<span class="sl key">${lineHTML(r.slice(1))}</span>`
+      : `<span class="sl" style="--k:${k++}">${lineHTML(r)}</span>`).join('');
+    return `<div class="st" data-m="${s.m}"><p class="sent" style="--kd:${k * 110 + 260}ms">${html}</p></div>`;
+  }).join('');
+  stEls = [...unBox.querySelectorAll('.st')];
+  // one size for the sentence (its widest line fills the measure), one for the key word
+  stEls.forEach((st, k) => {
+    const s = STATES[k]; if (s.kind) return;
+    const sls = [...st.querySelectorAll('.sl')];
+    const ms = sls.map(sl => ({ sl, key: sl.classList.contains('key'), ...measure(sl, false) }));
+    const norm = ms.filter(m => !m.key), keys = ms.filter(m => m.key);
+    const fitW = m => Math.min(100 * W / Math.max(1, m.ink), m.hang ? 100 * (W + pad * .8) / (m.ink + m.hang) : Infinity);
+    let S = Math.min(...norm.map(fitW));
+    let K = Math.min(...keys.map(fitW));
+    if (s.m === 'bleed') {
+      // anger does not fit: the key word is wider than the frame, and the rest makes room for it
+      K = Math.min(...keys.map(m => 100 * W * 1.2 / Math.max(1, m.ink)), H * .62 / (keys.length * .84));
+      S = Math.min(S, (H * .985 - keys.length * K * .87) / (norm.length * .88));
+    } else {
+      K = Math.min(K, H * (mode === 'wide' ? .6 : .5) / (keys.length * .84));
+      K = Math.max(K, S);
+      const h = norm.length * S * .88 + keys.length * K * .84 + .03 * K;
+      const f = Math.min(1, H * .985 / h);
+      S *= f; K *= f;
+    }
+    S *= .996; K *= .996;
+    ms.forEach(m => {
+      const z = m.key ? K : S;
+      m.sl.style.fontSize = z.toFixed(2) + 'px';
+      let ml = -m.sl._bl;
+      if (m.key && s.m === 'bleed') ml = -(m.ink / 100 * K - W) / 2 / K;
+      m.sl.style.marginLeft = ml.toFixed(4) + 'em';
+    });
+  });
+  curSt = -2; updRun();
+}
+function updRun() {
+  if (!unsaid.classList.contains('pin') || !stEls.length) return;
+  const r = run.getBoundingClientRect(), h = vh();
+  const total = STATES.reduce((a, s) => a + s.len, 0);
+  const y = -r.top / h;                      // screens scrolled into the run
+  let idx;
+  if (r.top > h * .2) idx = -1;
+  else if (r.bottom < h * .2) idx = STATES.length - 1;
+  else { idx = 0; let acc = 0; for (let k = 0; k < STATES.length; k++) { acc += STATES[k].len; if (y < acc - .0001) { idx = k; break; } idx = k; } }
+  if (y >= total) idx = STATES.length - 1;
+  if (idx === curSt) return;
+  const prev = curSt; curSt = idx;
+  const down = idx > prev;
+  const flip = idx >= 0 && !!STATES[idx].flip;
+  unStage.classList.toggle('flip', flip);
+  unsaid.dataset.tone = flip ? 'paper' : 'ink'; navTone();
+  if (prev >= 0 && stEls[prev]) {
+    const o = stEls[prev];
+    o.classList.remove('on', 'again');
+    // the flash cuts hard: no exit animation into or out of the white
+    if (!reduce() && !STATES[prev].flip && !flip) {
+      o.classList.toggle('down', !down); o.classList.add('out');
+      clearTimeout(outT.get(o)); outT.set(o, setTimeout(() => o.classList.remove('out', 'down'), 300));
+    }
+  }
+  if (idx >= 0) {
+    const el = stEls[idx];
+    clearTimeout(outT.get(el)); el.classList.remove('out', 'down', 'on');
+    void el.offsetWidth;
+    el.style.setProperty('--d0', prev >= 0 && STATES[idx].m !== 'hit' ? '170ms' : '0ms');
+    el.classList.toggle('again', said.has(idx));
+    el.classList.add('on'); said.add(idx);
+  }
+}
+window.addEventListener('scroll', () => requestAnimationFrame(updRun), { passive: true });
+
+/* ---------- team: the prints are pulled up, each name slides out from under its own face ---------- */
+(function () {
+  const strip = document.getElementById('strip');
+  const go = () => strip.classList.add('in');
+  if (!('IntersectionObserver' in window) || reduce()) { go(); return; }
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { go(); io.disconnect(); } }), { rootMargin: '0px 0px -22% 0px' });
+  io.observe(strip);
+})();
+
+/* ============================================================
+   THE CIRCLE: scroll-driven. A queue walks in, sits down in a
+   circle (two open dots: us), one goes to the middle, everyone
+   leans in. At the end the one in the middle takes the whole
+   screen: that black is the next section.
+   ============================================================ */
+const scene = document.getElementById('cirkel');
+const stage = document.getElementById('stage');
+const svg = document.getElementById('circle-svg');
+const steps = [...document.querySelectorAll('#steps .step')];
+const N = 12, R = 37, DOT = 2.6;
+const svgNS = 'http://www.w3.org/2000/svg';
+const gDots = document.getElementById('dots');
+const people = [];
+(function () {
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647, (seed - 1) / 2147483646);
+  const crowd = [];
+  while (crowd.length < N) {
+    const x = -14 + (rnd() - .5) * 52, y = 8 + (rnd() - .5) * 46;
+    if (crowd.every(c => Math.hypot(c.x - x, c.y - y) > 10.5)) crowd.push({ x, y });
+  }
+  // whoever stands at a given angle takes the nearest chair, so nobody crosses the room
+  const order = crowd.map((c, i) => ({ i, a: Math.atan2(c.y - 8, c.x + 14) })).sort((p, q) => p.a - q.a);
+  const seatOf = []; order.forEach((o, k) => { seatOf[o.i] = k; });
+  for (let i = 0; i < N; i++) {
+    const seat = (seatOf[i] + 3) % N;
+    const ang = -Math.PI / 2 + seat * 2 * Math.PI / N;
+    const c = document.createElementNS(svgNS, 'circle'); c.setAttribute('r', DOT); c.setAttribute('fill', 'currentColor'); c.setAttribute('stroke', 'currentColor'); c.setAttribute('stroke-width', '0');
+    people.push({ i, seat, ang, cx: crowd[i].x, cy: crowd[i].y, c, ph: rnd() * 6.28 });
+  }
+  people.slice().sort((p, q) => q.cx - p.cx).forEach((p, k) => { p.q = k; p.qx = -45 - k * 9.5; p.qy = 20 + Math.sin(k * 1.7) * 2.5; });
+  people.forEach(p => { p.center = p.seat === 0; p.fac = p.seat === 4 || p.seat === 8; });
+  // the one who goes to the middle is drawn last, so it can cover everyone
+  people.filter(p => !p.center).concat(people.filter(p => p.center)).forEach(p => gDots.appendChild(p.c));
+})();
+let target = 0, prog = 0, sceneOn = false, curStep = -2, sceneStatic = false, pulseT0 = -1e9, inked = false;
+/* where each step starts, as a share of the scene's scroll */
+const STEP_AT = [0, .2, .38, .55, .71];
+function measureScene() {
+  if (sceneStatic) return;
+  const r = scene.getBoundingClientRect();
+  target = clamp(-r.top / Math.max(1, r.height - vh()), 0, 1);
+  // the words follow the scroll position directly, so they can never be stale
+  let s = 0; STEP_AT.forEach((a, k) => { if (target >= a) s = k; });
+  setStep(s);
+}
+/* one poster per step: the words in the corner, the ring in its own field, the headline across the foot */
+function layoutScene() {
+  const W = stage.clientWidth, H = stage.clientHeight;
+  if (!W || !H) return;
+  const stepsEl = document.getElementById('steps');
+  const pad = parseFloat(getComputedStyle(document.body).getPropertyValue('--pad')) || 16;
+  const wide = W > 900, nh = navH();
+  if (!wide) {
+    const cs = Math.min(W * .8, H * .36);
+    stage.style.setProperty('--cs', cs.toFixed(1) + 'px');
+    stage.style.setProperty('--cx', ((W - cs) / 2).toFixed(1) + 'px');
+    stage.style.setProperty('--cy', (nh + 8) + 'px');
+    stepsEl.style.top = (nh + 8 + cs + 22).toFixed(1) + 'px';
+  } else stepsEl.style.top = '';
+  // the headline: as big as the measure allows, at most two lines (three on a phone), one size for all five
+  const heads = steps.map(st => st.querySelector('.step-h'));
+  heads.forEach(h => { const sp = h.querySelector(`[data-l="${lang()}"]`); if (sp && sp.dataset.src) sp.textContent = sp.dataset.src; });
+  const maxL = wide ? 2 : 3;
+  const ok = z => heads.every(h => { h.style.fontSize = z + 'px'; return h.offsetHeight <= z * .86 * maxL + 2; });
+  let lo = 16, hi = wide ? H * .185 : Math.min(76, H * .09);
+  if (ok(hi)) lo = hi; else for (let i = 0; i < 14; i++) { const m = (lo + hi) / 2; if (ok(m)) lo = m; else hi = m; }
+  heads.forEach(h => h.style.fontSize = '');
+  stage.style.setProperty('--hs', Math.floor(lo) + 'px');
+  if (wide) {
+    // the ring gets a clear field of its own: right of the words, above the headline
+    const lw = Math.min(W * .3, 440);
+    stage.style.setProperty('--lw', lw + 'px');
+    const top = nh + 22;
+    const bottom = H - parseFloat(getComputedStyle(stepsEl).bottom) - Math.floor(lo) * .86 * maxL - 30;
+    const x0 = pad + lw + 48, x1 = W - pad;
+    // the dots never travel further than ~43% of the box from its centre, so the box may be a bit bigger than the field
+    const cs = Math.max(120, Math.min(bottom - top, x1 - x0) / .86);
+    stage.style.setProperty('--cs', cs.toFixed(1) + 'px');
+    stage.style.setProperty('--cx', (x0 + (x1 - x0 - cs) / 2).toFixed(1) + 'px');
+    stage.style.setProperty('--cy', (top + (bottom - top - cs) / 2).toFixed(1) + 'px');
+  }
+}
+function splitAllSteps() {
+  if (sceneStatic || reduce()) return;
+  layoutScene();
+  steps.forEach(s => splitLines(s.querySelector('.step-h')));
+  document.querySelectorAll('.allowed [data-l]').forEach(sp => {
+    if (!sp.dataset.src) sp.dataset.src = sp.textContent.trim();
+    sp.innerHTML = sp.dataset.src.split(' ').map((w, i) => `<span class="aw" style="--w:${i}">${esc(w)}</span>`).join(' ');
+  });
+  const was = curStep; curStep = -2; setStep(Math.max(0, was));
+}
+function setStep(idx) {
+  if (idx === curStep) return;
+  steps.forEach(s => s.classList.remove('on'));
+  if (idx >= 0) { void steps[idx].offsetWidth; steps[idx].classList.add('on'); }
+  if (idx === 4 && curStep === 3) pulseT0 = performance.now();
+  curStep = idx;
+}
+function drawCircle(p) {
+  const a = smooth(.17, .3, p), f = smooth(.27, .33, p), b = smooth(.4, .48, p), c = smooth(.58, .66, p), d = smooth(.74, .82, p);
+  const z = sceneStatic ? 0 : smooth(.86, .985, p);
+  const t = reduce() || sceneStatic ? 0 : performance.now() / 1000;
+  const pu = clamp((performance.now() - pulseT0) / 760, 0, 1);
+  const pulse = 1 + .1 * Math.sin(Math.PI * pu) * (pu < 1 ? 1 : 0);
+  // how big the middle dot must get to cover the whole stage, in svg units
+  let cover = 80;
+  if (z > 0) {
+    const sr = svg.getBoundingClientRect(), u = sr.width / 100;
+    const cx = sr.left + sr.width / 2, cy = sr.top + sr.height / 2;
+    cover = Math.max(Math.hypot(cx, cy), Math.hypot(vw() - cx, cy), Math.hypot(cx, vh() - cy), Math.hypot(vw() - cx, vh() - cy)) / Math.max(u, .01) + 2;
+  }
+  const Rr = R + d * 2;
+  people.forEach(q => {
+    const w = smooth(q.q * .009, .14 + q.q * .006, p);
+    let x = q.qx + (q.cx - q.qx) * w, y = q.qy + (q.cy - q.qy) * w;
+    if (w > 0 && w < 1) y -= Math.abs(Math.sin(w * Math.PI * 6)) * 1.3;
+    const amp = w >= 1 ? (.55 * (1 - a) + .1) : 0;
+    x += Math.sin(t * .7 + q.ph) * amp; y += Math.cos(t * .55 + q.ph * 1.3) * amp * .7;
+    const rx = Math.cos(q.ang) * Rr, ry = Math.sin(q.ang) * Rr;
+    x += (rx - x) * a; y += (ry - y) * a;
+    x = -x;                                     // the queue comes in from the right edge
+    let r = DOT;
+    if (q.center) {
+      x += (0 - x) * b; y += (0 - y) * b;
+      r = (DOT + b * 1 + c * 1.4 + d * 7) * pulse;
+      r += (cover - r) * z * z;
+    } else {
+      if (q.fac) r = DOT - f * .45;
+      // leaning in: the whole body moves toward the middle, it does not deform
+      const phi = Math.atan2(-y, -x), lean = c * (1 - d * .3);
+      x += Math.cos(phi) * lean * 3.4; y += Math.sin(phi) * lean * 3.4;
+    }
+    if (q.fac) { q.c.setAttribute('fill-opacity', (1 - f).toFixed(3)); q.c.setAttribute('stroke-width', (f * .9).toFixed(3)); }
+    q.c.setAttribute('r', Math.max(0, r).toFixed(3));
+    q.c.setAttribute('cx', x.toFixed(3)); q.c.setAttribute('cy', y.toFixed(3));
+  });
+  const ink = z > .985;
+  if (ink !== inked) { inked = ink; scene.dataset.tone = ink ? 'ink' : 'paper'; navTone(); }
+}
+function sceneLoop() {
+  prog += (target - prog) * .12;
+  if (Math.abs(target - prog) < .0004) prog = target;
+  drawCircle(prog);
+  if (sceneOn) requestAnimationFrame(sceneLoop);
+}
+function initScene() {
+  if (reduce()) {
+    sceneStatic = true; scene.classList.add('static');
+    drawCircle(.84);
+    steps.forEach(s => s.classList.add('on'));
+    return;
+  }
+  window.addEventListener('scroll', measureScene, { passive: true });
+  measureScene(); prog = target; drawCircle(prog);
+  new IntersectionObserver(es => es.forEach(e => {
+    const was = sceneOn; sceneOn = e.isIntersecting;
+    if (sceneOn && !was) requestAnimationFrame(sceneLoop);
+    // leaving: settle on the real position, so coming back never shows a stale frame
+    if (!sceneOn) { measureScene(); prog = target; drawCircle(prog); }
+  })).observe(scene);
+}
+initScene();
+
+/* ---------- who: the word is too big for the page; scrolling on, you get to see the end of it ---------- */
+(function () {
+  const sec = document.getElementById('voor-wie');
+  if (reduce()) return;
+  let on = false;
+  function upd() {
+    if (!on) return;
+    const ln = sec.querySelector(`.who-big .pb[data-l="${lang()}"] .ln`);
+    if (!ln) return;
+    const pad = parseFloat(getComputedStyle(document.body).getPropertyValue('--pad')) || 16;
+    const over = Math.max(0, sec.getBoundingClientRect().left + ln.offsetLeft + ln.offsetWidth - (vw() - pad));
+    const top = ln.parentElement.parentElement.getBoundingClientRect().top;
+    const t = smooth(0, 1, (vh() * .85 - top) / (vh() * .8));
+    ln.style.transform = `translate3d(${(-over * t).toFixed(1)}px,0,0)`;
+  }
+  window.addEventListener('scroll', () => requestAnimationFrame(upd), { passive: true });
+  window.addEventListener('resize', () => requestAnimationFrame(upd));
+  new IntersectionObserver(es => es.forEach(e => { on = e.isIntersecting; upd(); })).observe(sec);
+})();
+
+/* ---------- closing: the last line rises out of its own baseline; the frame it lands, the page cuts to black ---------- */
+(function () {
+  const sec = document.getElementById('slot');
+  let on = false, flipped = false;
+  function setCut(v) {
+    if (v === flipped) return;
+    flipped = v;
+    sec.classList.toggle('inv', v);
+    sec.dataset.tone = v ? 'ink' : 'paper'; navTone();
+  }
+  if (reduce()) { setCut(true); return; }
+  function upd() {
+    if (!on) return;
+    const h = vh();
+    const ln = sec.querySelector(`#closing-line .pb[data-l="${lang()}"] .ln.last`);
+    if (!ln) return;
+    const lb = ln.getBoundingClientRect().bottom;
+    const t = clamp((h * .98 - lb) / (h * .3), 0, 1);
+    const e = 1 - Math.pow(1 - t, 3);
+    sec.querySelectorAll('.rise').forEach(el => { el.style.transform = `translate3d(0,${((1 - e) * 1.05).toFixed(3)}em,0)`; });
+    // a hard frame both ways, with a little hysteresis so it never flickers
+    if (t >= 1) setCut(true); else if (t < .9) setCut(false);
+  }
+  window.addEventListener('scroll', () => requestAnimationFrame(upd), { passive: true });
+  new IntersectionObserver(es => es.forEach(e => { on = e.isIntersecting; upd(); }), { rootMargin: '0px 0px 20% 0px' }).observe(sec);
+})();
+
+/* ============================================================
+   FEEL FIRST. Press the full stop: it grows until it is the whole
+   screen, settles to a small dot, and becomes the breath. No
+   extra choices: sound is off, the toggle is always there.
+   ============================================================ */
+(function () {
+  const ov = document.getElementById('breath');
+  const disc = document.getElementById('bdisc');
+  const wordBox = document.getElementById('bword');
+  const live = document.getElementById('b-live');
+  const end = document.getElementById('b-end'), bot = document.getElementById('b-bot');
+  const bq = document.getElementById('b-q');
+  const countIs = [...document.querySelectorAll('#b-count i')];
+  const soundBtn = document.getElementById('b-sound');
+  const trigger = feelBtn;
+  const IO = 'cubic-bezier(.7,0,.2,1)', SINE = 'cubic-bezier(.37,0,.63,1)';
+  const minScale = () => window.innerWidth < 760 ? .26 : .2;
+  const Dpx = () => Math.min(Math.min(innerWidth, innerHeight) * .84, 820);
+  const cover = () => Math.hypot(innerWidth, innerHeight) / Dpx() + .06;
+  let timers = [], lastFocus = null, curWord = null;
+  const W = { nl: { in: 'In', hold: 'Vast', out: 'Uit' }, en: { in: 'In', hold: 'Hold', out: 'Out' } };
+  const QL = {
+    nl: { wide: ['Wat merk je nu,', 'in je lijf?'], narrow: ['Wat merk', 'je nu, in', 'je lijf?'] },
+    en: { wide: ['What do you notice', 'now, in your body?'], narrow: ['What do', 'you notice', 'now, in', 'your body?'] }
+  };
+  /* the question fills the measure: one size, the widest line edge to edge */
+  function buildQ() {
+    const l = lang(), sp = bq.querySelector(`[data-l="${l}"]`);
+    const rows = QL[l][innerWidth / innerHeight > .9 ? 'wide' : 'narrow'];
+    sp.innerHTML = rows.map((t, k) => `<span class="sl" style="--k:${k}">${esc(t)}</span>`).join('');
+    bq.style.fontSize = '100px';
+    const w = Math.max(...[...sp.children].map(c => c.offsetWidth));
+    const avail = innerHeight - 76 - 22 - end.querySelector('.later').offsetHeight - 40;
+    const z = Math.min(100 * bq.clientWidth / Math.max(1, w), avail / (rows.length * .98));
+    bq.style.fontSize = (z * .985).toFixed(1) + 'px';
+  }
+
+  /* sound: a soft singing bowl, synthesised, off by default */
+  let ac = null, master = null, soundOn = false;
+  function ensureAudio() {
+    if (ac) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    ac = new AC();
+    master = ac.createGain(); master.gain.value = 0;
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400;
+    master.connect(lp); lp.connect(ac.destination);
+  }
+  function bowl(f, vol = 1, dur = 7) {
+    if (!soundOn || !ac) return;
+    const now = ac.currentTime;
+    [[1, 1], [2.76, .32], [5.4, .1], [8.93, .035]].forEach(([m, g], k) => {
+      [0, 1].forEach(j => {
+        const o = ac.createOscillator(), gn = ac.createGain();
+        o.type = 'sine'; o.frequency.value = f * m * (j ? 1.0035 : 1);
+        const peak = .16 * g * vol * (j ? .6 : 1);
+        gn.gain.setValueAtTime(0.0001, now);
+        gn.gain.exponentialRampToValueAtTime(peak, now + .03 + k * .01);
+        gn.gain.exponentialRampToValueAtTime(0.0001, now + dur / (1 + k * .6));
+        o.connect(gn); gn.connect(master);
+        o.start(now); o.stop(now + dur + .1);
+      });
+    });
+  }
+  function soundLabel() { document.getElementById('b-sound-st').textContent = soundOn ? (lang() === 'en' ? 'on' : 'aan') : (lang() === 'en' ? 'off' : 'uit'); }
+  function setSound(on) {
+    soundOn = on;
+    soundBtn.setAttribute('aria-pressed', String(on));
+    soundLabel();
+    document.getElementById('b-sound-wave').style.display = on ? '' : 'none';
+    document.getElementById('b-sound-x').style.display = on ? 'none' : '';
+    if (on) {
+      ensureAudio(); if (!ac) return;
+      if (ac.state === 'suspended') ac.resume();
+      master.gain.cancelScheduledValues(ac.currentTime);
+      master.gain.setTargetAtTime(1, ac.currentTime, .05);
+      bowl(392, .5, 4);
+    } else if (ac) {
+      master.gain.cancelScheduledValues(ac.currentTime);
+      master.gain.setTargetAtTime(0, ac.currentTime, .08);
+    }
+  }
+  setSound(false);
+  soundBtn.addEventListener('click', () => setSound(!soundOn));
+
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  function clearAll() { timers.forEach(clearTimeout); timers = []; }
+  function xf(t, ms, ease) { disc.style.transition = ms && !reduce() ? `transform ${ms}ms ${ease}` : 'none'; disc.style.transform = t; }
+  function fromButton() {
+    const r = trigger.getBoundingClientRect();
+    const dx = r.left + r.width / 2 - innerWidth / 2, dy = r.top + r.height / 2 - innerHeight / 2;
+    return `translate(${dx.toFixed(1)}px,${dy.toFixed(1)}px) scale(${(r.width / Dpx()).toFixed(4)})`;
+  }
+  const at = s => `translate(0px,0px) scale(${s})`;
+  const breathScale = s => reduce() ? at(.62) : at(s);
+
+  function say(k) {
+    const txt = k ? W[lang()][k] : '';
+    live.textContent = txt;
+    let wait = 0;
+    if (curWord) {
+      const old = curWord;
+      if (reduce()) old.remove(); else { old.classList.remove('in'); old.classList.add('gone'); wait = 240; setTimeout(() => old.remove(), 260); }
+    }
+    curWord = null;
+    if (!k) return;
+    const s = document.createElement('span');
+    s.textContent = txt; s.dataset.k = k;
+    if (!reduce()) { s.className = 'in'; s.style.setProperty('--wd', wait + 'ms'); }
+    wordBox.appendChild(s); curWord = s;
+  }
+
+  function open() {
+    clearAll();
+    feelBtn.classList.remove('inhale'); clearTimeout(idleT);
+    lastFocus = document.activeElement;
+    ov.className = 'breath';
+    ov.hidden = false;
+    root.style.overflow = 'hidden';
+    end.hidden = true; end.classList.remove('show', 'late'); bot.hidden = true; say(null);
+    countIs.forEach(i => i.classList.remove('on'));
+    soundLabel();
+    xf(fromButton(), 0); void disc.offsetWidth;
+    trigger.style.visibility = 'hidden';
+    const { inMs, holdMs, outMs, rounds } = CONFIG.breath;
+    const cyc = inMs + holdMs + outMs;
+    // the full stop fills the screen, then settles back to a small dot on paper
+    const t0 = reduce() ? 0 : 760;
+    if (reduce()) xf(at(cover()), 0); else requestAnimationFrame(() => xf(at(cover()), 760, IO));
+    later(() => {
+      ov.classList.add('solid', 'lite'); bot.hidden = false;
+      xf(breathScale(minScale()), 1400, IO);
+      soundBtn.focus({ preventScroll: true });
+    }, t0);
+    const lead = t0 + 1700;
+    for (let r = 0; r < rounds; r++) {
+      const s0 = lead + r * cyc;
+      later(() => { say('in'); xf(breathScale(1), inMs, SINE); bowl(r === 0 ? 196 : 220, .9); }, s0);
+      later(() => { say('hold'); bowl(330, .18, 3); }, s0 + inMs);
+      later(() => { say('out'); xf(breathScale(minScale()), outMs, SINE); bowl(147, .7, 8); }, s0 + inMs + holdMs);
+      later(() => { countIs[r].classList.add('on'); }, s0 + cyc - 200);
+    }
+    const tEnd = lead + rounds * cyc;
+    // one last slow swell: the dot takes the screen and the question is asked on the black
+    later(() => { say(null); xf(at(cover()), 1800, IO); bowl(131, .8, 10); bowl(262, .35, 9); }, tEnd);
+    later(() => {
+      ov.classList.remove('lite');
+      bot.hidden = true; end.hidden = false; end.classList.remove('show', 'late');
+      buildQ();
+      void end.offsetWidth; end.classList.add('show');
+      bq.setAttribute('tabindex', '-1'); bq.focus({ preventScroll: true });
+    }, tEnd + (reduce() ? 300 : 1500));
+    later(() => { end.classList.add('late'); }, tEnd + (reduce() ? 900 : 1500 + 3600));
+  }
+  function close(flow) {
+    clearAll();
+    if (ac && soundOn) master.gain.setTargetAtTime(0, ac.currentTime, .4);
+    const done = () => {
+      ov.hidden = true; ov.className = 'breath';
+      trigger.style.visibility = '';
+      say(null);
+      if (ac && soundOn) master.gain.setTargetAtTime(1, ac.currentTime, .05);
+    };
+    root.style.overflow = '';
+    end.hidden = true; bot.hidden = true;
+    if (flow) {
+      // the screen is already black: the black simply becomes the next section
+      const target = document.getElementById('onuitgesproken');
+      window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY, behavior: 'instant' });
+      document.getElementById('unsaid-title').focus({ preventScroll: true });
+      if (reduce()) { done(); return; }
+      ov.classList.add('fading');
+      later(done, 520);
+    } else {
+      if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+      if (reduce()) { done(); return; }
+      ov.classList.remove('solid', 'lite'); say(null);
+      xf(fromButton(), 640, IO);
+      later(done, 660);
+    }
+  }
+
+  trigger.addEventListener('click', open);
+  document.getElementById('b-close').addEventListener('click', () => close(false));
+  document.getElementById('b-on').addEventListener('click', () => close(true));
+  document.addEventListener('keydown', e => {
+    if (ov.hidden) return;
+    if (e.key === 'Escape') { e.preventDefault(); close(false); }
+    if (e.key === 'Tab') {
+      const f = [...ov.querySelectorAll('button')].filter(b => b.offsetParent !== null && getComputedStyle(b).visibility !== 'hidden');
+      if (!f.length) return;
+      const i = f.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+  window.addEventListener('resize', () => {
+    if (ov.hidden) return;
+    if (!end.hidden) { buildQ(); disc.style.transition = 'none'; disc.style.transform = at(cover()); }
+  });
+  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => {
+    soundLabel();
+    if (curWord) curWord.textContent = W[lang()][curWord.dataset.k];
+    if (!end.hidden) buildQ();
+  }));
+})();
+
+/* ---------- boot ---------- */
+setLang(lang());
+</script>
+</body>
+</html>

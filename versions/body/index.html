@@ -1,0 +1,1637 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Inner Shadow Circle</title>
+<meta name="description" content="Inner Shadow Circle: schaduwwerk in een groep. Elke maandag een gratis cirkel.">
+<meta name="theme-color" content="#F6EBE0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Ccircle cx=%278%27 cy=%278%27 r=%277%27 fill=%27%23C4674A%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap">
+<script>
+  (function () {
+    var l = 'nl';
+    try { var s = localStorage.getItem('isc-body-lang'); if (s === 'en' || s === 'nl') l = s; } catch (e) {}
+    if (l === 'en') document.documentElement.classList.add('en');
+    try { if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('js-motion'); } catch (e) {}
+    document.documentElement.lang = l;
+  })();
+</script>
+<style>
+/* BODY direction. Skin, clay and honey.
+   Two registers: Young Serif is the intimate voice (the opening line, the unsaid sentences, the closing),
+   Zen Maru Gothic at heavy weight is the friendly, rounded structure (sections, times, names, buttons).
+   Fields meet in straight, confident cuts. The only soft forms are bodies: the clay body in the opening
+   sits on the floor of the next section, becomes the full stop of the first unsaid sentence, and steps
+   aside at the end to show the light it was sitting in front of. */
+:root {
+  --skin: #F6EBE0;
+  --sand: #EAD7C3;
+  --peach: #F2D3BF;
+  --clay: #C4674A;
+  --clay-btn: #A24E36;
+  --clay-ink: #8E412C;
+  --cocoa: #3A241F;
+  --cocoa-2: #66493F;
+  --honey: #EBB37A;
+  --cream: #FFF6EC;
+
+  --f-voice: "Young Serif", "Georgia", serif;
+  --f-round: "Zen Maru Gothic", "Nunito", "Arial Rounded MT Bold", system-ui, sans-serif;
+
+  --gutter: clamp(16px, 5vw, 80px);
+  --max: 1320px;
+  --nav-h: 72px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-io: cubic-bezier(.65, 0, .25, 1);
+  --ease-back: cubic-bezier(.34, 1.36, .64, 1);
+  color-scheme: light;
+}
+@media (max-width: 1060px) { :root { --nav-h: 64px; } }
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--skin); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--skin); color: var(--cocoa);
+  font-family: var(--f-round); font-weight: 500; font-size: 1.0625rem; line-height: 1.7;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+main, footer { overflow-x: clip; }
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 300; opacity: .3;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .36  0 0 0 0 .22  0 0 0 0 .16  0 0 0 .09 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+::selection { background: var(--clay); color: var(--cream); }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2.5px solid var(--clay-btn); outline-offset: 4px; border-radius: 6px; }
+[hidden] { display: none !important; }
+:root:not(.en) [data-l="en"], :root.en [data-l="nl"] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.wrap { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
+h1, h2, h3, h4 { margin: 0; font-family: var(--f-voice); font-weight: 400; letter-spacing: -.012em; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+/* the structural register: rounded, heavy, friendly */
+.hx { font-family: var(--f-round); font-weight: 900; letter-spacing: -.03em; line-height: 1.04; }
+
+/* ---------- buttons ---------- */
+.pill {
+  --bg: var(--clay-btn); --fg: var(--cream);
+  position: relative; display: inline-flex; align-items: center; gap: .8em;
+  font-family: var(--f-round); font-weight: 700; font-size: 1.04rem; line-height: 1.2; letter-spacing: .005em;
+  padding: .9em .9em .9em 1.5em; border-radius: 999px; border: 0; cursor: pointer;
+  background: var(--bg); color: var(--fg); text-decoration: none;
+  box-shadow: 0 1px 0 rgba(58, 36, 31, .06), 0 14px 26px -16px rgba(140, 62, 40, .7);
+  transition: transform .6s var(--ease-out), box-shadow .6s var(--ease-out), background-color .4s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.pill .arr {
+  width: 2.05em; height: 2.05em; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--fg); color: var(--bg); transition: transform .6s var(--ease-out);
+}
+.pill .arr svg { width: 1em; height: 1em; }
+.pill:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(58, 36, 31, .06), 0 20px 30px -16px rgba(140, 62, 40, .78); }
+.pill:hover .arr { transform: translateX(3px); }
+.pill:active { transform: translateY(0) scale(.97); transition-duration: .15s; }
+.pill:focus-visible { outline-offset: 5px; border-radius: 999px; }
+.pill.dark { --bg: var(--cocoa); --fg: var(--cream); box-shadow: 0 14px 26px -16px rgba(58, 36, 31, .8); }
+.pill.cream { --bg: var(--cream); --fg: var(--clay-btn); box-shadow: 0 14px 30px -14px rgba(58, 20, 10, .45); }
+.pill.sm { font-size: .9rem; padding: .62em 1.05em; gap: .5em; white-space: nowrap; }
+.pill .wa { width: 1.15em; height: 1.15em; flex: none; }
+
+.ulink { text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1.5px no-repeat; padding-bottom: 2px; transition: background-size .55s var(--ease-out); }
+.ulink:hover { background-size: 0% 1.5px; background-position: 100% 100%; }
+
+/* ---------- nav ---------- */
+.nav { position: fixed; inset: 0 0 auto 0; z-index: 100; padding-top: env(safe-area-inset-top, 0px); transition: background-color .5s ease, box-shadow .5s ease; }
+.nav.solid, .nav.open { background: rgba(246, 235, 224, .9); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); box-shadow: 0 1px 0 rgba(58, 36, 31, .07); }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: var(--nav-h); }
+.brand { display: inline-flex; align-items: center; gap: .55rem; text-decoration: none; font-family: var(--f-voice); font-size: 1.14rem; letter-spacing: -.01em; white-space: nowrap; }
+/* the only thing that moves all the time: the site's breath, 4s in, 2.2s hold, 6s out */
+.brand-dot { width: .62em; height: .62em; border-radius: 50%; background: var(--clay); flex: none; animation: dotbreath 12.2s infinite; }
+@keyframes dotbreath {
+  0% { transform: scale(.74); animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  32.8% { transform: scale(1.12); }
+  50.8% { transform: scale(1.12); animation-timing-function: cubic-bezier(.45, 0, .55, 1); }
+  100% { transform: scale(.74); }
+}
+.nav-links { display: flex; gap: 1.7rem; list-style: none; margin: 0; padding: 0; }
+.nav-links a { text-decoration: none; font-size: .95rem; color: var(--cocoa-2); position: relative; padding-block: .3rem; transition: color .3s; }
+.nav-links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1.5px; background: var(--clay); transform: scaleX(0); transform-origin: 100% 50%; transition: transform .5s var(--ease-out); }
+.nav-links a:hover { color: var(--cocoa); }
+.nav-links a:hover::after { transform: scaleX(1); transform-origin: 0 50%; }
+.nav-right { display: flex; align-items: center; gap: .7rem; }
+.lang { position: relative; display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(58, 36, 31, .07); }
+.lang::before { content: ""; position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; background: var(--cocoa); transition: transform .5s var(--ease-out); }
+:root.en .lang::before { transform: translateX(100%); }
+.lang button { position: relative; z-index: 1; border: 0; background: none; cursor: pointer; font-weight: 700; font-size: .78rem; letter-spacing: .03em; padding: .34em .74em; border-radius: 999px; color: var(--cocoa-2); transition: color .4s; min-width: 2.5em; }
+.lang button:hover { color: var(--cocoa); }
+:root:not(.en) .lang [data-set="nl"], :root.en .lang [data-set="en"] { color: var(--cream); }
+.menu-btn { display: none; width: 44px; height: 44px; border: 0; border-radius: 50%; background: rgba(58, 36, 31, .07); cursor: pointer; place-items: center; transition: background-color .3s; }
+.menu-btn:hover { background: rgba(58, 36, 31, .12); }
+.menu-btn i { display: block; width: 16px; height: 1.8px; background: var(--cocoa); border-radius: 2px; transition: transform .45s var(--ease-out); }
+.menu-btn i + i { margin-top: 5px; }
+.menu-btn span { display: grid; }
+.nav.open .menu-btn i:first-child { transform: translateY(3.4px) rotate(45deg); }
+.nav.open .menu-btn i:last-child { transform: translateY(-3.4px) rotate(-45deg); }
+.menu { position: absolute; left: 0; right: 0; top: 100%; background: var(--skin); border-radius: 0 0 32px 32px; box-shadow: 0 24px 40px -30px rgba(58, 36, 31, .45); padding: .6rem var(--gutter) 1.6rem; }
+.menu ul { list-style: none; margin: 0; padding: 0; }
+.menu li a { display: block; text-decoration: none; font-weight: 900; letter-spacing: -.02em; font-size: 1.6rem; line-height: 1.2; padding: .38rem 0; }
+.menu .lang { margin-top: 1rem; }
+@media (max-width: 1060px) {
+  .nav-links, .nav-right .lang { display: none; }
+  .menu-btn { display: grid; }
+}
+@media (max-width: 420px) { .nav .wrap { gap: .4rem; } .brand { font-size: .98rem; gap: .42rem; } .nav-right { gap: .4rem; } .nav .pill.sm { font-size: .8rem; padding: .62em .9em; } .menu-btn { width: 40px; height: 40px; } }
+@media (max-width: 350px) { .brand { font-size: .86rem; } .nav .pill.sm { display: none; } }
+
+/* ---------- hero: the line on the left, a resting body on the right that sits on the floor of the next section ---------- */
+.hero { position: relative; min-height: min(100svh, 980px); padding-top: calc(var(--nav-h) + clamp(28px, 6vh, 80px)); padding-bottom: clamp(64px, 9vh, 120px); display: flex; align-items: flex-start; }
+.hero-text { position: relative; z-index: 2; width: 100%; pointer-events: none; }
+.hero-copy { pointer-events: auto; }
+.hero h1 { font-size: clamp(2rem, 4.1vw, 4.25rem); line-height: 1.04; letter-spacing: -.022em; text-wrap: initial; }
+.hero h1 .l { display: block; }
+/* the turn: one word, on its own line, at body size */
+.hero h1 .turn { display: block; font-style: normal; font-size: 2.8em; line-height: .92; letter-spacing: -.03em; color: var(--clay); margin-top: .04em; }
+.hero-copy { margin-top: clamp(1.8rem, 3.4vw, 3rem); display: flex; flex-direction: column; gap: 1.6rem; max-width: 31rem; }
+.lede { font-size: clamp(1.08rem, 1.4vw, 1.25rem); line-height: 1.55; color: var(--cocoa); }
+.lede b { color: var(--cocoa); font-weight: 700; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.4rem; }
+.when { font-size: 1rem; color: var(--cocoa-2); line-height: 1.3; font-weight: 700; font-variant-numeric: tabular-nums; }
+.when b { color: var(--cocoa); font-weight: 900; letter-spacing: -.02em; font-size: clamp(1.2rem, 1.6vw, 1.4rem); display: block; margin-bottom: .15rem; }
+
+/* the body: large, partly off the right edge, its centre at about 55% of the screen, reaching up into the line.
+   The front body's centre sits at about 43% / 55% of this box. */
+.feel { --fw: min(64vw, 72svh * 1.5, 1000px); position: absolute; z-index: 1; width: var(--fw); right: calc(var(--fw) * -.065); top: calc(min(100svh, 980px) * .55 - var(--fw) * .55); }
+.feel-body { position: relative; aspect-ratio: 1; }
+.feel-body > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+/* the button is the front body itself; js lays it over the shape */
+.feel-btn {
+  position: absolute; left: 20%; top: 30%; width: 50%; height: 50%; border-radius: 50%; border: 0; background: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .55rem; text-align: center; color: var(--cream);
+  -webkit-tap-highlight-color: transparent; padding: 0 2% 6%;
+}
+.feel-btn:focus-visible { outline: 2px solid var(--cream); outline-offset: -14px; border-radius: 50%; }
+.feel-big { font-family: var(--f-voice); font-size: clamp(2.1rem, 4vw, 3.9rem); line-height: 1; letter-spacing: -.015em; position: relative; padding-bottom: .3em; }
+/* the underline draws on hover, from the centre, like a breath widening */
+.feel-big::after { content: ""; position: absolute; left: 0; right: 0; margin-inline: auto; width: 100%; bottom: 0; height: 2px; border-radius: 2px; background: currentColor; transform: scaleX(.18); transition: transform .9s var(--ease-out); }
+.feel-btn:hover .feel-big::after, .feel-btn:focus-visible .feel-big::after { transform: scaleX(1); }
+.feel-small { font-size: clamp(.9rem, 1.05vw, 1.02rem); line-height: 1.4; font-weight: 500; max-width: 15em; color: #FFE9DA; }
+/* the sound switch: a small, quiet setting low on the body, clearly a switch and not a second button */
+.snd-hero { position: absolute; transform: translateX(-50%); display: inline-flex; align-items: center; gap: .5rem; border: 0; cursor: pointer; font-size: .84rem; font-weight: 700; color: #FFE9DA; background: none; padding: .5rem .4rem; white-space: nowrap; transition: color .3s; -webkit-tap-highlight-color: transparent; z-index: 2; }
+.snd-hero:hover { color: var(--cream); }
+.snd-hero:focus-visible { outline-color: var(--cream); }
+.snd-hero:active .sw { transform: scale(.94); }
+.snd-hero:focus-visible { border-radius: 999px; }
+.snd-hero .sw { width: 30px; height: 18px; border-radius: 999px; background: rgba(58, 20, 10, .32); position: relative; transition: background-color .35s, transform .2s; flex: none; }
+.snd-hero .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--cream); transition: transform .45s var(--ease-out); }
+.snd-hero[aria-pressed="true"] .sw { background: var(--cream); }
+.snd-hero[aria-pressed="true"] .sw::after { background: var(--clay-btn); }
+.snd-hero[aria-pressed="true"] .sw::after { transform: translateX(12px); }
+
+.hero h1, .hero-copy, .feel { opacity: 0; }
+.hero h1 { position: relative; z-index: 3; }
+.ready .hero h1 { animation: rise 1.3s .1s var(--ease-out) both; }
+.ready .hero-copy { animation: rise 1.3s .45s var(--ease-out) both; }
+.ready .feel { animation: settle 1.8s .15s var(--ease-out) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+/* the body arrives the way someone sits down: from slightly above, settling onto the floor */
+@keyframes settle { from { opacity: 0; transform: translateY(-3%); } to { opacity: 1; transform: none; } }
+
+@media (min-width: 901px) {
+  .hero h1 { max-width: 60vw; }
+  .hero-copy { max-width: min(36vw, 30rem); }
+}
+@media (max-width: 900px) {
+  .hero { min-height: 0; padding-top: calc(var(--nav-h) + 22px); padding-bottom: 0; flex-direction: column; overflow: visible; }
+  .hero h1 { font-size: clamp(1.9rem, 8.2vw, 3.4rem); text-wrap: balance; }
+  .hero h1 .l { display: inline; }
+  .hero h1 .turn { font-size: 2.05em; }
+  .hero-copy { margin-top: 1.1rem; gap: 1.2rem; }
+  .lede { font-size: 1rem; line-height: 1.6; }
+  .feel { --fw: min(112vw, 640px); position: relative; right: auto; bottom: auto; top: auto; align-self: flex-end; margin-right: calc(var(--fw) * -.2); margin-top: calc(var(--fw) * -.14); margin-bottom: calc(var(--fw) * -.1067); }
+  .feel-big { font-size: clamp(1.8rem, 8vw, 2.8rem); }
+  .feel-small { font-size: .85rem; max-width: 12em; }
+}
+
+/* ---------- section shells ---------- */
+.sec { position: relative; padding-block: clamp(88px, 10vw, 160px); }
+.h2 { font-size: clamp(2.1rem, 4.9vw, 4.4rem); line-height: 1.04; }
+
+/* ---------- the unsaid: six sentences, each with its own posture ---------- */
+.unsaid { background: var(--peach); color: var(--cocoa); padding-top: clamp(72px, 9vw, 140px); }
+.said { list-style: none; margin: 0; padding: 0; }
+.said li { display: flex; padding-block: clamp(2.2rem, 6.5vh, 5.5rem); }
+.said .s { display: block; font-family: var(--f-voice); letter-spacing: -.018em; text-wrap: balance;
+  opacity: 0; transform: translateY(8px); transition: opacity 1.1s var(--ease-out), transform 1.1s var(--ease-out); }
+.said li.seen .s { opacity: 1; transform: none; }
+.stop { display: inline-block; width: .16em; height: .16em; margin-left: .05em; border-radius: 50%; background: var(--clay); vertical-align: baseline; }
+.stop.wait { opacity: 0; }
+/* most sentences simply surface. Two have a posture of their own: grief takes its time, anger lands. */
+/* envy: said plainly, at speaking height */
+.said .envy { padding-top: 0; }
+.said .envy .s { font-size: clamp(2rem, 4.3vw, 4.3rem); line-height: 1.08; max-width: 16ch; }
+/* competition: pushed to the far edge */
+.said .comp { justify-content: flex-end; text-align: right; }
+.said .comp .s { font-size: clamp(2.2rem, 5vw, 5rem); line-height: 1.04; max-width: 14ch; }
+/* grief: gets the room, and takes its time */
+.said .grief { justify-content: center; text-align: center; padding-block: clamp(4rem, 15vh, 11rem); }
+.said .grief .s { max-width: 13ch; font-size: clamp(2.5rem, 7.6vw, 7.6rem); line-height: 1.02; color: var(--clay-ink); transform: translateY(22px); transition: opacity 2.8s var(--ease-out), transform 2.8s var(--ease-out); }
+/* fear: small, pulled into the corner */
+.said .fear .s { font-size: clamp(1.35rem, 1.9vw, 1.85rem); line-height: 1.3; max-width: 19ch; color: var(--cocoa); transform: none; transition: opacity 1.6s ease-out; }
+/* shame: quiet and pale */
+.said .shame { padding-left: 18%; }
+.said .shame .s { font-size: clamp(1.8rem, 3.3vw, 3.2rem); line-height: 1.12; max-width: 17ch; color: #7A5546; transform: none; transition: opacity 2.4s cubic-bezier(.4, 0, .2, 1); }
+.said .shame .stop { background: #B98571; }
+.said .envy .s, .said .comp .s { transform: none; transition: opacity 1.4s ease-out; }
+/* anger: the rounded type at full weight, very big, and it lands hard */
+.said .anger { padding-bottom: 0; }
+.said .anger .s { font-family: var(--f-round); font-weight: 900; letter-spacing: -.045em; font-size: clamp(2.7rem, 8.6vw, 9.4rem); line-height: .96; max-width: 12ch; color: var(--clay-btn);
+  transform: scale(.92); transform-origin: 0 100%; transition: opacity .16s ease-out, transform .5s cubic-bezier(.18, 1.9, .4, 1); }
+.said .anger .stop { background: var(--clay-btn); }
+.said li.anger.seen .stop { animation: thud .42s .2s linear both; }
+@keyframes thud { 0% { transform: none; } 12% { transform: translate(3px, 1px); } 26% { transform: translate(-3px, 0); } 42% { transform: translate(2px, -1px); } 60% { transform: translate(-1px, 0); } 100% { transform: none; } }
+.said li.seen .s { transform: none; }
+/* after six sentences: one wide, warm answer */
+.unsaid-end { margin-top: clamp(5rem, 11vw, 10rem); padding-bottom: clamp(80px, 8vw, 120px); display: grid; gap: clamp(1.4rem, 2.6vw, 2.4rem); }
+.unsaid-end h2 { font-family: var(--f-round); font-weight: 900; letter-spacing: -.04em; font-size: clamp(2.5rem, 6.4vw, 6.6rem); line-height: .98; color: var(--cocoa); }
+.unsaid-end p { font-family: var(--f-voice); font-size: clamp(1.3rem, 2.1vw, 1.75rem); line-height: 1.38; max-width: 30ch; justify-self: end; margin-right: clamp(0px, 6vw, 120px); color: var(--cocoa); }
+@media (max-width: 700px) {
+  .said li { padding-block: 2rem; }
+  /* on a phone each sentence still keeps its own size: small, bigger, biggest, smallest */
+  .said .envy .s { font-size: 1.85rem; }
+  .said .comp .s { font-size: 2.25rem; max-width: 12ch; }
+  .said .grief { padding-block: 4.5rem; }
+  .said .grief .s { font-size: 2.75rem; letter-spacing: -.025em; }
+  .said .fear .s { font-size: 1.2rem; max-width: 22ch; }
+  .said .shame { padding-left: 14%; }
+  .said .shame .s { font-size: 1.6rem; }
+  .said .anger .s { font-size: 3.35rem; }
+  .unsaid-end p { justify-self: start; margin-right: 0; }
+}
+
+/* ---------- body + circle ---------- */
+.circle { position: relative; background: var(--skin); }
+.scene { position: relative; height: calc(100svh + 5.2 * 46svh); }
+.stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage > .wrap { position: relative; height: 100%; }
+.panel { position: absolute; left: var(--gutter); top: 0; bottom: 0; width: min(28rem, 34vw); }
+/* one step at a time: the old one leaves completely, the new one follows the picture a beat later */
+.step { position: absolute; left: 0; top: 0; width: 100%; display: flex; flex-direction: column; gap: .9rem; opacity: 0; pointer-events: none;
+  transition: transform 1s var(--ease-out), opacity .7s var(--ease-out); will-change: transform, opacity; }
+.step.on { pointer-events: auto; }
+.step h3 { font-family: var(--f-round); font-weight: 900; letter-spacing: -.025em; font-size: clamp(1.8rem, 2.7vw, 2.6rem); line-height: 1.06; }
+.step p { color: var(--cocoa); font-size: clamp(1.06rem, 1.25vw, 1.2rem); line-height: 1.55; }
+/* the section's own heading is the first state of the scene: big, over the empty ring */
+.step.first { width: min(40vw, 36rem); gap: 1.4rem; }
+.step.first h2 { font-size: clamp(2.6rem, 5.6vw, 6rem); line-height: .98; letter-spacing: -.04em; }
+.step.first p { font-family: var(--f-voice); font-size: clamp(1.1rem, 1.4vw, 1.35rem); line-height: 1.45; max-width: 30ch; }
+@media (max-width: 900px) {
+  .scene { height: calc(100svh + 5.2 * 55svh); }
+  .panel { left: var(--gutter); right: var(--gutter); width: auto; top: 52%; }
+  .step.first { width: 100%; gap: .8rem; }
+  .step.first h2 { font-size: clamp(2.1rem, 9.4vw, 3rem); }
+  .step.first p { font-size: 1.06rem; max-width: none; }
+  .step h3 { font-size: clamp(1.55rem, 6.6vw, 2.1rem); }
+  .step p { font-size: 1rem; line-height: 1.5; }
+}
+@media (max-width: 900px) and (max-height: 700px) { .panel { top: 50%; } .step.first p { font-size: .98rem; } }
+
+/* ---------- who: a clay field, edge to edge, carried by one word ---------- */
+.who { background: var(--clay-btn); color: var(--cream); padding-block: clamp(80px, 9vw, 150px) clamp(88px, 10vw, 160px); overflow: hidden; }
+.who-h { font-family: var(--f-round); font-weight: 900; letter-spacing: -.03em; line-height: 1.04; text-wrap: initial; }
+.who-h .a { display: block; font-size: clamp(1.7rem, 3.4vw, 3.3rem); }
+.who-h .b { text-align: right; }
+/* the one requirement, as big as the page allows */
+.who-h .big { display: block; overflow: hidden; font-size: clamp(6.4rem, 23vw, 22rem); line-height: .86; padding-bottom: .2em; margin-block: 0 -.14em; }
+.who-h .big > span { display: block; letter-spacing: -.055em; color: var(--honey); margin-left: -.05em;
+  transform: translateY(70%); transition: transform 1.6s var(--ease-out); }
+.who.in .who-h .big > span { transform: none; }
+.who-rest { margin-top: clamp(2.8rem, 5vw, 4.5rem); display: grid; grid-template-columns: minmax(0, 34rem) minmax(0, 24rem); justify-content: space-between; align-items: end; gap: 2.4rem 3rem; }
+.who p.body { font-size: clamp(1.2rem, 1.75vw, 1.55rem); line-height: 1.42; font-weight: 500; letter-spacing: -.005em; }
+/* the not-therapy line: said calmly, in the intimate voice, in honey */
+.who p.note { font-family: var(--f-voice); color: #FFE2C4; font-size: clamp(1.08rem, 1.35vw, 1.25rem); line-height: 1.45; }
+.who p.note b { font-weight: 400; color: var(--honey); }
+@media (max-width: 800px) {
+  .who-h .b { text-align: left; }
+  .who-rest { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- team: four people sitting a little apart, like in a circle, not in a lineup ---------- */
+.team { background: var(--skin); }
+.team h2 { font-size: clamp(2.5rem, 6.2vw, 6.2rem); max-width: 10ch; }
+.people { margin-top: clamp(2.6rem, 5vw, 4.4rem); display: flex; align-items: flex-start; }
+/* equal widths with a small overlap: 4 x 26.5% - 3 x 2% = 100% */
+.person { margin: 0; position: relative; flex: none; width: 26.5%; }
+.person + .person { margin-left: -2%; }
+.person:nth-child(2) { margin-top: 32px; } .person:nth-child(3) { margin-top: 12px; } .person:nth-child(4) { margin-top: 44px; }
+.person:nth-child(1) { z-index: 4; } .person:nth-child(2) { z-index: 3; } .person:nth-child(3) { z-index: 2; } .person:nth-child(4) { z-index: 1; }
+/* one shape for all four, so the crops (tuned for this) line the heads up */
+.portrait { aspect-ratio: 4 / 5; overflow: hidden; background: var(--sand); position: relative; isolation: isolate; border-radius: 48% 48% 40% 40% / 36% 36% 26% 26%; box-shadow: 0 0 0 clamp(4px, .6vw, 8px) var(--skin); }
+.portrait .in { position: absolute; inset: 0; clip-path: circle(30% at 50% 38%); transform: scale(1.03); transition: clip-path 1.4s var(--ease-out), transform 1.8s var(--ease-out); transition-delay: var(--d, 0ms); }
+.portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.person.in .portrait .in { clip-path: circle(80% at 50% 38%); transform: none; }
+.person figcaption { margin-top: 1rem; padding-left: 12%; }
+.person h3 { font-family: var(--f-voice); font-weight: 400; letter-spacing: -.015em; font-size: clamp(1.6rem, 2.4vw, 2.3rem); line-height: 1; }
+.person .role { display: block; color: var(--clay-ink); font-size: .95rem; font-weight: 700; margin-top: .3rem; }
+/* their own words, in the intimate voice, set in from the left */
+.team-words { margin: clamp(3.4rem, 6vw, 5.6rem) 0 0 clamp(0px, 24%, 340px); max-width: 34ch; font-family: var(--f-voice); font-size: clamp(1.3rem, 2.1vw, 1.95rem); line-height: 1.36; color: var(--cocoa); }
+/* the one fact that matters for safety, as one big statement */
+.twelve { margin-top: clamp(3.4rem, 6vw, 5.6rem); font-family: var(--f-round); font-weight: 900; letter-spacing: -.035em; font-size: clamp(2rem, 4.6vw, 4.5rem); line-height: 1.02; max-width: 17ch; color: var(--cocoa); }
+.twelve em { font-style: normal; color: var(--clay-btn); }
+.twelve-why { margin-top: 1.1rem; max-width: 30ch; font-family: var(--f-voice); font-size: clamp(1.1rem, 1.4vw, 1.3rem); line-height: 1.42; color: var(--clay-ink); }
+@media (max-width: 900px) {
+  /* on a phone: one big portrait at a time, swiped like walking round the circle */
+  .people { margin-inline: calc(var(--gutter) * -1); padding: 0 var(--gutter) 1.2rem; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .people::-webkit-scrollbar { display: none; }
+  .person { width: 78vw; max-width: 380px; scroll-snap-align: start; }
+  .person + .person { margin-left: 0; }
+  .person:nth-child(2) { margin-top: 18px; } .person:nth-child(3) { margin-top: 6px; } .person:nth-child(4) { margin-top: 24px; }
+  .portrait { box-shadow: none; }
+  .person figcaption { padding-left: 8%; }
+  .team-words { margin-left: 0; }
+}
+
+/* ---------- join ---------- */
+.join { background: var(--sand); }
+/* the day and the time are the headline: an evening you put in your calendar. Set from the left, big, with the practical bits tucked under the time */
+.join-h { font-size: clamp(1.35rem, 2.2vw, 1.9rem); letter-spacing: -.02em; max-width: 24ch; }
+.join-h .free { color: var(--clay-ink); }
+.time { margin-top: clamp(.4rem, 1.2vw, 1rem); margin-left: -.05em; font-family: var(--f-round); font-weight: 900; font-size: clamp(3.5rem, 17.5vw, 13rem); line-height: .86; letter-spacing: -.05em; color: var(--cocoa); font-variant-numeric: tabular-nums; }
+.time > span { display: block; white-space: nowrap; }
+.time .day { color: var(--clay-btn); }
+/* the one moving thing here: the evening is laid out, the dash drawing from the first time to the second */
+.time .dash { display: inline-block; color: var(--clay); padding-inline: .02em; transform-origin: 0 55%; }
+.js-motion .time .dash { transform: scaleX(0); transition: transform .9s .25s var(--ease-out); }
+.js-motion .join.in .time .dash { transform: none; }
+.join-act { margin-top: clamp(2rem, 3.6vw, 3rem); display: flex; flex-wrap: wrap; align-items: center; gap: 1.4rem clamp(1.6rem, 3vw, 3rem); }
+.join-notes { max-width: 30ch; display: flex; flex-direction: column; gap: .35rem; color: var(--cocoa); font-family: var(--f-voice); font-size: clamp(1.06rem, 1.25vw, 1.2rem); line-height: 1.42; }
+:root:not(.signup-wa) .su-wa, :root.signup-wa .su-form { display: none; }
+.su-wa { display: inline-flex; align-items: center; gap: .6em; }
+:root:not(.signup-wa) .note-wa, :root.signup-wa .note-form { display: none; }
+
+.events { margin: clamp(4.5rem, 9vw, 8rem) 0 0; max-width: 52rem; }
+.events h3 { font-size: clamp(1.6rem, 2.6vw, 2.3rem); max-width: 18ch; margin-bottom: 1.6rem; }
+.ev-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .7rem; max-width: 52rem; }
+.ev { display: grid; grid-template-columns: 4.4rem minmax(0, 1fr) auto; gap: 1.2rem; align-items: center; background: var(--skin); border-radius: 32px; padding: 1rem 1.4rem 1rem 1rem; transition: transform .6s var(--ease-out), background-color .4s; }
+.ev:hover { transform: translateX(4px); background: var(--cream); }
+.ev-date { aspect-ratio: 1; border-radius: 50%; background: var(--honey); display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+.ev-date .d { font-weight: 900; font-size: 1.5rem; }
+.ev-date .m { font-size: .78rem; font-weight: 700; margin-top: .15rem; }
+.ev h4 { font-family: var(--f-round); font-weight: 700; font-size: 1.2rem; line-height: 1.25; }
+.ev p { font-size: .95rem; color: var(--cocoa-2); line-height: 1.45; margin-top: .2rem; }
+.ev-link { justify-self: start; font-weight: 700; font-size: .95rem; color: var(--clay-ink); white-space: nowrap; }
+@media (max-width: 560px) { .ev { grid-template-columns: 3.5rem minmax(0, 1fr); } .ev-date .d { font-size: 1.2rem; } .ev-link { grid-column: 2; } }
+
+/* ---------- teams: a honey band, and a meeting table seen from above, too big for the band ---------- */
+.teams { position: relative; background: var(--honey); padding-block: clamp(72px, 8vw, 128px); overflow: hidden; }
+.teams-grid { position: relative; z-index: 1; }
+.teams-copy { max-width: min(46rem, 52%); }
+.teams h2 { font-size: clamp(1.9rem, 3.6vw, 3.5rem); max-width: 16ch; }
+.teams .why { margin-top: clamp(1.1rem, 1.8vw, 1.5rem); max-width: 31ch; color: var(--cocoa); font-family: var(--f-voice); font-size: clamp(1.1rem, 1.45vw, 1.35rem); line-height: 1.42; }
+.table-wrap { position: absolute; top: 0; bottom: 0; right: 0; width: 46%; pointer-events: none; }
+.table { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+.wa-row { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; margin-top: clamp(1.8rem, 3vw, 2.6rem); }
+.wa-row p { max-width: 20rem; color: var(--cocoa); font-size: 1rem; font-weight: 700; line-height: 1.45; }
+#ghost { transition: stroke-dashoffset 2.8s cubic-bezier(.45, 0, .3, 1); }
+@media (max-width: 900px) {
+  .teams { padding-top: 0; }
+  .teams-copy { max-width: none; }
+  .table-wrap { position: relative; width: auto; height: min(64vw, 320px); margin-bottom: clamp(1.6rem, 5vw, 2.4rem); }
+}
+
+/* ---------- closing: the body steps aside and shows the light it was sitting in front of ---------- */
+.closing { --bg: var(--skin); position: relative; background: var(--bg); padding-block: clamp(72px, 8vw, 130px) clamp(96px, 11vw, 170px); }
+.closing .wrap { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.ecl { width: min(62vw, 420px); height: auto; overflow: visible; display: block; margin-bottom: calc(min(62vw, 420px) * -.08); }
+.closing h2 { margin-top: clamp(1.2rem, 2.6vw, 2.2rem); font-size: clamp(2.2rem, 5.4vw, 5.2rem); line-height: 1.06; letter-spacing: -.018em; max-width: 15ch; }
+.closing h2 .lt { display: block; color: var(--clay-ink); }
+.closing-cta { display: flex; justify-content: center; margin-top: clamp(2.2rem, 4vw, 3.2rem); }
+
+/* ---------- footer ---------- */
+footer { position: relative; background: var(--clay-btn); color: var(--cream); padding-block: clamp(64px, 7vw, 110px) 1.6rem; }
+.foot-top { display: flex; flex-direction: column; align-items: flex-start; }
+.foot-top small { font-size: 1rem; color: #FBE3D4; margin-bottom: .6rem; }
+.wa-big { display: inline-flex; align-items: center; gap: .22em; text-decoration: none; color: var(--cream); max-width: 100%; font-family: var(--f-round); font-weight: 900; font-size: clamp(2.3rem, 10.6vw, 7.2rem); line-height: 1; letter-spacing: -.045em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.wa-big .num { background: linear-gradient(var(--cream), var(--cream)) 0 100% / 0% 3px no-repeat; transition: background-size .7s var(--ease-out); padding-bottom: .08em; }
+.wa-big .wa-g { width: .5em; height: .5em; flex: none; display: grid; place-items: center; color: var(--honey); transform: translateX(-.15em); opacity: .85; transition: transform .6s var(--ease-out), opacity .4s, color .4s; }
+.wa-big .wa-g svg { width: 100%; height: 100%; }
+.wa-big:hover .num, .wa-big:focus-visible .num { background-size: 100% 3px; }
+.wa-big:hover .wa-g, .wa-big:focus-visible .wa-g { transform: translateX(.08em); opacity: 1; color: var(--cream); }
+.wa-big:active .wa-g { transform: translateX(.08em) scale(.92); }
+/* the crisis line gets its own quiet row, full width */
+.crisis { margin-top: clamp(3rem, 6vw, 5rem); padding-block: 1.5rem; border-block: 1px solid rgba(255, 246, 236, .28); font-family: var(--f-voice); font-size: clamp(1.1rem, 1.5vw, 1.35rem); line-height: 1.45; color: var(--cream); }
+.crisis b { font-family: var(--f-round); font-weight: 900; letter-spacing: -.01em; }
+.crisis a { color: var(--cream); font-family: var(--f-round); font-weight: 900; text-decoration: underline; text-underline-offset: .18em; text-decoration-thickness: 1.5px; white-space: nowrap; }
+.legal { margin-top: 1.4rem; display: flex; flex-wrap: wrap; align-items: center; gap: .8rem 2rem; font-size: .9rem; color: #FBE3D4; }
+.legal .lang { margin-left: auto; }
+/* the same switch as in the menu */
+footer .lang { background: var(--skin); }
+footer :focus-visible { outline-color: var(--cream); }
+
+/* ---------- breath overlay ---------- */
+.breath { --S: min(90vw, 70svh, 780px); --cy: 42%; position: fixed; inset: 0; z-index: 400; color: var(--cocoa); overflow: hidden; }
+.breath-bg { position: absolute; inset: 0; background: var(--peach); }
+.breath-ui { transition: opacity .7s var(--ease-out); }
+.breath:not(.ui) .breath-ui { opacity: 0; pointer-events: none; }
+.breath-top { position: absolute; top: calc(16px + env(safe-area-inset-top, 0px)); left: 16px; right: 16px; display: flex; justify-content: space-between; gap: 1rem; z-index: 3; }
+.chip { display: inline-flex; align-items: center; gap: .5rem; border: 0; cursor: pointer; background: rgba(58, 36, 31, .08); color: var(--cocoa); font-weight: 700; font-size: .92rem; padding: .62em 1.05em; border-radius: 999px; transition: background-color .35s, color .35s, transform .5s var(--ease-out); }
+.chip:hover { background: rgba(58, 36, 31, .14); }
+.chip:active { transform: scale(.96); }
+.chip:focus-visible { border-radius: 999px; }
+.chip svg { width: 1.1em; height: 1.1em; flex: none; }
+.chip[aria-pressed="true"] { background: var(--cocoa); color: var(--cream); }
+.chip .wave { opacity: 0; transition: opacity .3s; }
+.chip[aria-pressed="true"] .wave { opacity: 1; }
+.chip[aria-pressed="true"] .mute { opacity: 0; }
+.breath-svg { position: absolute; left: calc(50% - var(--S) / 2); top: calc(var(--cy) - var(--S) / 2); width: var(--S); height: var(--S); overflow: visible; transform-origin: 50% 50%; z-index: 1; will-change: transform; }
+.breath-cue { position: absolute; left: 0; right: 0; margin: 0 auto; top: calc(var(--cy) + var(--S) * .44 + min(6vh, 56px)); z-index: 2; display: grid; justify-items: center; font-family: var(--f-voice); font-size: clamp(1.7rem, 3.4vw, 2.6rem); letter-spacing: -.01em; text-align: center; padding-inline: 1rem; line-height: 1.1; }
+.breath.rm .breath-cue { top: calc(var(--cy) + var(--S) * .5); }
+@media (max-width: 700px) { .breath { --cy: 40%; } }
+.breath-cue span { grid-area: 1 / 1; max-width: 16ch; opacity: 0; transform: translateY(6px); transition: opacity .32s ease, transform .6s var(--ease-out); }
+.breath-cue span.on { opacity: 1; transform: none; }
+.breath-dots { position: absolute; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); display: flex; gap: .7rem; z-index: 2; transition: opacity .8s; }
+.breath-dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(58, 36, 31, .18); transition: background-color .8s, transform .8s var(--ease-back); }
+.breath-dots i.on { background: var(--clay-btn); transform: scale(1.2); }
+/* the end: the question is written on the body itself, the way 'Voel eerst' was; what to do next waits underneath */
+.breath-end { position: absolute; inset: 0; z-index: 2; pointer-events: none; transition: opacity .35s ease; }
+.breath-end h2 { position: absolute; left: 50%; top: var(--cy); transform: translate(-50%, -50%); width: calc(var(--S) * .64); text-align: center; color: var(--cream);
+  font-size: calc(var(--S) * .068); line-height: 1.08; letter-spacing: -.015em; opacity: 0; transition: opacity 1.6s var(--ease-out); }
+.breath-end .more { position: absolute; left: 0; right: 0; top: 80%; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.1rem; padding-inline: 20px; opacity: 0; transform: translateY(10px); transition: opacity 1.2s var(--ease-out), transform 1.2s var(--ease-out); }
+.breath-end .more p { color: var(--cocoa); font-family: var(--f-voice); font-size: clamp(1.02rem, 1.3vw, 1.2rem); line-height: 1.42; max-width: 26ch; }
+.breath-end.show h2 { opacity: 1; }
+.breath-end.show2 .more { opacity: 1; transform: none; pointer-events: auto; }
+.breath-end.gone { opacity: 0; }
+.pill .down { transform: rotate(90deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-dot { animation: none; }
+  .hero h1, .hero-copy, .feel { opacity: 1 !important; animation: none !important; transform: none !important; }
+  .said li .s { transition: none !important; transform: none !important; opacity: 1 !important; }
+  .who-h .big > span { transform: none !important; transition: none !important; }
+  .portrait .in { clip-path: none !important; transform: none !important; transition: none !important; }
+  .step, .breath-end h2, .breath-end .more, .breath-ui { transition-duration: .01s !important; transition-delay: 0s !important; }
+  .breath-cue span { transition: opacity .6s ease !important; transform: none !important; }
+  .pill, .pill .arr, .feel-big::after, .snd-hero .sw::after { transition-duration: .01s !important; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <!-- a very light warm duotone (18%), so four different rooms read as one light without looking filtered -->
+  <filter id="warm" color-interpolation-filters="sRGB">
+    <feColorMatrix in="SourceGraphic" type="matrix" values=".33 .5 .17 0 0  .33 .5 .17 0 0  .33 .5 .17 0 0  0 0 0 1 0" result="g"/>
+    <feComponentTransfer in="g" result="duo">
+      <feFuncR type="table" tableValues="0.227 0.74 1"/>
+      <feFuncG type="table" tableValues="0.141 0.50 0.965"/>
+      <feFuncB type="table" tableValues="0.122 0.40 0.925"/>
+    </feComponentTransfer>
+    <feComposite in="duo" in2="SourceGraphic" operator="arithmetic" k1="0" k2=".18" k3=".82" k4="0"/>
+  </filter>
+</svg>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="brand-dot" aria-hidden="true"></span>Inner Shadow Circle</a>
+    <nav aria-label="Menu">
+      <ul class="nav-links">
+        <li><a href="#niet-gezegd"><span data-l="nl">Wat je niet zegt</span><span data-l="en">The unsaid</span></a></li>
+        <li><a href="#cirkel"><span data-l="nl">De cirkel</span><span data-l="en">The circle</span></a></li>
+        <li><a href="#voor-wie"><span data-l="nl">Voor wie</span><span data-l="en">Who it’s for</span></a></li>
+        <li><a href="#wij"><span data-l="nl">Over ons</span><span data-l="en">About us</span></a></li>
+        <li><a href="#meedoen"><span data-l="nl">Maandag</span><span data-l="en">Monday</span></a></li>
+        <li class="nav-events" hidden><a href="#events"><span data-l="nl">Verdieping</span><span data-l="en">Events</span></a></li>
+        <li><a href="#teams"><span data-l="nl">Teams</span><span data-l="en">Teams</span></a></li>
+      </ul>
+    </nav>
+    <div class="nav-right">
+      <div class="lang" role="group" aria-label="Taal / Language">
+        <button type="button" data-set="nl" lang="nl">NL</button>
+        <button type="button" data-set="en" lang="en">EN</button>
+      </div>
+      <a class="pill sm js-signup" data-near href="#meedoen"><span data-l="nl">Aanmelden</span><span data-l="en">Sign up</span></a>
+      <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu"><span aria-hidden="true"><i></i><i></i></span><span class="sr"><span data-l="nl">Menu</span><span data-l="en">Menu</span></span></button>
+    </div>
+  </div>
+  <div class="menu" id="menu" hidden>
+    <ul>
+      <li><a href="#niet-gezegd"><span data-l="nl">Wat je niet zegt</span><span data-l="en">The unsaid</span></a></li>
+      <li><a href="#cirkel"><span data-l="nl">De cirkel</span><span data-l="en">The circle</span></a></li>
+      <li><a href="#voor-wie"><span data-l="nl">Voor wie</span><span data-l="en">Who it’s for</span></a></li>
+      <li><a href="#wij"><span data-l="nl">Over ons</span><span data-l="en">About us</span></a></li>
+      <li><a href="#meedoen"><span data-l="nl">Maandag</span><span data-l="en">Monday</span></a></li>
+      <li class="nav-events" hidden><a href="#events"><span data-l="nl">Verdieping</span><span data-l="en">Events</span></a></li>
+      <li><a href="#teams"><span data-l="nl">Teams</span><span data-l="en">Teams</span></a></li>
+    </ul>
+    <div class="lang" role="group" aria-label="Taal / Language">
+      <button type="button" data-set="nl" lang="nl">NL</button>
+      <button type="button" data-set="en" lang="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- 1. OPENING -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero-text">
+      <h1 id="hero-title">
+        <span data-l="nl"><span class="l">De meeste mensen denken,</span> <span class="l">zodat ze niet hoeven te</span> <em class="turn">voelen.</em></span>
+        <span data-l="en"><span class="l">Most of us think,</span> <span class="l">so we don’t have to</span> <em class="turn">feel.</em></span>
+      </h1>
+      <div class="hero-copy">
+        <p class="lede">
+          <span data-l="nl"><b>Inner Shadow Circle</b> is schaduwwerk in een groep. Samen gaan we naar wat je normaal nooit hardop zegt, en dat gaat vooral via je lijf.</span>
+          <span data-l="en"><b>Inner Shadow Circle</b> is shadow work in a group. Together we go to the things you’d normally never say out loud, and that happens mostly through the body.</span>
+        </p>
+        <div class="hero-actions">
+          <a class="pill js-signup" data-near href="#meedoen">
+            <span data-l="nl">Meld je aan voor maandag</span><span data-l="en">Sign up for Monday</span>
+            <span class="arr" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+          <p class="when"><span data-l="nl"><b>Elke maandag, gratis</b>18:30–22:00</span><span data-l="en"><b>Every Monday, free</b>18:30–22:00</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="feel" id="feel">
+      <div class="feel-body">
+        <svg id="hero-svg" viewBox="-300 -300 600 600" aria-hidden="true">
+          <defs>
+            <pattern id="grain-h" class="grain-pat" width="140" height="140" patternUnits="userSpaceOnUse"><image width="140" height="140"/></pattern>
+            <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C86A4C"/><stop offset="1" stop-color="#A24E37"/></linearGradient>
+            <clipPath id="hclip"><path id="hb-clip"/></clipPath>
+          </defs>
+          <path id="hb-lean" fill="#E7B590"/>
+          <path id="hb-rim" fill="#DD8E6D"/>
+          <path id="hb-body" fill="url(#hg)" clip-path="url(#hclip)"/>
+          <path id="hb-grain" fill="url(#grain-h)" opacity=".75"/>
+        </svg>
+        <button class="feel-btn" id="feel-open" type="button">
+          <span class="feel-big"><span data-l="nl">Voel eerst</span><span data-l="en">Feel first</span></span>
+          <span class="feel-small"><span data-l="nl">Drie ademhalingen, een&nbsp;minuutje.</span><span data-l="en">Three breaths, about a&nbsp;minute.</span></span>
+        </button>
+        <button class="snd-hero" id="snd-hero" type="button" aria-pressed="false"><span class="sw" aria-hidden="true"></span><span data-l="nl">Met geluid</span><span data-l="en">With sound</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. WHAT YOU DON'T SAY -->
+  <section class="unsaid" id="niet-gezegd" aria-labelledby="unsaid-title">
+    <div class="wrap">
+      <ol class="said" id="said">
+        <li class="envy"><span class="s" data-l="nl">Ik ben jaloers op mijn beste vriend, en ik lach erbij<span class="stop" aria-hidden="true"></span></span><span class="s" data-l="en">I’m jealous of my best friend, and I smile through it<span class="stop" aria-hidden="true"></span></span></li>
+        <li class="comp"><span class="s" data-l="nl">Ik wil winnen. Ook van de mensen van wie ik hou<span class="stop" aria-hidden="true"></span></span><span class="s" data-l="en">I want to win. Even against the people I love<span class="stop" aria-hidden="true"></span></span></li>
+        <li class="grief"><span class="s" data-l="nl">Ik heb nooit om mijn vader gehuild. Ik&nbsp;ben gewoon doorgegaan<span class="stop" aria-hidden="true"></span></span><span class="s" data-l="en">I never cried for my father. I&nbsp;just kept going<span class="stop" aria-hidden="true"></span></span></li>
+        <li class="fear"><span class="s" data-l="nl">Ik ben bang dat ze erachter komen dat ik het eigenlijk niet kan<span class="stop" aria-hidden="true"></span></span><span class="s" data-l="en">I’m scared they’ll find out I can’t actually do it<span class="stop" aria-hidden="true"></span></span></li>
+        <li class="shame"><span class="s" data-l="nl">Ik schaam me voor hoe graag ik gezien wil worden<span class="stop" aria-hidden="true"></span></span><span class="s" data-l="en">I’m ashamed of how badly I want to be seen<span class="stop" aria-hidden="true"></span></span></li>
+        <li class="anger"><span class="s" data-l="nl">Soms ben ik zo kwaad dat ik er zelf van schrik<span class="stop" aria-hidden="true"></span></span><span class="s" data-l="en">Sometimes I’m so angry it frightens me<span class="stop" aria-hidden="true"></span></span></li>
+      </ol>
+      <div class="unsaid-end">
+        <h2 id="unsaid-title"><span data-l="nl">Iedereen heeft er wel eentje.</span><span data-l="en">Everyone has one.</span></h2>
+        <p><span data-l="nl">Meestal draag je zo’n zin in je eentje mee. Ongemerkt bepaalt hij wie je belt en wanneer je dichtklapt. In de cirkel zeg je hem hardop, en niemand kijkt weg.</span><span data-l="en">Most of us carry a sentence like that alone. Without us noticing, it decides who we call and when we shut down. In the circle you say it out loud, and nobody looks away.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. THE BODY AND THE CIRCLE -->
+  <section class="circle" id="cirkel" aria-labelledby="circle-title">
+    <div class="scene" id="scene">
+      <div class="stage">
+        <canvas id="circle-canvas" aria-hidden="true"></canvas>
+        <div class="wrap">
+          <div class="panel" id="steps">
+            <div class="step first">
+              <h2 class="hx" id="circle-title"><span data-l="nl">Hier wordt niet veel gepraat.</span><span data-l="en">We don’t do much talking here.</span></h2>
+              <p><span data-l="nl">Praten kunnen we allemaal. We leggen onze pijn uit tot er een kloppend verhaal ligt, en zo houden we hem mooi op afstand. Wij gaan naar wat er onder dat verhaal in je lijf gebeurt: een keel die dichtgaat, een knoop in je buik.</span><span data-l="en">We can all talk. We explain our pain until it makes a tidy story, and that’s a handy way to keep it at arm’s length. We go to what’s happening in your body underneath that story: a throat closing up, a knot in your stomach.</span></p>
+            </div>
+            <div class="step">
+              <h3><span data-l="nl">Je komt binnen zoals je bent.</span><span data-l="en">You come in as you are.</span></h3>
+              <p><span data-l="nl">Twee van ons zitten er al. Je mag gerust moe of zenuwachtig binnenkomen, je hoeft hier niets te kunnen.</span><span data-l="en">Two of us are already there. It’s fine to walk in tired or nervous; you don’t need to be good at anything here.</span></p>
+            </div>
+            <div class="step">
+              <h3><span data-l="nl">We gaan in een cirkel zitten.</span><span data-l="en">We sit down in a circle.</span></h3>
+              <p><span data-l="nl">Eerst de afspraken: wat hier gebeurt, blijft hier, en niemand hoeft gerepareerd te worden. Iedereen kan iedereen zien.</span><span data-l="en">Agreements first: what happens here stays here, and nobody needs fixing. Everyone can see everyone.</span></p>
+            </div>
+            <div class="step">
+              <h3><span data-l="nl">Iemand stapt in het midden.</span><span data-l="en">One person steps into the center.</span></h3>
+              <p><span data-l="nl">De rest blijft zitten, kijkt en ademt mee. Met zoveel aandacht op je gericht, kun je moeilijk in je hoofd wegduiken.</span><span data-l="en">Everyone else stays put, watching, breathing along. With that much attention on you, it’s hard to hide in your head.</span></p>
+            </div>
+            <div class="step">
+              <h3><span data-l="nl">Alles mag er zijn.</span><span data-l="en">Everything is allowed.</span></h3>
+              <p><span data-l="nl">Stilte, diep rusten, tranen, trillen, schreeuwen, vechten. Het kan allemaal gebeuren, maar er ligt geen programma klaar. We voelen samen aan wat er nodig is.</span><span data-l="en">Silence, deep rest, tears, shaking, screaming, fighting. Any of it can happen, but there’s no script waiting. Together we feel out what’s needed.</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. WHO IT IS FOR -->
+  <section class="who" id="voor-wie" aria-labelledby="who-title">
+    <div class="wrap">
+      <h2 class="who-h" id="who-title">
+        <span data-l="nl"><span class="a">Voor iedereen die</span> <span class="big"><span>bereid</span></span> <span class="a b">is om echt te kijken.</span></span>
+        <span data-l="en"><span class="a">For anyone who is</span> <span class="big"><span>willing</span></span> <span class="a b">to really look.</span></span>
+      </h2>
+      <div class="who-rest">
+        <p class="body"><span data-l="nl">Jong of oud, Nederlands- of Engelstalig, dat maakt niet uit. Je gaat dingen voelen die je misschien al jaren ontwijkt, met anderen erbij. Wil je dat, dan ben je welkom.</span><span data-l="en">Young or old, Dutch or English speaking, it doesn’t matter. You’ll feel things you may have been dodging for years, with other people in the room. If you want that, you’re welcome.</span></p>
+        <p class="note"><span data-l="nl"><b>Dit is geen therapie</b> en geen medische of psychologische behandeling. Zit je in een acute crisis, dan is dit nu niet de goede plek. Onderaan deze pagina staat wie je dan kunt bellen.</span><span data-l="en"><b>This isn’t therapy</b>, and it isn’t medical or psychological treatment. If you’re in acute crisis, this isn’t the right place right now. At the bottom of this page you’ll find who to call.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. THE FOUR OF US -->
+  <section class="sec team" id="wij" aria-labelledby="team-title">
+    <div class="wrap">
+      <h2 class="hx" id="team-title"><span data-l="nl">Wij zijn met z’n vieren.</span><span data-l="en">There are four of us.</span></h2>
+      <div class="people" id="people"></div>
+      <p class="team-words"><span data-l="nl">We zijn geen coaches aan de zijlijn. Al twee jaar zitten we zelf elke week in de cirkel, en sinds kort doen er anderen mee. Samen hebben we zo’n tien jaar ervaring met meditatie, retraites, ademwerk, Focusing, parts work en TRE.</span><span data-l="en">We are not coaches on the sidelines. For two years we have sat in the circle ourselves every week, and recently we opened it to others. Between us we bring around ten years of meditation, retreats, breathwork, Focusing, parts work and TRE.</span></p>
+      <p class="twelve"><span data-l="nl">Hooguit <em>twaalf</em> mensen per cirkel, en altijd minstens <em>twee</em> van ons.</span><span data-l="en"><em>Twelve</em> people per circle at most, and always at least <em>two</em> of us.</span></p>
+      <p class="twelve-why"><span data-l="nl">Het werk kan flink binnenkomen, dus we houden de groep klein en zijn er nooit alleen.</span><span data-l="en">The work can hit hard, so we keep the group small and never hold it alone.</span></p>
+    </div>
+  </section>
+
+  <!-- 6. JOIN: Monday, events, teams -->
+  <section class="sec join" id="meedoen" aria-labelledby="join-title">
+    <div class="wrap">
+      <div class="join-main">
+        <h2 class="hx join-h" id="join-title"><span data-l="nl">Een <span class="free">gratis</span> cirkel, elke week op</span><span data-l="en">A <span class="free">free</span> circle, every week on</span></h2>
+        <p class="time"><span class="day"><span data-l="nl">maandag</span><span data-l="en">Monday</span></span><span class="hrs">18:30<span class="dash">–</span>22:00</span></p>
+        <div class="join-act">
+        <a class="pill js-signup" href="#meedoen"><span class="su-form"><span data-l="nl">Meld je aan voor maandag</span><span data-l="en">Sign up for Monday</span></span><span class="su-wa"><svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.4-.3Z"/></svg><span data-l="nl">Meld je aan via WhatsApp</span><span data-l="en">Sign up via WhatsApp</span></span><span class="arr" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <div class="join-notes">
+          <p class="note-form"><span data-l="nl">Je meldt je aan met een kort intakeformulier, zodat we weten wie er komt. Daar staat ook waar we zitten.</span><span data-l="en">You sign up with a short intake form so we know who’s coming. That’s also where you’ll find the location.</span></p>
+          <p class="note-wa"><span data-l="nl">Stuur ons een appje. We sturen je de details, ook waar we zitten.</span><span data-l="en">Send us a message. We’ll send you the details, including where we meet.</span></p>
+          <p><span data-l="nl">Onze thuisbasis is Groningen, maar we trekken ook rond.</span><span data-l="en">Home base is Groningen, but we move around.</span></p>
+        </div>
+        </div>
+      </div>
+
+      <div class="events" id="events" hidden>
+        <h3 class="hx"><span data-l="nl">Soms gaan we verder dan één avond.</span><span data-l="en">Sometimes we go beyond one evening.</span></h3>
+        <ul class="ev-list" id="ev-list"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="teams" id="teams" aria-labelledby="teams-title">
+    <div class="table-wrap"><svg class="table" id="table" viewBox="0 0 600 520" preserveAspectRatio="xMinYMid slice" aria-hidden="true"></svg></div>
+    <div class="wrap teams-grid">
+      <div class="teams-copy">
+        <h2 class="hx" id="teams-title"><span data-l="nl">Wat jullie in de vergadering niet zeggen, zit wel mee aan tafel.</span><span data-l="en">What nobody says in the meeting still has a seat at the table.</span></h2>
+        <p class="why"><span data-l="nl">De irritatie die niemand benoemt, de concurrentie die iedereen voelt: in de cirkel komt het op tafel, met z’n allen erbij. Daarna weet je waar je staat met elkaar, en hoef je er niet meer omheen te werken.</span><span data-l="en">The irritation nobody names, the competition everyone feels: in the circle it comes out, with all of you in the room. After that you know where you stand with each other, and you can stop working around it.</span></p>
+        <div class="wa-row">
+          <a class="pill dark js-wa" data-wa="team" href="https://wa.me/31630269017" target="_blank" rel="noopener">
+            <svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.4-.3Z"/></svg>
+            <span data-l="nl">App ons over je team</span><span data-l="en">Message us about your team</span>
+            <span class="arr" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+          <p><span data-l="nl">Ook voor werk op maat. Stuur een appje, dan bellen we je even.</span><span data-l="en">Custom work too. Send a message and we’ll give you a call.</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CLOSING -->
+  <section class="closing" id="closing" aria-labelledby="closing-title">
+    <div class="wrap">
+      <svg class="ecl" id="ecl" viewBox="-300 -300 600 600" aria-hidden="true">
+        <defs>
+          <pattern id="grain-c" class="grain-pat" width="140" height="140" patternUnits="userSpaceOnUse"><image width="140" height="140"/></pattern>
+          <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C86A4C"/><stop offset="1" stop-color="#A24E37"/></linearGradient>
+          <clipPath id="cclip"><path id="cl-clip"/></clipPath>
+        </defs>
+        <circle id="cl-light" cx="0" cy="40" r="160" fill="#FFF4E6"/>
+        <circle id="cl-light-g" cx="0" cy="40" r="160" fill="url(#grain-c)" opacity=".55"/>
+        <path id="cl-lean" fill="#E7B590"/>
+        <path id="cl-rim" fill="#DD8E6D"/>
+        <path id="cl-body" fill="url(#cg)" clip-path="url(#cclip)"/>
+        <path id="cl-grain" fill="url(#grain-c)" opacity=".75"/>
+      </svg>
+      <h2 id="closing-title"><span data-l="nl">Het licht was er altijd al. <span class="lt">Je moest alleen de&nbsp;schaduw&nbsp;in.</span></span><span data-l="en">The light was always there. <span class="lt">You just had to step into the&nbsp;shadow.</span></span></h2>
+      <div class="closing-cta"><a class="pill js-signup" href="#meedoen"><span class="su-form"><span data-l="nl">Meld je aan voor maandag</span><span data-l="en">Sign up for Monday</span></span><span class="su-wa"><svg class="wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.4-.3Z"/></svg><span data-l="nl">Meld je aan via WhatsApp</span><span data-l="en">Sign up via WhatsApp</span></span><span class="arr" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <small><span data-l="nl">Vragen, teams of werk op maat? App ons.</span><span data-l="en">Questions, teams or custom work? Message us.</span></small>
+      <a class="wa-big js-wa" href="https://wa.me/31630269017" target="_blank" rel="noopener"><span class="sr">WhatsApp </span><span class="num">+31 6 30269017</span><span class="wa-g" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.2-.2-.4-.3Z"/></svg></span></a>
+    </div>
+    <p class="crisis"><span data-l="nl"><b>Zit je nu in nood?</b> Wacht dan niet op een cirkel. Bel 113 Zelfmoordpreventie op <a href="tel:113">113</a> of gratis op <a href="tel:08000113">0800-0113</a>, dag en nacht.</span><span data-l="en"><b>Struggling right now?</b> Don’t wait for a circle. In the Netherlands, call 113 Suicide Prevention on <a href="tel:113">113</a> or free on <a href="tel:08000113">0800-0113</a>, day and night.</span></p>
+    <div class="legal">
+      <span>© 2026 Inner Shadow Circle</span>
+      <span><span data-l="nl">Vanuit Groningen, en onderweg.</span><span data-l="en">From Groningen, and on the road.</span></span>
+      <div class="lang" role="group" aria-label="Taal / Language">
+        <button type="button" data-set="nl" lang="nl">NL</button>
+        <button type="button" data-set="en" lang="en">EN</button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- FEEL FIRST: the breath -->
+<div class="breath" id="breath" hidden role="dialog" aria-modal="true" aria-labelledby="breath-label">
+  <div class="breath-bg" id="breath-bg"></div>
+  <span class="sr" id="breath-label"><span data-l="nl">Voel eerst: drie ademhalingen</span><span data-l="en">Feel first: three breaths</span></span>
+  <div class="breath-top breath-ui">
+    <button class="chip" type="button" id="breath-close">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span data-l="nl">Stoppen</span><span data-l="en">Stop</span>
+    </button>
+    <button class="chip" type="button" id="breath-sound" aria-pressed="false">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7.5h3l4-3.5v12l-4-3.5H3z" fill="currentColor"/><path class="wave" d="M13 7.2a4 4 0 0 1 0 5.6M15.2 5a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path class="mute" d="M13.2 7.6l4 4.8M17.2 7.6l-4 4.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span class="snd-off"><span data-l="nl">Geluid aanzetten</span><span data-l="en">Turn sound on</span></span><span class="snd-on" hidden><span data-l="nl">Geluid uitzetten</span><span data-l="en">Turn sound off</span></span>
+    </button>
+  </div>
+  <svg class="breath-svg" id="breath-svg" viewBox="-300 -300 600 600" aria-hidden="true">
+    <defs>
+      <pattern id="grain-b" class="grain-pat" width="140" height="140" patternUnits="userSpaceOnUse"><image width="140" height="140"/></pattern>
+      <linearGradient id="bgr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C86A4C"/><stop offset="1" stop-color="#A24E37"/></linearGradient>
+      <clipPath id="bclip"><path id="br-clip"/></clipPath>
+    </defs>
+    <path id="br-contour" fill="none" stroke="#8E412C" opacity="0"/>
+    <path id="br-lean" fill="#E7B590"/>
+    <path id="br-rim" fill="#DD8E6D"/>
+    <path id="br-body" fill="url(#bgr)" clip-path="url(#bclip)"/>
+    <path id="br-grain" fill="url(#grain-b)" opacity=".75"/>
+    <circle id="br-prog" r="240" fill="none" stroke="#A24E36" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" transform="rotate(-90)" opacity="0"/>
+  </svg>
+  <p class="breath-cue breath-ui" id="breath-cue" aria-live="polite"><span></span><span></span></p>
+  <div class="breath-dots breath-ui" id="breath-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="breath-end" id="breath-end" hidden>
+    <h2 id="breath-q"><span data-l="nl">Wat merk je nu, <br>in je lijf?</span><span data-l="en">What do you notice <br>now, in your body?</span></h2>
+    <div class="more">
+      <p><span data-l="nl">Je hoeft er niets mee. Neem het mee terwijl je verder leest.</span><span data-l="en">You don’t have to do anything with it. Take it with you as you read on.</span></p>
+      <button class="pill" type="button" id="breath-next"><span data-l="nl">Lees verder</span><span data-l="en">Read on</span><span class="arr" aria-hidden="true"><svg class="down" viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG: edit these values. Nothing else needs touching.
+   ============================================================ */
+const CONFIG = {
+  // Sign-up / intake form for the free Monday circle.
+  // >>> REPLACE this placeholder with the real link (https://...).
+  // Until then: buttons near the top scroll to the Monday section, and the sign-up buttons
+  // in the Monday section and the closing say 'Meld je aan via WhatsApp' and open WhatsApp
+  // with a sign-up message, so no click is dead and nobody is surprised.
+  SIGNUP_URL: 'SIGNUP_URL',
+
+  whatsapp: '31630269017',
+  whatsappText: {
+    nl: 'Hoi! Ik kom via de website van Inner Shadow Circle en ik ben benieuwd naar ',
+    en: 'Hi! I found Inner Shadow Circle through the website and I’m curious about '
+  },
+  whatsappTeamText: {
+    nl: 'Hoi! Ik kom via de website van Inner Shadow Circle. Ik ben benieuwd naar een cirkel voor ons team.',
+    en: 'Hi! I found Inner Shadow Circle through the website. I’m curious about a circle for our team.'
+  },
+  whatsappSignupText: {
+    nl: 'Hoi! Ik wil graag meedoen met de cirkel op maandag.',
+    en: 'Hi! I’d like to join the circle on Monday.'
+  },
+
+  // Paid events. Empty list = the events block and its menu links are fully hidden.
+  // Example: { date: '2026-11-14', title: { nl: 'Dagcirkel', en: 'Day circle' }, line: { nl: 'Een hele dag in de cirkel.', en: 'A full day in the circle.' }, url: 'https://...' }
+  events: [],
+
+  // Photo crops are tuned so the four heads line up. Keep pos / scale / origin as they are.
+  // `tone` only evens out exposure between the photos.
+  team: [
+    { photo: '../../images/team/marko.jpg',           pos: '52% 28%', tone: 'brightness(1.08) contrast(1.02)', nl: { name: 'Marko',  role: 'begeleider' }, en: { name: 'Marko',  role: 'facilitator' } },
+    { photo: '../../images/team/max-field-clean.jpg', pos: '55% 30%', tone: 'brightness(1.05)', nl: { name: 'Max',    role: 'begeleider' }, en: { name: 'Max',    role: 'facilitator' } },
+    { photo: '../../images/team/natan.jpg',           pos: '50% 22%', tone: 'brightness(.94) contrast(1.04) saturate(.9)', nl: { name: 'Natan',  role: 'begeleider' }, en: { name: 'Natan',  role: 'facilitator' } },
+    { photo: '../../images/team/thomas-white-shirt-face-original.png', pos: '50% 50%', scale: 1.25, origin: '50% 2%', tone: 'brightness(.86) contrast(1.1)', nl: { name: 'Thomas', role: 'begeleider' }, en: { name: 'Thomas', role: 'facilitator' } }
+  ]
+};
+
+/* ============================================================ */
+const root = document.documentElement;
+const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = id => document.getElementById(id);
+const lang = () => root.classList.contains('en') ? 'en' : 'nl';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const both = (nl, en) => `<span data-l="nl">${esc(nl)}</span><span data-l="en">${esc(en)}</span>`;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const lerp = (a, b, t) => a + (b - a) * t;
+const mixRGB = (a, b, t) => `rgb(${Math.round(lerp(a[0], b[0], t))},${Math.round(lerp(a[1], b[1], t))},${Math.round(lerp(a[2], b[2], t))})`;
+const easeIO = x => .5 - .5 * Math.cos(Math.PI * clamp(x));
+const easeOut = x => 1 - Math.pow(1 - clamp(x), 3);
+const easeInOutCubic = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const backOut = x => { const c = 1.5; x = clamp(x) - 1; return 1 + (c + 1) * x * x * x + c * x * x; };
+const PI2 = Math.PI * 2;
+
+/* one breath rhythm for the whole site: 4s in, 2.2s hold, 6s out */
+const IN = 4000, HOLD = 2200, OUT = 6000, CYC = IN + HOLD + OUT;
+function breathPhase(ms) {
+  const k = ((ms % CYC) + CYC) % CYC;
+  if (k < IN) return { v: easeIO(k / IN), ph: 'in', p: k / IN };
+  if (k < IN + HOLD) return { v: 1, ph: 'hold', p: (k - IN) / HOLD };
+  const p = (k - IN - HOLD) / OUT;
+  return { v: 1 - easeIO(p), ph: 'out', p };
+}
+/* the shape loosens on the out-breath: that is where the release is visible */
+const bodyAmp = b => b.ph === 'out' ? .045 + .035 * Math.sin(Math.PI * b.p) : b.ph === 'hold' ? .03 : .04;
+
+/* ---------- language ---------- */
+const TITLES = { nl: 'Inner Shadow Circle: schaduwwerk in een groep', en: 'Inner Shadow Circle: shadow work in a group' };
+const waLink = txt => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(txt)}`;
+const SIGNUP_REAL = /^https?:\/\//.test(CONFIG.SIGNUP_URL);
+function applyLang() {
+  const l = lang();
+  root.lang = l;
+  document.title = TITLES[l];
+  document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.set === l)));
+  document.querySelectorAll('.js-wa').forEach(a => a.href = waLink(a.dataset.wa === 'team' ? CONFIG.whatsappTeamText[l] : CONFIG.whatsappText[l]));
+  if (!SIGNUP_REAL) document.querySelectorAll('.js-signup:not([data-near])').forEach(a => a.href = waLink(CONFIG.whatsappSignupText[l]));
+}
+const langHooks = [];
+function setLang(l) {
+  root.classList.toggle('en', l === 'en');
+  try { localStorage.setItem('isc-body-lang', l); } catch (e) {}
+  applyLang();
+  langHooks.forEach(f => f());
+}
+document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.set)));
+
+/* ---------- sign-up links ---------- */
+(function () {
+  document.querySelectorAll('.js-signup').forEach(a => {
+    if (SIGNUP_REAL) { a.href = CONFIG.SIGNUP_URL; a.target = '_blank'; a.rel = 'noopener'; return; }
+    a.dataset.placeholder = 'SIGNUP_URL';
+    if (a.hasAttribute('data-near')) a.href = '#meedoen';
+    else { a.target = '_blank'; a.rel = 'noopener'; }
+  });
+  root.classList.toggle('signup-wa', !SIGNUP_REAL);
+  if (!SIGNUP_REAL) console.info('[Inner Shadow Circle] CONFIG.SIGNUP_URL is still a placeholder. Sign-up buttons fall back to WhatsApp until it is set.');
+})();
+
+/* ---------- one scroll dispatcher ---------- */
+const onScroll = new Set(); let scrollQueued = false;
+function runScroll() { scrollQueued = false; onScroll.forEach(f => f()); }
+window.addEventListener('scroll', () => { if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(runScroll); } }, { passive: true });
+window.addEventListener('resize', runScroll);
+function onceInView(el, fn, threshold = .3) {
+  if (RM || !('IntersectionObserver' in window)) { fn(); return; }
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { fn(); io.disconnect(); } }), { threshold });
+  io.observe(el);
+}
+
+/* ---------- nav + menu ---------- */
+const nav = $('nav'), menu = $('menu'), menuBtn = $('menu-btn');
+onScroll.add(() => nav.classList.toggle('solid', window.scrollY > 24));
+function setMenu(open) {
+  menu.hidden = !open; nav.classList.toggle('open', open);
+  menuBtn.setAttribute('aria-expanded', String(open));
+}
+menuBtn.addEventListener('click', () => setMenu(menu.hidden));
+menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { setMenu(false); menuBtn.focus(); } });
+window.addEventListener('resize', () => { if (innerWidth > 1060 && !menu.hidden) setMenu(false); });
+
+/* ---------- team ---------- */
+$('people').innerHTML = CONFIG.team.map((p, i) => {
+  const st = `object-position:${p.pos};transform:scale(${p.scale || 1});transform-origin:${p.origin || '50% 50%'}`;
+  const tone = p.tone || '';
+  return `<figure class="person">
+    <div class="portrait"><div class="in">
+      <img src="${esc(p.photo)}" alt="${esc(p.nl.name)}" decoding="async" style="${st};filter:${tone} url(#warm)">
+    </div></div>
+    <figcaption><h3>${esc(p.nl.name)}</h3><span class="role">${both(p.nl.role, p.en.role)}</span></figcaption>
+  </figure>`;
+}).join('');
+/* each face arrives as its portrait comes into view; side by side they follow each other left to right */
+(function () {
+  const figs = [...$('people').querySelectorAll('.person')];
+  const cols = () => innerWidth > 900 ? 4 : 2;
+  figs.forEach((f, i) => {
+    const im = f.querySelector('img');
+    const decoded = (im.decode ? im.decode() : Promise.resolve()).catch(() => {});
+    onceInView(f, () => {
+      f.style.setProperty('--d', (cols() === 4 ? i * 140 : 0) + 'ms');
+      let done = false; const go = () => { if (!done) { done = true; f.classList.add('in'); } };
+      decoded.then(go); setTimeout(go, 2000);
+    }, .3);
+  });
+})();
+onceInView($('voor-wie'), () => $('voor-wie').classList.add('in'), .25);
+onceInView($('meedoen').querySelector('.time'), () => $('meedoen').classList.add('in'), .6);
+
+/* ---------- events ---------- */
+(function () {
+  const evs = (CONFIG.events || []).filter(e => e && e.date);
+  if (!evs.length) return;
+  $('events').hidden = false;
+  document.querySelectorAll('.nav-events').forEach(li => li.hidden = false);
+  const md = (iso, l) => new Date(iso + 'T12:00:00').toLocaleDateString(l === 'en' ? 'en-GB' : 'nl-NL', { month: 'short' }).replace('.', '');
+  $('ev-list').innerHTML = evs.map(e => {
+    const d = new Date(e.date + 'T12:00:00');
+    const t = e.title || {}, ln = e.line || {};
+    return `<li class="ev">
+      <div class="ev-date" aria-hidden="true"><span class="d">${d.getDate()}</span><span class="m">${both(md(e.date, 'nl'), md(e.date, 'en'))}</span></div>
+      <div><h4>${both(t.nl || '', t.en || t.nl || '')}</h4><p>${both(ln.nl || '', ln.en || ln.nl || '')}</p>
+        <span class="sr">${both(d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }), d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }))}</span></div>
+      ${e.url ? `<a class="ev-link ulink" href="${esc(e.url)}" target="_blank" rel="noopener">${both('Meer weten', 'Find out more')}</a>` : ''}
+    </li>`;
+  }).join('');
+})();
+
+applyLang();
+
+/* ============================================================
+   Organic shapes
+   ============================================================ */
+function seeded(seed) { return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+function makeShape(seed, n = 8) {
+  const r = seeded(seed);
+  return Array.from({ length: n }, () => ({ p1: r() * 6.283, p2: r() * 6.283, s1: .55 + r() * .6, s2: .3 + r() * .5, k: .8 + r() * .4 }));
+}
+/* heavy > 0 makes a resting body: narrower at the top, wider and flatter where it meets the ground */
+function blobPoints(shape, R, t, amp, sx = 1, sy = 1, heavy = 0) {
+  const n = shape.length, pts = [];
+  for (let i = 0; i < n; i++) {
+    const s = shape[i], a = i / n * PI2, sa = Math.sin(a);
+    const d = R * (1 + amp * s.k * (Math.sin(t * s.s1 + s.p1) * .62 + Math.sin(t * s.s2 * 1.7 + s.p2) * .38));
+    const hx = 1 + heavy * .55 * sa, hy = sa > 0 ? 1 - heavy * .4 * sa : 1;
+    pts.push([Math.cos(a) * d * sx * hx, sa * d * sy * hy]);
+  }
+  return pts;
+}
+const maxY = pts => pts.reduce((m, p) => Math.max(m, p[1]), -1e9);
+function pathFrom(pts, ox = 0, oy = 0) {
+  const n = pts.length; const P = i => pts[(i + n) % n];
+  let d = `M${(P(0)[0] + ox).toFixed(1)} ${(P(0)[1] + oy).toFixed(1)}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
+    d += `C${(p1[0] + (p2[0] - p0[0]) / 6 + ox).toFixed(1)} ${(p1[1] + (p2[1] - p0[1]) / 6 + oy).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6 + ox).toFixed(1)} ${(p2[1] - (p3[1] - p1[1]) / 6 + oy).toFixed(1)} ${(p2[0] + ox).toFixed(1)} ${(p2[1] + oy).toFixed(1)}`;
+  }
+  return d + 'Z';
+}
+function canvasBlob(ctx, pts, x, y) {
+  const n = pts.length; const P = i => pts[(i + n) % n];
+  ctx.beginPath(); ctx.moveTo(P(0)[0] + x, P(0)[1] + y);
+  for (let i = 0; i < n; i++) {
+    const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
+    ctx.bezierCurveTo(p1[0] + (p2[0] - p0[0]) / 6 + x, p1[1] + (p2[1] - p0[1]) / 6 + y, p2[0] - (p3[0] - p1[0]) / 6 + x, p2[1] - (p3[1] - p1[1]) / 6 + y, p2[0] + x, p2[1] + y);
+  }
+  ctx.closePath();
+}
+
+/* clay grain: a small noise tile made once, used inside every body so they read as matte clay */
+(function () {
+  try {
+    const S = 140, c = document.createElement('canvas'); c.width = c.height = S;
+    const x = c.getContext('2d'), img = x.createImageData(S, S), r = seeded(5);
+    for (let i = 0; i < S * S; i++) {
+      const v = r(), o = i * 4;
+      if (v < .5) { img.data[o] = 70; img.data[o + 1] = 32; img.data[o + 2] = 20; img.data[o + 3] = Math.round(r() * 70); }
+      else { img.data[o] = 255; img.data[o + 1] = 236; img.data[o + 2] = 218; img.data[o + 3] = Math.round(r() * 46); }
+    }
+    x.putImageData(img, 0, 0);
+    const url = c.toDataURL();
+    document.querySelectorAll('.grain-pat image').forEach(im => im.setAttribute('href', url));
+  } catch (e) {}
+})();
+
+/* one shared ticker that only runs what is on screen */
+const ticks = new Set(); let rafId = 0;
+function loop(t) { ticks.forEach(f => f(t)); rafId = ticks.size ? requestAnimationFrame(loop) : 0; }
+function whenVisible(el, fn) {
+  fn(RM ? 0 : performance.now());
+  if (RM) { window.addEventListener('resize', () => fn(0)); return; }
+  new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) ticks.add(fn); else ticks.delete(fn);
+    if (ticks.size && !rafId) rafId = requestAnimationFrame(loop);
+  }), { rootMargin: '80px' }).observe(el);
+}
+
+/* ---------- the resting body: a taller front form, and a second one leaning into it ---------- */
+const BODY_SHAPE = makeShape(47, 8), LEAN_SHAPE = makeShape(61, 7);
+const GROUND = 236, HEAVY = .28, SY = 1.02, FRONT_X = -40, LEAN_DX = 176;
+/* draws the pair into one svg; returns where the front body's centre is.
+   st.float (0..1) lifts the front body off the ground towards st.floatY (its centre) */
+function drawBodies(el, st) {
+  const pts = blobPoints(BODY_SHAPE, st.R, st.t, st.amp, 1, SY, HEAVY * (1 - (st.float || 0)));
+  const cy = lerp(GROUND - maxY(pts), st.floatY || 0, st.float || 0);
+  const d = pathFrom(pts, st.x, cy);
+  el.rim.setAttribute('d', d); el.clip.setAttribute('d', d);
+  el.body.setAttribute('d', pathFrom(pts, st.x, cy + Math.min(7, st.R * .035)));
+  const lp = blobPoints(LEAN_SHAPE, st.R2, st.t * .8 + 3, st.amp * .9, 1, SY * .96, HEAVY * .8);
+  const ld = pathFrom(lp, st.lx != null ? st.lx : st.x + LEAN_DX * (st.R2 / 120) ** .5, GROUND - maxY(lp));
+  el.lean.setAttribute('d', ld); el.lean.setAttribute('opacity', st.leanA.toFixed(3));
+  el.grain.setAttribute('d', st.leanA > .5 ? ld + d : d);
+  return { pts, cx: st.x, cy, R: st.R };
+}
+const HERO = { R: 200, R2: 120, t: 0, x: FRONT_X, paused: false };
+(function () {
+  const wrap = $('feel'), btn = $('feel-open'), snd = $('snd-hero');
+  const el = { rim: $('hb-rim'), clip: $('hb-clip'), body: $('hb-body'), lean: $('hb-lean'), grain: $('hb-grain') };
+  let hover = 0, hoverT = 0, lagR = 200, placed = false;
+  btn.addEventListener('pointerenter', () => hoverT = 1);
+  btn.addEventListener('pointerleave', () => hoverT = 0);
+  btn.addEventListener('focus', () => hoverT = 1);
+  btn.addEventListener('blur', () => hoverT = 0);
+  // the button covers the front body (measured once at mid breath, in % of the 600 unit box)
+  function place() {
+    const g = drawBodies(el, { R: 203, R2: 122, t: 0, amp: 0, x: FRONT_X, leanA: 1 });
+    const w = g.R * 1.62, h = g.R * SY * 1.5;
+    const pc = v => (v / 6).toFixed(2) + '%';
+    Object.assign(btn.style, { left: pc(g.cx + 300 - w / 2), top: pc(g.cy + 300 - h / 2 - 10), width: pc(w), height: pc(h) });
+    Object.assign(snd.style, { left: pc(g.cx + 300), top: pc(g.cy + 300 + g.R * SY * .5) });
+  }
+  place();
+  const t0 = performance.now() - IN * .1;
+  whenVisible(wrap, t => {
+    if (HERO.paused) return;
+    hover += (hoverT - hover) * .06;
+    const b = RM ? { v: .45, ph: 'hold', p: 0 } : breathPhase(t - t0);
+    // pointing at it makes it lean towards you a little: a bigger, softer breath
+    const R = 188 + 30 * b.v + hover * 14;
+    lagR += (R - lagR) * .025;
+    HERO.R = R; HERO.R2 = lagR * .6; HERO.t = RM ? 1.3 : t / 1000 * .5;
+    const amp = RM ? .04 : bodyAmp(b);
+    drawBodies(el, { R, R2: HERO.R2, t: HERO.t, amp, x: FRONT_X, leanA: 1 });
+    HERO.amp = amp;
+  });
+  // the dot in the menu breathes on the same clock as this body, so there is only ever one breath on screen
+  requestAnimationFrame(() => {
+    const dot = document.querySelector('.brand-dot'), a = !RM && dot.getAnimations && dot.getAnimations()[0];
+    if (a) a.currentTime = ((performance.now() - t0) % CYC + CYC) % CYC;
+  });
+  const ready = () => root.classList.add('ready');
+  requestAnimationFrame(() => requestAnimationFrame(ready));
+  setTimeout(ready, 400);
+})();
+
+/* ---------- the unsaid: one sentence spoken at a time ---------- */
+(function () {
+  const items = [...document.querySelectorAll('#said li')];
+  if (RM || !('IntersectionObserver' in window)) items.forEach(li => li.classList.add('seen'));
+  else {
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('seen'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -18% 0px' });
+    items.forEach(li => io.observe(li));
+  }
+})();
+
+/* ---------- the circle: two of us wait, twelve people arrive, take their seats, one goes to the middle.
+   Then, in time and not with the scroll, the moment everything is allowed: a tremor, a few big breaths, stillness. ---------- */
+(function () {
+  const c = $('circle-canvas'), scene = $('scene'), panel = $('steps');
+  const steps = [...panel.querySelectorAll('.step')], NS = steps.length; // 0 heading, 1 arrive, 2 sit, 3 middle, 4 allowed
+  // twelve participants plus the two of us: fourteen seats
+  const N = 14, CENTRE = 0, FAC = [4, 11];
+  const tones = ['#E2B796', '#D9A47F', '#B9825E', '#8F5D40', '#E8C2A2', '#C99470', '#A86F4F', '#F0CFB4', '#7E4E35', '#D2A07C', '#B37A57', '#E0AF8A', '#C68B66', '#9C6446'];
+  const CLAY = [196, 103, 74], START = [226, 183, 150], COCOA = [58, 36, 31];
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const rnd = seeded(23);
+  const people = Array.from({ length: N }, (_, i) => {
+    const aN = -Math.PI / 2 + i * PI2 / N;
+    const fac = FAC.includes(i), base = fac ? [154, 74, 51] : hex(tones[i]);
+    return { shape: makeShape(100 + i * 7, 6), base, rim: mixRGB(base, COCOA, .32), fill: `rgb(${base.join(',')})`, ph: i * 1.7, fac, aN,
+      aM: -Math.PI / 2 + PI2 / (N - 1) * (i - .5),
+      sa: aN + (rnd() - .5) * .8, sr: 1.32 + rnd() * .18, ord: 0 };
+  });
+  // where they stand while arriving, just outside the ring: pushed apart so nobody overlaps
+  (function relax() {
+    const P = people.map(q => q.fac ? [Math.cos(q.aN), Math.sin(q.aN), 1] : [Math.cos(q.sa) * q.sr, Math.sin(q.sa) * q.sr, 0]);
+    const MIN = .42;
+    for (let it = 0; it < 80; it++) {
+      for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+        const dx = P[j][0] - P[i][0], dy = P[j][1] - P[i][1], d = Math.hypot(dx, dy) || .001;
+        if (d < MIN) {
+          const push = (MIN - d) / 2, ux = dx / d, uy = dy / d;
+          if (!P[i][2]) { P[i][0] -= ux * push; P[i][1] -= uy * push; }
+          if (!P[j][2]) { P[j][0] += ux * push; P[j][1] += uy * push; }
+        }
+      }
+      P.forEach(p => { if (p[2]) return; const r = Math.hypot(p[0], p[1]); const rc = clamp(r, 1.28, 1.55); p[0] *= rc / r; p[1] *= rc / r; });
+    }
+    people.forEach((q, i) => { if (!q.fac) { q.sa = Math.atan2(P[i][1], P[i][0]); q.sr = Math.hypot(P[i][0], P[i][1]); } });
+  })();
+  // they come in one by one, in a loose order
+  const order = people.map((_, i) => i).filter(i => !FAC.includes(i));
+  for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  order.forEach((i, k) => people[i].ord = k / (order.length - 1));
+  const discShape = makeShape(77, 9);
+  // clay grain, the same as on the bodies in the opening
+  let grain = null, grainImg = null;
+  function grainPattern(ctx) {
+    if (grain) return grain;
+    if (!grainImg) {
+      const im = document.querySelector('.grain-pat image'), url = im && im.getAttribute('href');
+      if (!url) return null;
+      grainImg = new Image(); grainImg.src = url;
+    }
+    if (!grainImg.complete || !grainImg.naturalWidth) return null;
+    try { grain = ctx.createPattern(grainImg, 'repeat'); } catch (e) { grain = null; }
+    return grain;
+  }
+  // the phases, in scroll units: arrive 1.0 to 1.8, sit 2.0 to 2.8, middle 3.0 to 3.6, then 4 holds
+  const PH = { arrive: [1.0, 1.8], seat: [2.0, 2.8], mid: [3.0, 3.6] };
+  // a step's words appear once its picture is about 60% there
+  const SHOW = [0, 1.48, 2.48, 3.36, 3.86];
+  const U_MAX = 4, U_SPAN = 5.2;
+  let target = 0, prog = 0, idx = -1, size = { w: 0, h: 0, dpr: 1 };
+  let seqStart = -1, sTrem = 0, sHeave = 0, sStill = 0;
+  const narrow = () => innerWidth <= 900;
+
+  function placeSteps() {
+    if (idx < 0) return;
+    const nar = narrow(), H = panel.clientHeight;
+    const hs = steps.map(s => s.offsetHeight);
+    const top0 = nar ? 0 : Math.round((H - hs[idx]) / 2);
+    steps.forEach((s, i) => {
+      const on = i === idx;
+      const y = on ? (nar ? 0 : Math.round((H - hs[i]) / 2)) : i < idx ? top0 - 28 : top0 + 36;
+      s.style.transitionDelay = on ? '.12s' : '0s';
+      s.style.transform = `translate3d(0,${y}px,0)`; s.style.opacity = on ? 1 : 0;
+      s.classList.toggle('on', on);
+      s.setAttribute('aria-hidden', String(!on));
+    });
+  }
+  function setIdx(u) {
+    let ni = 0; for (let i = 0; i < NS; i++) if (u >= SHOW[i]) ni = i;
+    if (ni !== idx) {
+      idx = ni; placeSteps();
+      if (idx === NS - 1) { if (seqStart < 0) seqStart = performance.now(); }
+      else seqStart = -1;
+    }
+  }
+  function measure() {
+    const r = scene.getBoundingClientRect(), span = r.height - innerHeight;
+    target = Math.min(U_MAX, clamp(-r.top / span) * U_SPAN);
+    if (RM) { prog = target; setIdx(prog); }
+  }
+  function fit() {
+    const dpr = Math.min(window.devicePixelRatio || 1, innerWidth > 900 ? 1.5 : 2), w = c.clientWidth, h = c.clientHeight;
+    if (w !== size.w || h !== size.h || dpr !== size.dpr) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); size = { w, h, dpr }; }
+    const ctx = c.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return ctx;
+  }
+  const ph = (u, k) => clamp((u - PH[k][0]) / (PH[k][1] - PH[k][0]));
+  let lastT = 0, cph = 0, oph = 0, dph = 0;
+  function draw(t) {
+    const ctx = fit(); const { w, h } = size; if (!w) return;
+    prog += (target - prog) * (RM ? 1 : .085);
+    const u = prog, s = t / 1000, dts = lastT ? Math.min(.05, (t - lastT) / 1000) : 0; lastT = t;
+    setIdx(u);
+    ctx.clearRect(0, 0, w, h);
+    const nar = w <= 900, navH = nar ? 64 : 72;
+    let cx, cy, M;
+    if (nar) {
+      const top = navH + 14, bottom = h * .52 - 14;
+      M = Math.min(w * .98, bottom - top); cx = w / 2; cy = (top + bottom) / 2;
+    } else { cx = w * .665; cy = h * .53; M = Math.min(h * .86, w * .5); }
+    const Rc = M * .31, pr = M * (nar ? .047 : .044);
+    const arrive = ph(u, 'arrive'), seat = ph(u, 'seat'), mid = easeIO(ph(u, 'mid'));
+    // step 4 plays in time: a tremor in the middle, the ring breathing with it, then everything goes still
+    let trem = 0, heave = 0, still = 0, heaveV = 0;
+    if (RM) { still = idx === NS - 1 ? 1 : 0; }
+    else {
+      let tT = 0, tH = 0, tS = 0, q = -1;
+      if (seqStart >= 0) {
+        q = (t - seqStart) / 1000;
+        tT = smooth(0, .35, q) * (1 - smooth(1.4, 2.0, q));
+        tH = smooth(1.6, 2.1, q) * (1 - smooth(3.6, 4.2, q));
+        tS = smooth(3.9, 5.0, q);
+      }
+      const k = seqStart >= 0 ? 1 : 1 - Math.exp(-dts / .5);
+      sTrem += (tT - sTrem) * k; sHeave += (tH - sHeave) * k; sStill += (tS - sStill) * k;
+      trem = sTrem; heave = sHeave; still = sStill;
+      heaveV = heave * (q >= 0 ? .5 - .5 * Math.cos((q - 1.6) * PI2 / 1.25) : .5);
+    }
+    const live = RM ? 0 : 1;
+    // phases are accumulated, so changing speed never makes a shape jump; in the stillness they stop
+    cph += dts * (.5 + trem * 9) * (1 - still);
+    oph += dts * .45 * (1 - still);
+    dph += dts * .3 * (1 - still);
+
+    // the floor: a broad, soft worn ring, like a rug the chairs stand on
+    ctx.lineCap = 'round';
+    ctx.lineWidth = pr * 2.6;
+    ctx.strokeStyle = `rgba(234,215,195,${(.5 + .4 * seat).toFixed(3)})`;
+    ctx.beginPath(); ctx.arc(cx, cy, Rc, 0, PI2); ctx.stroke();
+
+    // the space in the middle that the group holds: warm, and it brightens as the person steps in and as the room goes still
+    if (mid > 0) {
+      // one flat, matte field (no glow): honey while someone stands in it, paling to cream as the room goes still
+      ctx.globalAlpha = mid;
+      ctx.fillStyle = mixRGB([240, 196, 150], [253, 236, 214], .25 * mid + .75 * still);
+      canvasBlob(ctx, blobPoints(discShape, Rc * (.8 + heaveV * .05), live * dph, .035 * (1 - still)), cx, cy); ctx.fill();
+      const gp0 = grainPattern(ctx); if (gp0) { ctx.globalAlpha = mid * .6; ctx.fillStyle = gp0; ctx.fill(); }
+      ctx.globalAlpha = 1;
+    }
+    const gp = grainPattern(ctx);
+
+    people.forEach((q, i) => {
+      const centre = i === CENTRE;
+      const seatA = centre ? q.aN : lerp(q.aN, q.aM, mid);
+      let ang, rr, alpha = 1, moving = 0;
+      if (q.fac) { ang = seatA; rr = 1; }
+      else {
+        // arrival: they walk in from beyond the edge to their own spot just outside the ring
+        const ka = clamp(arrive * 1.6 - q.ord * .6), ea = easeOut(ka);
+        const sr = nar ? 1 + (q.sr - 1) * .8 : q.sr;
+        const ang0 = q.sa + (1 - ea) * .35, r0 = lerp(2.2, sr, ea);
+        alpha = smooth(0, .3, ka);
+        // seating: they move around the ring, not through it, and settle with a small give
+        const ks = clamp(seat * 1.7 - q.ord * .7);
+        ang = lerp(ang0, seatA, easeIO(ks));
+        rr = lerp(r0, 1, backOut(ks));
+        moving = (ka > 0 && ka < 1 ? 1 : 0) + (ks > 0 && ks < 1 ? 1 : 0);
+      }
+      let x = cx + Math.cos(ang) * Rc * rr, y = cy + Math.sin(ang) * Rc * rr;
+      if (centre) { x = lerp(x, cx, mid); y = lerp(y, cy, mid); }
+      if (alpha <= .01) return;
+      // nobody stands outside the screen or under the menu
+      const m = pr * 1.3;
+      x = clamp(x, m, w - m); y = clamp(y, navH + m, h - m);
+      const quiet = (1 - mid * .85) * (1 - still);
+      // in the stillness the ring steps back and only the one in the middle stays vivid
+      if (!centre) alpha *= 1 - .4 * still;
+      let rad = q.fac ? pr * 1.14 : pr, amp, speed;
+      if (centre) {
+        rad *= 1 + mid * .38 + heaveV * .4;
+        amp = (.04 + trem * .22) * (1 - still);
+        speed = cph + q.ph;
+        x += live * (Math.sin(s * 41 + 1.3) + .5 * Math.sin(s * 67)) * trem * pr * .34;
+        y += live * Math.sin(s * 37) * trem * pr * .22;
+      } else {
+        amp = moving ? .06 : .035 * quiet;
+        speed = oph + q.ph;
+      }
+      const pts = blobPoints(q.shape, rad, RM ? q.ph : speed, RM ? .03 : amp);
+      ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y);
+      if (!centre && mid > 0) {
+        // the ring leans in towards the middle, and breathes in with the one in the middle
+        ctx.rotate(Math.atan2(cy - y, cx - x));
+        ctx.translate(rad * (.16 * mid + .34 * heaveV), 0);
+        ctx.scale(1 + .14 * mid, 1 - .05 * mid);
+        ctx.rotate(-Math.atan2(cy - y, cx - x));
+      }
+      // a darker rim underneath, like the base of the clay body in the opening
+      ctx.fillStyle = centre ? mixRGB(mixRGB(START, CLAY, mid).match(/\d+/g).map(Number), COCOA, .3) : q.rim;
+      canvasBlob(ctx, pts, 0, Math.min(4, rad * .1)); ctx.fill();
+      ctx.fillStyle = centre ? mixRGB(START, CLAY, mid) : q.fill;
+      canvasBlob(ctx, pts, 0, 0); ctx.fill();
+      if (gp) { ctx.globalAlpha = alpha * .8; ctx.fillStyle = gp; ctx.fill(); }
+      ctx.restore();
+    });
+  }
+  onScroll.add(() => { measure(); if (RM) draw(0); });
+  window.addEventListener('resize', () => { placeSteps(); });
+  langHooks.push(() => { placeSteps(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeSteps);
+  measure(); prog = target; setIdx(prog);
+  whenVisible(c, draw);
+})();
+
+/* ---------- teams: one big clay table seen from above, people along it, cut off by the band.
+   At the head of the table the seat of what nobody says draws itself in, slowly, as the band comes into view ---------- */
+(function () {
+  const svg = $('table');
+  // the table: one long, soft clay form running off the right edge
+  const tbl = pathFrom(blobPoints(makeShape(808, 10), 150, 1.4, .03, 2.6, 1, 0), 545, 260);
+  let h = `<path d="${pathFrom(blobPoints(makeShape(808, 10), 150, 1.4, .03, 2.6, 1, 0), 545, 266)}" fill="#A24E36"/>`;
+  h += `<path d="${tbl}" fill="#C4674A"/><path d="${tbl}" fill="url(#grain-t)" opacity=".8"/>`;
+  const cols = ['#3A241F', '#8E412C', '#66493F', '#5A3A31', '#4A2E27', '#7A4A39'];
+  // people along both long sides, half out of the band
+  [[300, 72], [440, 60], [580, 76], [312, 452], [454, 464], [598, 446]].forEach(([x, y], i) => {
+    const d = pathFrom(blobPoints(makeShape(300 + i * 13, 6), 50 + (i * 7 % 9), i * 1.1, .07, 1.05, .95), x, y);
+    h += `<path d="${d}" fill="${cols[i]}"/>`;
+  });
+  // the empty head seat: a bold clay outline, the same shape language as everyone else
+  const ghost = pathFrom(blobPoints(makeShape(911, 7), 62, 2, .07, .96, 1.04), 92, 262);
+  h += `<path id="ghost" d="${ghost}" fill="none" stroke="#3A241F" stroke-width="6" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>`;
+  svg.innerHTML = `<defs><pattern id="grain-t" width="140" height="140" patternUnits="userSpaceOnUse"><image width="140" height="140" href="${(document.querySelector('.grain-pat image') || { getAttribute: () => '' }).getAttribute('href') || ''}"/></pattern></defs>` + h;
+  const g = $('ghost');
+  onceInView(svg.parentElement, () => { if (RM) g.style.transition = 'none'; requestAnimationFrame(() => { g.style.strokeDashoffset = '0'; }); }, .45);
+})();
+
+/* ---------- closing: the same clay body as the opening steps aside, and the light it sat in front of is there ---------- */
+(function () {
+  const sec = $('closing'), svg = $('ecl'), light = $('cl-light'), lightG = $('cl-light-g');
+  const el = { rim: $('cl-rim'), clip: $('cl-clip'), body: $('cl-body'), lean: $('cl-lean'), grain: $('cl-grain') };
+  // the room around the light warms and deepens, so the cream disc reads as light without any glow
+  const SKIN = [246, 235, 224], WARM = [238, 196, 156];
+  let cur = -1;
+  function upd() {
+    const r = svg.getBoundingClientRect(), mid = r.top + r.height / 2;
+    const p = RM ? 1 : clamp((innerHeight * .98 - mid) / (innerHeight * .5));
+    if (Math.abs(p - cur) < .002) return; cur = p;
+    const e = easeInOutCubic(p);
+    // the pair from the opening, seen again: the front body shifts its weight and steps aside,
+    // the one leaning on it straightens up, and between them is the light they were sitting in front of
+    drawBodies(el, { R: lerp(200, 176, e), R2: lerp(118, 132, e), t: 1.1 + e * .6, amp: .035 + .03 * Math.sin(Math.PI * e), x: lerp(-18, -262, e), lx: lerp(150, 252, e), float: .05 * Math.sin(Math.PI * e), floatY: -20, leanA: 1 });
+    sec.style.setProperty('--bg', mixRGB(SKIN, WARM, smooth(.25, 1, p)));
+    // the light grows a little as they step aside: that is the payoff
+    const lr = (lerp(150, 196, e)).toFixed(1);
+    light.setAttribute('r', lr); lightG.setAttribute('r', lr);
+  }
+  onScroll.add(upd); window.addEventListener('resize', () => { cur = -1; upd(); }); upd();
+})();
+
+/* ============================================================
+   FEEL FIRST: the body you pressed becomes the breath.
+   ============================================================ */
+(function () {
+  const ov = $('breath'), bgEl = $('breath-bg'), openBtn = $('feel-open');
+  const svg = $('breath-svg'), stops = [...svg.querySelectorAll('#bgr stop')], rim = $('br-rim'), prog = $('br-prog');
+  const el = { rim, clip: $('br-clip'), body: $('br-body'), lean: $('br-lean'), grain: $('br-grain') };
+  const contour = $('br-contour'), qEl = $('breath-q'), moreEl = $('breath-end').querySelector('.more');
+  const heroSvg = $('hero-svg');
+  const cue = $('breath-cue'), cueA = [...cue.children], dotsWrap = $('breath-dots'), dots = [...dotsWrap.querySelectorAll('i')];
+  const end = $('breath-end'), soundBtn = $('breath-sound'), soundHero = $('snd-hero');
+  const INTRO = 3400, NB = 3, TOTAL = INTRO + CYC * NB;
+  if (RM) ov.classList.add('rm');
+  const WORDS = {
+    nl: { intro: 'Ga even lekker zitten.', in: 'adem in', hold: 'even vasthouden', out: 'laat maar gaan' },
+    en: { intro: 'Get comfortable for a moment.', in: 'breathe in', hold: 'hold it', out: 'let it go' }
+  };
+  // clay when full, blush when empty
+  const CLAY = [[200, 106, 76], [162, 78, 55]], BLUSH = [[230, 160, 132], [206, 126, 98]];
+  const RIM_C = [[221, 142, 109], [240, 186, 160]];
+  const PEACH = [242, 211, 191], WARM = [238, 176, 140];
+  let raf = 0, start = 0, last = '', prevT = 0, endTimers = [], mode = 'idle', cueI = 0, endShown = false;
+  let R = 210, R2 = 120, col = 1, tt = 0, x = FRONT_X, v = 0, fl = 0, leanA = 1, amp = .04, geo = { cx: 0, cy: 0 };
+  // the breathing pair is centred on screen; the front body floats a little off the floor, more on the in-breath
+  const PAIR_X = -LEAN_DX / 4, FLOAT_Y = 20, endR = 200;
+  let ringT = -1;
+  let soundOn = false, ac = null, master = null, droneGain = null;
+
+  /* -- sound: a soft synthesized bowl and a low breath tone, Web Audio only, off by default -- */
+  function initAudio() {
+    if (ac) return;
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    ac = new AC();
+    master = ac.createGain(); master.gain.value = 0.0001; master.connect(ac.destination);
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; lp.Q.value = .3;
+    droneGain = ac.createGain(); droneGain.gain.value = 0.0001; lp.connect(droneGain); droneGain.connect(master);
+    [[110, 0], [164.81, 2], [220.5, -3]].forEach(([f, det]) => { const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = f; o.detune.value = det; const g = ac.createGain(); g.gain.value = f > 200 ? .25 : .55; o.connect(g); g.connect(lp); o.start(); });
+  }
+  function bowl(f = 220, vol = .22) {
+    if (!soundOn || !ac) return;
+    const now = ac.currentTime;
+    [[1, 1, 7.5], [2.76, .34, 5], [5.4, .12, 3.2], [8.93, .05, 2]].forEach(([m, g, d]) => {
+      [-.9, .9].forEach(beat => {
+        const o = ac.createOscillator(), e = ac.createGain();
+        o.type = 'sine'; o.frequency.value = f * m + beat * m;
+        e.gain.setValueAtTime(0.0001, now); e.gain.exponentialRampToValueAtTime(vol * g * .5, now + .02); e.gain.exponentialRampToValueAtTime(0.0001, now + d);
+        o.connect(e); e.connect(master); o.start(now); o.stop(now + d + .1);
+      });
+    });
+  }
+  function drone(level, tc) { if (ac && droneGain) droneGain.gain.setTargetAtTime(Math.max(level, 0.0001), ac.currentTime, tc); }
+  function setSound(on) {
+    soundOn = on;
+    [soundBtn, soundHero].forEach(b => b.setAttribute('aria-pressed', String(on)));
+    soundBtn.querySelector('.snd-on').hidden = !on; soundBtn.querySelector('.snd-off').hidden = on;
+    if (on) {
+      initAudio(); if (!ac) return;
+      ac.resume(); master.gain.cancelScheduledValues(ac.currentTime); master.gain.setTargetAtTime(1, ac.currentTime, .05);
+      bowl(220, .12); // you hear it working right away
+      if (mode === 'run' && (last.startsWith('in') || last.startsWith('hold'))) drone(.07, .8);
+      if (mode === 'idle') setTimeout(() => { if (mode === 'idle' && ac) ac.suspend(); }, 8000);
+    } else if (ac) master.gain.setTargetAtTime(0.0001, ac.currentTime, .2);
+  }
+  soundBtn.addEventListener('click', () => setSound(!soundOn));
+  soundHero.addEventListener('click', () => setSound(!soundOn));
+
+  // cross-fade: the old word leaves while the new one arrives, so there is never an empty beat
+  function say(txt) {
+    const a = cueA[cueI], b = cueA[1 - cueI];
+    if (a.textContent === txt && a.classList.contains('on')) return;
+    a.classList.remove('on');
+    b.textContent = txt; if (txt) b.classList.add('on');
+    cueI = 1 - cueI;
+  }
+  function clearCue() { cueA.forEach(s => { s.textContent = ''; s.classList.remove('on'); }); }
+  function paint(now) {
+    geo = drawBodies(el, { R, R2, t: tt, amp, x, float: fl, floatY: FLOAT_Y, leanA });
+    stops.forEach((s, i) => s.setAttribute('stop-color', mixRGB(BLUSH[i], CLAY[i], col)));
+    rim.setAttribute('fill', mixRGB(RIM_C[1], RIM_C[0], col));
+    // the out-breath: one thin line leaves the body's outline, widens and thins out until it is gone
+    const q = ringT < 0 ? -1 : (now - ringT) / 3600;
+    if (q < 0 || q > 1) contour.setAttribute('opacity', '0');
+    else {
+      const k = easeOut(q);
+      contour.setAttribute('d', pathFrom(blobPoints(BODY_SHAPE, R * (1.03 + .34 * k), tt, amp, 1, SY, HEAVY * (1 - fl)), geo.cx, geo.cy));
+      contour.setAttribute('stroke-width', (2.4 - 2 * k).toFixed(2));
+      contour.setAttribute('opacity', (.6 * (1 - q) * Math.min(1, q * 8)).toFixed(3));
+    }
+    if (RM) { prog.setAttribute('cx', geo.cx.toFixed(1)); prog.setAttribute('cy', geo.cy.toFixed(1)); prog.setAttribute('r', (R + 30).toFixed(1)); prog.setAttribute('transform', `rotate(-90 ${geo.cx.toFixed(1)} ${geo.cy.toFixed(1)})`); }
+  }
+
+  function frame(now) {
+    const el2 = now - start, dt = Math.min(64, now - (prevT || now)); prevT = now;
+    const l = lang();
+    let phase, cyc = 0, tR, k1, b = null;
+    if (mode === 'closing') { phase = 'closing'; tR = HERO.R; k1 = 1 - Math.exp(-dt / 160); }
+    else if (el2 < INTRO) { phase = 'intro'; v = 0; tR = 150; k1 = 1 - Math.exp(-dt / 700); }
+    else if (el2 < TOTAL) {
+      const e = el2 - INTRO; cyc = Math.floor(e / CYC);
+      b = breathPhase(e); phase = b.ph;
+      v = b.v; tR = 150 + 120 * v; k1 = 1 - Math.exp(-dt / 90);
+    } else { phase = 'end'; v = 0; tR = endR; k1 = 1 - Math.exp(-dt / 900); }
+    const key = phase + cyc;
+    if (key !== last && mode === 'run') {
+      if (phase === 'intro') say(WORDS[l].intro);
+      else if (phase === 'end') {
+        mode = 'end'; say('');
+        dotsWrap.style.opacity = 0;
+        end.hidden = false;
+        endShown = false;
+        bowl(146.8, .2); drone(0.0001, 1.6);
+      } else {
+        say(WORDS[l][phase]);
+        if (phase === 'in') { dots.forEach((d, i) => d.classList.toggle('on', i <= cyc)); bowl(220, .2); drone(.07, 1.2); }
+        if (phase === 'out') { drone(.012, 1.8); if (!RM) ringT = now; }
+      }
+      last = key;
+    }
+    if (mode === 'end' && phase !== 'end') mode = 'run';
+    // reduced motion: the body keeps its size; a ring around it fills and empties with the breath instead
+    if (RM) {
+      tR = phase === 'end' ? endR : phase === 'closing' ? HERO.R : 190; k1 = 1;
+      const fill = phase === 'in' || phase === 'hold' || phase === 'out' ? v : 0;
+      prog.setAttribute('stroke-dashoffset', (100 - 100 * fill).toFixed(2));
+      prog.setAttribute('opacity', phase === 'end' || phase === 'closing' ? '0' : '1');
+    }
+    R += (tR - R) * k1;
+    R2 += (R * .6 - R2) * (1 - Math.exp(-dt / 600));
+    const colT = phase === 'closing' || phase === 'end' ? 1 : phase === 'intro' ? .55 : v;
+    col += (colT - col) * (1 - Math.exp(-dt / (RM ? 900 : 500)));
+    // the body rises a little off the floor on the in-breath and settles back on the out-breath, so it grows from its middle
+    const flT = phase === 'closing' ? 0 : phase === 'end' ? .5 : .3 + .28 * v;
+    fl += (flT - fl) * (1 - Math.exp(-dt / (phase === 'closing' ? 200 : 260)));
+    const xT = phase === 'closing' ? FRONT_X : PAIR_X;
+    x += (xT - x) * (1 - Math.exp(-dt / (phase === 'closing' ? 200 : 900)));
+    leanA += (1 - leanA) * (1 - Math.exp(-dt / 500));
+    // reduced motion: no travelling, the end state is simply there
+    if (RM) { fl = flT; x = xT; if (phase === 'end') col = 1; }
+    // the question only appears once the body has come to rest, and it is written on the body
+    if (mode === 'end' && !endShown && ((Math.abs(R - endR) < 4 && Math.abs(x - PAIR_X) < 4) || RM)) {
+      endShown = true;
+      end.classList.add('show');
+      endTimers.push(setTimeout(() => end.classList.add('show2'), RM ? 0 : 1700));
+    }
+    if (mode === 'end') {
+      const br = svg.getBoundingClientRect(), unit = br.width / 600;
+      const sx = br.left + br.width / 2 + geo.cx * unit, sy = br.top + br.height / 2 + geo.cy * unit;
+      qEl.style.left = sx.toFixed(1) + 'px'; qEl.style.top = (sy + 4).toFixed(1) + 'px';
+      moreEl.style.top = (sy + R * unit * .98 + 30).toFixed(1) + 'px';
+    }
+    amp = b ? bodyAmp(b) : .04;
+    const still = phase === 'hold' ? .15 : 1;
+    if (!RM) tt += dt / 1000 * .5 * still;
+    // the room warms a little at the top of the breath
+    bgEl.style.backgroundColor = mixRGB(PEACH, WARM, phase === 'end' || phase === 'closing' ? 0 : v);
+    paint(now);
+    raf = requestAnimationFrame(frame);
+  }
+
+  function heroMap() {
+    const hr = heroSvg.getBoundingClientRect(), br = svg.getBoundingClientRect();
+    return { dx: hr.left + hr.width / 2 - (br.left + br.width / 2), dy: hr.top + hr.height / 2 - (br.top + br.height / 2), k: hr.width / br.width, visible: hr.bottom > 0 && hr.top < innerHeight };
+  }
+  const EASE = 'cubic-bezier(.65,0,.25,1)';
+  let lastFocus = null, refocus = false;
+  function open() {
+    if (mode !== 'idle') return;
+    lastFocus = document.activeElement;
+    mode = 'run';
+    ov.hidden = false; ov.classList.remove('ui'); end.hidden = true; end.classList.remove('show', 'show2', 'gone');
+    qEl.style.left = qEl.style.top = moreEl.style.top = '';
+    dotsWrap.style.opacity = ''; dots.forEach(d => d.classList.remove('on'));
+    clearCue(); last = ''; prevT = 0; v = 0; ringT = -1; fl = 0; leanA = 1;
+    R = HERO.R; R2 = HERO.R2; tt = HERO.t; x = FRONT_X; col = 1; amp = HERO.amp || .04;
+    prog.setAttribute('opacity', '0'); prog.setAttribute('stroke-dashoffset', '100');
+    bgEl.style.backgroundColor = mixRGB(PEACH, WARM, 0);
+    paint(performance.now());
+    root.style.overflow = 'hidden';
+    HERO.paused = true;
+    if (RM) {
+      ov.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400 });
+    } else {
+      const m = heroMap();
+      heroSvg.parentElement.style.visibility = 'hidden';
+      svg.animate([{ transform: `translate(${m.dx}px,${m.dy}px) scale(${m.k})` }, { transform: 'none' }], { duration: 950, easing: EASE });
+      bgEl.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 800, easing: 'cubic-bezier(.22,1,.36,1)' });
+    }
+    setTimeout(() => ov.classList.add('ui'), RM ? 0 : 650);
+    if (soundOn && ac) { ac.resume(); master.gain.setTargetAtTime(1, ac.currentTime, .25); }
+    start = performance.now(); raf = requestAnimationFrame(frame);
+    setTimeout(() => $('breath-close').focus({ preventScroll: true }), 60);
+  }
+  function finish() {
+    cancelAnimationFrame(raf); endTimers.forEach(clearTimeout); endTimers = [];
+    ov.hidden = true; ov.classList.remove('ui'); svg.style.transform = '';
+    heroSvg.parentElement.style.visibility = ''; HERO.paused = false; mode = 'idle';
+    if (ac) ac.suspend();
+    if (refocus && lastFocus) lastFocus.focus({ preventScroll: true });
+    refocus = false;
+  }
+  function stopSound() { if (ac) { drone(0.0001, .3); master.gain.setTargetAtTime(0.0001, ac.currentTime, .25); } }
+
+  // Stop: the breath goes back to where it came from
+  function close() {
+    if (mode === 'idle' || mode === 'closing' || mode === 'exit') return;
+    stopSound(); endTimers.forEach(clearTimeout);
+    ov.classList.remove('ui'); end.classList.add('gone'); ringT = -1;
+    prog.setAttribute('opacity', '0');
+    root.style.overflow = '';
+    HERO.paused = false;
+    const m = heroMap();
+    if (RM || !m.visible) {
+      const a = ov.animate([{ opacity: 1 }, { opacity: 0 }], { duration: RM ? 200 : 600, easing: 'ease' });
+      a.onfinish = finish;
+    } else {
+      mode = 'closing';
+      const a = svg.animate([{ transform: 'none' }, { transform: `translate(${m.dx}px,${m.dy}px) scale(${m.k})` }], { duration: 900, easing: EASE, fill: 'forwards' });
+      bgEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 800, easing: 'ease', fill: 'forwards' });
+      a.onfinish = () => { a.cancel(); bgEl.getAnimations().forEach(x => x.cancel()); finish(); };
+    }
+    refocus = true;
+  }
+
+  // Read on: the breath shrinks into the full stop of the first unsaid sentence
+  function next() {
+    if (mode !== 'end') return;
+    mode = 'exit'; stopSound(); endTimers.forEach(clearTimeout);
+    cancelAnimationFrame(raf);
+    ov.classList.remove('ui'); end.classList.add('gone');
+    root.style.overflow = '';
+    // the hero body sits down again behind us, quietly, while the breath travels on
+    const feelEl = heroSvg.parentElement;
+    feelEl.style.visibility = ''; HERO.paused = false;
+    if (!RM) feelEl.animate([{ opacity: 0, transform: 'translateY(-2%)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: 350, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' });
+    const first = document.querySelector('#said li');
+    const sentence = [...first.querySelectorAll('.s')].find(x => x.offsetParent !== null);
+    const stop = sentence.querySelector('.stop');
+    const sr = sentence.getBoundingClientRect();
+    const y0 = window.scrollY;
+    const y1 = Math.max(0, Math.round(sr.top + y0 + sr.height / 2 - innerHeight * .46));
+    first.classList.add('seen');
+    const focusFirst = () => { first.setAttribute('tabindex', '-1'); first.focus({ preventScroll: true }); };
+    if (RM) {
+      window.scrollTo({ top: y1, behavior: 'instant' });
+      const a = ov.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 }); a.onfinish = () => { finish(); focusFirst(); };
+      return;
+    }
+    stop.classList.add('wait');
+    const st = stop.getBoundingClientRect();
+    const dotC = [st.left + st.width / 2, st.top + st.height / 2 - (y1 - y0)];
+    const br = svg.getBoundingClientRect(), unit = br.width / 600;
+    const C = [br.left + br.width / 2, br.top + br.height / 2];
+    const bc = [C[0] + geo.cx * unit, C[1] + geo.cy * unit];
+    const k = st.width / (2 * R * unit);
+    const T = [dotC[0] - C[0] - k * (bc[0] - C[0]), dotC[1] - C[1] - k * (bc[1] - C[1])];
+    bgEl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 900, delay: 250, easing: 'ease', fill: 'forwards' });
+    contour.setAttribute('opacity', '0');
+    const t0 = performance.now(), DUR = 1500;
+    const c0 = col;
+    (function step(now) {
+      const p = clamp((now - t0) / DUR), e = easeInOutCubic(p);
+      window.scrollTo({ top: lerp(y0, y1, e), behavior: 'instant' });
+      svg.style.transform = `translate(${(T[0] * e).toFixed(2)}px,${(T[1] * e).toFixed(2)}px) scale(${lerp(1, k, e).toFixed(4)})`;
+      col = lerp(c0, .85, e);
+      stops.forEach((s, i) => s.setAttribute('stop-color', mixRGB(BLUSH[i], CLAY[i], col)));
+      el.grain.setAttribute('opacity', (.75 * (1 - e)).toFixed(3));
+      if (p < 1) requestAnimationFrame(step);
+      else {
+        stop.classList.remove('wait');
+        el.grain.setAttribute('opacity', '.75');
+        bgEl.getAnimations().forEach(x => x.cancel());
+        finish(); focusFirst();
+      }
+    })(t0);
+  }
+  openBtn.addEventListener('click', open);
+  $('breath-close').addEventListener('click', close);
+  $('breath-next').addEventListener('click', next);
+  langHooks.push(() => { if (mode === 'run' && last) { const ph = last.replace(/\d+$/, ''); if (WORDS.nl[ph]) cueA[cueI].textContent = WORDS[lang()][ph]; } });
+  document.addEventListener('keydown', e => {
+    if (ov.hidden) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'Tab') {
+      const f = [...ov.querySelectorAll('button')].filter(b => b.offsetParent !== null);
+      const i = f.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+})();
+</script>
+</body>
+</html>
